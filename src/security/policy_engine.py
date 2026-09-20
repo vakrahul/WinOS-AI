@@ -166,7 +166,31 @@ class SecurityPolicyEngine:
                 approval_nonce=nonce,
             )
 
-        # 3. Default Fail-Closed
+        # 3. Browser Automation Tools
+        elif tool_name in ["browser_open_x", "browser_navigate"]:
+            url = arguments.get("url", "https://x.com")
+            if self.require_approvals:
+                nonce = secrets.token_hex(32)
+                self._pending_approvals[nonce] = {
+                    "tool_name": tool_name,
+                    "target": url,
+                    "session_id": session_id,
+                }
+                return ActionEvaluationResult(
+                    decision=PolicyDecision.REQUIRE_APPROVAL,
+                    risk_tier=RiskTier.MEDIUM,
+                    reason="Browser automation requires user confirmation to launch window",
+                    target_resource=url,
+                    approval_nonce=nonce,
+                )
+            return ActionEvaluationResult(
+                decision=PolicyDecision.ALLOW,
+                risk_tier=RiskTier.LOW,
+                reason="Browser automation permitted by policy",
+                target_resource=url,
+            )
+
+        # 4. Default Fail-Closed
         return ActionEvaluationResult(
             decision=PolicyDecision.DENY,
             risk_tier=RiskTier.HIGH,
