@@ -37,7 +37,7 @@ def redact_secrets(data: Any) -> Any:
         cleaned_dict = {}
         for k, v in data.items():
             # If key name itself indicates sensitive data, redact value entirely
-            if any(term in k.lower() for term in ["api_key", "secret", "password", "token", "private_key"]):
+            if any(term in k.lower() for term in ["api_key", "secret", "password", "auth_token", "access_token", "refresh_token", "session_token", "private_key"]):
                 cleaned_dict[k] = "[REDACTED_SECRET]"
             else:
                 cleaned_dict[k] = redact_secrets(v)

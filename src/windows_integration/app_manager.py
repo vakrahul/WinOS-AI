@@ -30,6 +30,18 @@ class AppManager:
             binary_path=os.path.expandvars(r"%SystemRoot%\System32\calc.exe"),
             requires_approval=False,
         ),
+        ApprovedApp(
+            app_id="chrome",
+            display_name="Google Chrome",
+            binary_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            requires_approval=False,
+        ),
+        ApprovedApp(
+            app_id="vscode",
+            display_name="Visual Studio Code",
+            binary_path=os.path.expandvars(r"%LocalAppData%\Programs\Microsoft VS Code\Code.exe"),
+            requires_approval=False,
+        ),
     ]
 
     def __init__(self):
