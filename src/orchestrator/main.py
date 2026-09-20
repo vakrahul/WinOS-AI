@@ -13,18 +13,19 @@ from pydantic import BaseModel, Field
 
 from src.orchestrator.config import AppConfig, get_config
 from src.providers.base import BaseModelProvider, ChatMessage, ProviderResponse
-from src.providers.mock_provider import MockProvider
+from src.providers.registry import ProviderRegistry
 from src.security.policy_engine import (
     ActionEvaluationResult,
     PolicyDecision,
     SecurityPolicyEngine,
 )
+from src.storage.credential_vault import CredentialVault
 
 
 class ChatRequest(BaseModel):
     messages: List[ChatMessage]
-    provider: Optional[str] = "mock"
-    model: Optional[str] = "mock-gpt-4o"
+    provider: Optional[str] = None
+    model: Optional[str] = None
     temperature: float = 0.7
     max_tokens: int = 1024
 
@@ -48,17 +49,32 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
         workspace_root=app_config.workspace_root,
         require_approvals=(app_config.security_level.value == "strict"),
     )
-    provider: BaseModelProvider = MockProvider(model_name=app_config.default_model)
+    
+    vault = CredentialVault()
+    provider_registry = ProviderRegistry(vault=vault)
+    provider_registry.initialize_from_vault()
+
+    def get_target_provider(requested_provider: Optional[str] = None) -> BaseModelProvider:
+        if requested_provider:
+            return provider_registry.get_provider(requested_provider)
+        if app_config.environment == "testing":
+            return provider_registry.get_provider(app_config.default_provider)
+        if "gemini" in provider_registry._providers:
+            return provider_registry.get_provider("gemini")
+        return provider_registry.get_provider(app_config.default_provider)
 
     @app.get("/health")
     async def health_check():
-        provider_healthy = await provider.health_check()
+        active_prov = get_target_provider()
+        provider_healthy = await active_prov.health_check()
         return {
             "status": "healthy" if provider_healthy else "degraded",
             "app": app_config.app_name,
             "version": app_config.app_version,
             "environment": app_config.environment,
+            "provider": active_prov.get_capabilities().provider_name,
             "provider_healthy": provider_healthy,
+            "configured_providers": provider_registry.list_providers(),
         }
 
     @app.get("/api/v1/config")
@@ -73,6 +89,7 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
 
     @app.post("/api/v1/chat", response_model=ProviderResponse)
     async def complete_chat(request: ChatRequest):
+        provider = get_target_provider(request.provider)
         response = await provider.complete(
             messages=request.messages,
             temperature=request.temperature,
@@ -105,6 +122,8 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
 
                 if action == "chat":
                     raw_messages = message_json.get("messages", [])
+                    req_prov = message_json.get("provider")
+                    provider = get_target_provider(req_prov)
                     messages = [ChatMessage(**m) for m in raw_messages]
 
                     # 1. Stream tokens

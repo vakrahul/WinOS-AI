@@ -18,7 +18,7 @@ class GeminiAdapter(BaseModelProvider):
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model_name: str = "gemini-2.0-flash",
+        model_name: str = "gemini-1.5-flash",
         base_url: str = "https://generativelanguage.googleapis.com/v1beta",
         timeout: float = 60.0,
     ):
