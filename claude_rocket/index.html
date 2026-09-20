@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WinAI Rocket Showcase — Antigravity Workspace</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .header h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .header p {
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(56, 189, 248, 0.1);
+      max-width: 960px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .rocket-stage {
+      width: 100%;
+      height: 520px;
+      background: radial-gradient(circle at 50% 30%, #1e293b 0%, #090d16 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .rocket-svg-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: floatRocket 3.5s ease-in-out infinite;
+    }
+    .rocket-svg-container svg {
+      max-height: 480px;
+      width: auto;
+      filter: drop-shadow(0 15px 30px rgba(249, 115, 22, 0.25));
+    }
+    @keyframes floatRocket {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-16px) rotate(0.8deg);
+      }
+    }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      width: 100%;
+      margin-top: 24px;
+    }
+    .spec-item {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 14px 18px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .spec-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #38bdf8;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .spec-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="badge">
+      <span>●</span> Active In Antigravity Workspace
+    </div>
+    <h1>Aerodynamic Explorer Rocket</h1>
+    <p>Hand-crafted design created by Windows AI Operating Environment</p>
+  </div>
+
+  <div class="card">
+    <div class="rocket-stage">
+      <div class="rocket-svg-container">
+        <!-- Exact same SVG rocket embedded directly -->
+        <object data="rocket.svg" type="image/svg+xml" style="width: 100%; height: 100%; pointer-events: none;"></object>
+      </div>
+    </div>
+
+    <div class="specs-grid">
+      <div class="spec-item">
+        <span class="spec-label">Nose Assembly</span>
+        <span class="spec-value">Crimson Aerodynamic Cone</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Fuselage</span>
+        <span class="spec-value">Segmented White Hull</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Viewports</span>
+        <span class="spec-value">Dual Riveted Portholes</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Stabilizers</span>
+        <span class="spec-value">Swept Delta Booster Fins</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Propulsion</span>
+        <span class="spec-value">Triple-Tier Fiery Exhaust</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Environment</span>
+        <span class="spec-value">Ringed Saturn &amp; Moon</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
