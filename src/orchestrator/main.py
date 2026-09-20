@@ -23,10 +23,15 @@ from src.security.policy_engine import (
 from src.storage.credential_vault import CredentialVault
 from src.windows_integration.system_app_scanner import SystemAppScanner
 from src.windows_integration.app_manager import AppManager
+from src.orchestrator.task_dispatcher import AutonomousTaskDispatcher
 
 
 class LaunchAppPayload(BaseModel):
     app_id: str
+
+
+class TaskDispatchPayload(BaseModel):
+    task: str
 
 
 class ChatRequest(BaseModel):
@@ -120,6 +125,13 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
             "default_provider": app_config.default_provider,
             "default_model": app_config.default_model,
         }
+
+    dispatcher = AutonomousTaskDispatcher(workspace_root=app_config.workspace_root)
+
+    @app.post("/api/v1/tasks/dispatch")
+    async def dispatch_task(payload: TaskDispatchPayload):
+        result = await dispatcher.execute_task(payload.task)
+        return result.model_dump()
 
     @app.post("/api/v1/chat", response_model=ProviderResponse)
     async def complete_chat(request: ChatRequest):

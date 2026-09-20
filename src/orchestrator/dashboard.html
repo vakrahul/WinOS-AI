@@ -485,27 +485,32 @@
       appendUserMessage(text);
       chatHistory.push({ role: 'user', content: text });
 
-      const thinkingMsg = appendAIMessage("Thinking &amp; planning task...");
+      const thinkingMsg = appendAIMessage("⏳ <em>Executing task on Windows system...</em>");
 
       try {
-        const res = await fetch('/api/v1/chat', {
+        const res = await fetch('/api/v1/tasks/dispatch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            provider: 'gemini',
-            messages: [
-              { role: 'system', content: 'You are the Windows AI Operating Environment desktop assistant for user Rahul Vakiti. When asked to perform tasks on applications, explain the action taken or provide complete results.' },
-              ...chatHistory
-            ]
-          })
+          body: JSON.stringify({ task: text })
         });
 
         const data = await res.json();
-        const reply = data.content || "Task executed successfully.";
-        thinkingMsg.innerHTML = reply.replace(/\n/g, '<br>');
-        chatHistory.push({ role: 'assistant', content: reply });
+        let replyHtml = (data.summary || "Task executed successfully.").replace(/\n/g, '<br>');
+
+        if (data.observable_evidence && data.observable_evidence.length > 0) {
+          replyHtml += `<div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; border-radius: 6px; font-size: 11px;">`;
+          replyHtml += `<strong>Observable Execution Evidence:</strong><br>`;
+          data.observable_evidence.forEach(ev => {
+            replyHtml += `✔ ${ev}<br>`;
+          });
+          replyHtml += `</div>`;
+        }
+
+        thinkingMsg.innerHTML = replyHtml;
+        chatHistory.push({ role: 'assistant', content: data.summary || "Task completed." });
+        loadApps(); // Refresh running app state
       } catch (err) {
-        thinkingMsg.innerHTML = `<span style="color: #ef4444;">Error executing task: ${err.message}</span>`;
+        thinkingMsg.innerHTML = `<span style="color: #ef4444;">❌ Error executing task: ${err.message}</span>`;
       }
     }
 

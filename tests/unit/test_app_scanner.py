@@ -39,4 +39,4 @@ def test_system_apps_endpoint():
         # Verify dashboard HTML endpoint
         dash_res = client.get("/dashboard")
         assert dash_res.status_code == 200
-        assert "Windows AI Control Center" in dash_res.text
+        assert "Windows AI Operating Environment" in dash_res.text
