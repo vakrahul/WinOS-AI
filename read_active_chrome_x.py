@@ -1,161 +1,134 @@
-"""Reads the first tweet from your existing, logged-in Google Chrome window and analyzes it with Gemini 3.1 Flash-Lite."""
+"""Accurately reads the visible X (Twitter) feed from your active Chrome window using Gemini 3.1 Flash-Lite Vision."""
 import asyncio
+import base64
 import ctypes
+import json
 from pathlib import Path
-import subprocess
 import time
 
-from src.providers.base import ChatMessage
-from src.providers.gemini_adapter import GeminiAdapter
+from PIL import ImageGrab
+import httpx
 from src.storage.credential_vault import CredentialVault
 
 user32 = ctypes.windll.user32
-kernel32 = ctypes.windll.kernel32
-
-# 64-bit Win32 API definitions
-user32.GetClipboardData.restype = ctypes.c_void_p
-user32.GetClipboardData.argtypes = [ctypes.c_uint]
-kernel32.GlobalLock.restype = ctypes.c_void_p
-kernel32.GlobalLock.argtypes = [ctypes.c_void_p]
-kernel32.GlobalUnlock.argtypes = [ctypes.c_void_p]
 
 
-def get_clipboard_text() -> str:
-    CF_UNICODETEXT = 13
-    if not user32.OpenClipboard(0):
-        return ""
-    try:
-        h_clip = user32.GetClipboardData(CF_UNICODETEXT)
-        if not h_clip:
-            return ""
-        ptr = kernel32.GlobalLock(h_clip)
-        if not ptr:
-            return ""
-        text = ctypes.wstring_at(ptr)
-        kernel32.GlobalUnlock(h_clip)
-        return text
-    finally:
-        user32.CloseClipboard()
-
-
-def get_chrome_hwnd() -> int:
-    cmd = [
-        "powershell",
-        "-NoProfile",
-        "-Command",
-        "(Get-Process chrome -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1).MainWindowHandle",
+class RECT(ctypes.Structure):
+    _fields_ = [
+        ("left", ctypes.c_long),
+        ("top", ctypes.c_long),
+        ("right", ctypes.c_long),
+        ("bottom", ctypes.c_long),
     ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
-    try:
-        return int(res.stdout.strip())
-    except Exception:
-        return 0
+
+
+def find_chrome_window():
+    found_hwnd = 0
+
+    def check_win(hwnd, _):
+        nonlocal found_hwnd
+        if user32.IsWindowVisible(hwnd):
+            length = user32.GetWindowTextLengthW(hwnd)
+            if length > 0:
+                buff = ctypes.create_unicode_buffer(length + 1)
+                user32.GetWindowTextW(hwnd, buff, length + 1)
+                if "Google Chrome" in buff.value:
+                    found_hwnd = hwnd
+                    return False
+        return True
+
+    CMPFUNC = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+    user32.EnumWindows(CMPFUNC(check_win), 0)
+    return found_hwnd
 
 
 def focus_window(hwnd: int):
     user32.keybd_event(0x12, 0, 0, 0)  # ALT down
     user32.ShowWindow(hwnd, 9)         # SW_RESTORE
+    user32.BringWindowToTop(hwnd)
     user32.SetForegroundWindow(hwnd)
     user32.keybd_event(0x12, 0, 2, 0)  # ALT up
 
 
 async def main():
     print("=" * 65)
-    print("   WINDOWS AI OPERATING ENVIRONMENT — ACTIVE BROWSER INSPECTION")
-    print("   Target: Existing Logged-in Google Chrome (X / Twitter)")
+    print("   WINDOWS AI OPERATING ENVIRONMENT — VISUAL BROWSER INSPECTION")
+    print("   Target: Active Logged-in Google Chrome (X / Twitter)")
     print("=" * 65)
 
-    # 1. Bring Chrome into active tab with X home
-    print("[1/3] Ensuring https://x.com/home is open in your existing Chrome...")
-    subprocess.run(["cmd", "/c", "start", "chrome", "https://x.com/home"], shell=False)
-    time.sleep(2.5)
-
-    hwnd = get_chrome_hwnd()
+    hwnd = find_chrome_window()
     if not hwnd:
-        print("[!] Could not obtain Chrome window handle.")
+        print("[!] No active Google Chrome window found.")
         return
 
-    # 2. Focus and read content
-    print(f"[2/3] Reading live feed from Chrome (Window Handle: {hwnd})...")
+    print(f"[1/3] Bringing your Chrome window (HWND: {hwnd}) to foreground...")
     focus_window(hwnd)
     time.sleep(1.0)
 
-    VK_CONTROL = 0x11
-    VK_A = 0x41
-    VK_C = 0x43
+    # Capture window bounds or full screen
+    rect = RECT()
+    user32.GetWindowRect(hwnd, ctypes.byref(rect))
 
-    # Select All (Ctrl + A)
-    user32.keybd_event(VK_CONTROL, 0, 0, 0)
-    user32.keybd_event(VK_A, 0, 0, 0)
-    time.sleep(0.1)
-    user32.keybd_event(VK_A, 0, 2, 0)
-    user32.keybd_event(VK_CONTROL, 0, 2, 0)
-    time.sleep(0.4)
+    print("[2/3] Capturing high-resolution visual snapshot of your active Chrome window...")
+    # Grab the window region
+    if rect.right > rect.left and rect.bottom > rect.top:
+        bbox = (max(0, rect.left), max(0, rect.top), rect.right, rect.bottom)
+        screenshot = ImageGrab.grab(bbox=bbox)
+    else:
+        screenshot = ImageGrab.grab()
 
-    # Copy (Ctrl + C)
-    user32.keybd_event(VK_CONTROL, 0, 0, 0)
-    user32.keybd_event(VK_C, 0, 0, 0)
-    time.sleep(0.1)
-    user32.keybd_event(VK_C, 0, 2, 0)
-    user32.keybd_event(VK_CONTROL, 0, 2, 0)
-    time.sleep(0.4)
+    screenshot_path = Path("active_x_feed.png")
+    screenshot.save(screenshot_path)
+    print(f"      Snapshot saved to {screenshot_path.name}")
 
-    raw_text = get_clipboard_text()
-    if not raw_text:
-        print("[!] No text captured from browser.")
-        return
-
-    lines = [l.strip() for l in raw_text.splitlines() if l.strip()]
-
-    # Extract first post after timeline header
-    author = "Unknown"
-    handle = ""
-    tweet_lines = []
-    found_timeline = False
-
-    for i, line in enumerate(lines):
-        if "Your Home Timeline" in line or "For you" in line:
-            found_timeline = True
-            for j in range(i + 1, min(i + 25, len(lines))):
-                curr = lines[j]
-                if curr.startswith("@") and not handle:
-                    handle = curr
-                    author = lines[j - 1]
-                    continue
-                if handle and not any(k in curr for k in ["Kuberhunt", "@KuberHunt", "Ad", "Who to follow", "Follow"]):
-                    if curr not in ["·", "1h", "2h", "3h", "4h", "5h", "now"]:
-                        tweet_lines.append(curr)
-                if len(tweet_lines) >= 3:
-                    break
-            if handle:
-                break
-
-    tweet_text = " ".join(tweet_lines).strip()
-
-    print("\n" + "=" * 65)
-    print("   FIRST TWEET DETECTED ON YOUR LIVE X FEED")
-    print("=" * 65)
-    print(f"Author: {author} ({handle})")
-    print(f"Text:   {tweet_text}")
-
-    # 3. Analyze with Gemini 3.1 Flash-Lite
-    print("\n[3/3] Sending to Gemini 3.1 Flash-Lite for verification...")
+    # Step 3: Run through Gemini 3.1 Flash-Lite Multimodal Vision
+    print("\n[3/3] Inspecting feed with Gemini 3.1 Flash-Lite Vision...")
     vault = CredentialVault()
     key = vault.get_credential("gemini")
-    if key:
-        gemini = GeminiAdapter(api_key=key, model_name="gemini-3.1-flash-lite")
-        prompt = (
-            f"The user's active Google Chrome browser was inspected on x.com. "
-            f"Here is the first tweet seen on their feed:\n\n"
-            f"Author: {author} ({handle})\n"
-            f"Tweet: {tweet_text}\n\n"
-            f"Please state clearly to the user what this tweet is about in 1-2 concise sentences."
-        )
-        resp = await gemini.complete([ChatMessage(role="user", content=prompt)])
-        print("\nGemini 3.1 Flash-Lite:")
-        print(resp.content)
-    else:
+    if not key:
         print("[!] Gemini API key not found in vault.")
+        return
+
+    img_b64 = base64.b64encode(screenshot_path.read_bytes()).decode("utf-8")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={key}"
+
+    prompt = (
+        "Examine this screenshot of Google Chrome showing the X (Twitter) timeline. "
+        "Locate the very first post/tweet in the main feed column under 'What's happening?'. "
+        "Extract and report: "
+        "\n1. Author / Account Name "
+        "\n2. Handle (@username) "
+        "\n3. Timestamp (e.g. 18m, 1h) "
+        "\n4. Exact Tweet Text "
+        "\n5. Attached Media/Image Description (if any) "
+        "\n6. Concise 1-sentence summary of the post."
+    )
+
+    payload = {
+        "contents": [{
+            "role": "user",
+            "parts": [
+                {"text": prompt},
+                {"inline_data": {"mime_type": "image/png", "data": img_b64}},
+            ],
+        }]
+    }
+
+    async with httpx.AsyncClient(timeout=40.0) as client:
+        res = await client.post(url, json=payload)
+        if res.status_code == 200:
+            content = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+            print("\n" + "=" * 65)
+            print("   DETECTION REPORT FROM GEMINI 3.1 FLASH-LITE")
+            print("=" * 65)
+            # Write to file to ensure clean UTF-8 rendering
+            Path("detected_tweet_report.txt").write_text(content, encoding="utf-8")
+            # Print with ASCII-safe replacement for standard Windows cmd
+            safe_content = content.encode("ascii", "replace").decode("ascii")
+            print(safe_content)
+            print("\n[+] Full report saved to 'detected_tweet_report.txt' (UTF-8).")
+        else:
+            print("[!] API Error:", res.status_code, res.text)
 
 
 if __name__ == "__main__":
