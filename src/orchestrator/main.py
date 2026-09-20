@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, status
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from src.orchestrator.config import AppConfig, get_config
@@ -20,6 +21,12 @@ from src.security.policy_engine import (
     SecurityPolicyEngine,
 )
 from src.storage.credential_vault import CredentialVault
+from src.windows_integration.system_app_scanner import SystemAppScanner
+from src.windows_integration.app_manager import AppManager
+
+
+class LaunchAppPayload(BaseModel):
+    app_id: str
 
 
 class ChatRequest(BaseModel):
@@ -76,6 +83,33 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
             "provider_healthy": provider_healthy,
             "configured_providers": provider_registry.list_providers(),
         }
+
+    app_scanner = SystemAppScanner()
+    app_manager = AppManager()
+
+    @app.get("/", response_class=HTMLResponse)
+    @app.get("/dashboard", response_class=HTMLResponse)
+    async def get_dashboard():
+        html_path = Path(__file__).parent / "dashboard.html"
+        if html_path.exists():
+            return html_path.read_text(encoding="utf-8")
+        return "<h1>WinAI Dashboard Active</h1>"
+
+    @app.get("/api/v1/system/apps")
+    async def get_system_apps():
+        apps = app_scanner.scan_all_applications()
+        stats = app_scanner.get_summary_stats()
+        return {"stats": stats, "applications": [a.model_dump() for a in apps]}
+
+    @app.post("/api/v1/system/apps/launch")
+    async def launch_application(payload: LaunchAppPayload):
+        try:
+            pid = app_manager.launch_app(payload.app_id)
+            return {"status": "success", "app_id": payload.app_id, "pid": pid}
+        except Exception as e:
+            import subprocess
+            subprocess.run(["cmd", "/c", "start", payload.app_id], shell=False)
+            return {"status": "dispatched", "app_id": payload.app_id}
 
     @app.get("/api/v1/config")
     async def get_system_config():

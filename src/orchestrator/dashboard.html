@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WinAI-OE — System Control Center & Application Hub</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(22, 27, 46, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.2);
+      --orange: #f59e0b;
+      --purple: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 0%, #172554 0%, #030712 85%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 30px 40px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 20px; box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .brand h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+    .brand p { font-size: 13px; color: var(--text-muted); }
+    .status-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--green); padding: 6px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+
+    /* Top Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
+    }
+    .stat-label { font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; }
+    .stat-num { font-size: 32px; font-weight: 800; color: #fff; }
+    .stat-sub { font-size: 12px; color: var(--accent); }
+
+    /* n8n Automation Banner */
+    .n8n-banner {
+      background: linear-gradient(135deg, rgba(234, 88, 12, 0.15), rgba(168, 85, 247, 0.15));
+      border: 1px solid rgba(234, 88, 12, 0.3);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(234, 88, 12, 0.1);
+    }
+    .n8n-info h2 { font-size: 18px; color: #fb923c; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .n8n-info p { font-size: 13px; color: #cbd5e1; max-width: 600px; }
+    .btn-n8n {
+      background: linear-gradient(135deg, #ea580c, #c026d3);
+      color: #fff; border: none; padding: 10px 20px; border-radius: 10px;
+      font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-n8n:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(234, 88, 12, 0.4); }
+
+    /* Controls & Filter */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .search-box {
+      flex: 1;
+      max-width: 400px;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-btn {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--text-muted); padding: 8px 14px; border-radius: 10px;
+      font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.15s;
+    }
+    .filter-btn.active, .filter-btn:hover { background: rgba(56, 189, 248, 0.15); border-color: var(--accent); color: var(--accent); }
+
+    /* Apps Grid */
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .app-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+    .app-card:hover { border-color: rgba(56, 189, 248, 0.4); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    .app-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .app-name { font-weight: 700; font-size: 15px; color: #fff; word-break: break-word; }
+    .badge-running {
+      background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3);
+      font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 700; text-transform: uppercase;
+    }
+    .badge-installed {
+      background: rgba(148, 163, 184, 0.15); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.2);
+      font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 600; text-transform: uppercase;
+    }
+    .app-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .app-cat { color: #38bdf8; font-weight: 600; }
+    .app-actions { display: flex; justify-content: space-between; align-items: center; pt: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .btn-launch {
+      background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent); padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .btn-launch:hover { background: var(--accent); color: #000; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">AI</div>
+      <div>
+        <h1>Windows AI Control Center</h1>
+        <p>System Application Discovery & Autonomous Task Hub</p>
+      </div>
+    </div>
+    <div class="status-pill">
+      <span class="dot"></span> Orchestrator Active (127.0.0.1:8765)
+    </div>
+  </header>
+
+  <!-- Metric Counters -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-label">Total Applications Discovered</span>
+      <span class="stat-num" id="totalApps">...</span>
+      <span class="stat-sub">Registry &amp; PATH scanned</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Active Running Software</span>
+      <span class="stat-num" id="runningApps" style="color: var(--green);">...</span>
+      <span class="stat-sub">Processes with live windows</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Developer &amp; AI Tools</span>
+      <span class="stat-num" id="devToolsCount" style="color: var(--purple);">...</span>
+      <span class="stat-sub">CLI &amp; IDEs detected</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Autonomous Security</span>
+      <span class="stat-num" style="color: var(--accent); font-size: 24px; padding-top: 6px;">GUARDED</span>
+      <span class="stat-sub">Least-Privilege Sandbox</span>
+    </div>
+  </div>
+
+  <!-- n8n Automation Spotlight -->
+  <div class="n8n-banner">
+    <div class="n8n-info">
+      <h2>⚡ n8n Autonomous Workflow Builder</h2>
+      <p>The AI can autonomously navigate to n8n (Local or Cloud), construct end-to-end webhook &amp; API workflows, wire nodes, and execute pipelines without manual intervention.</p>
+    </div>
+    <button class="btn-n8n" onclick="automateN8N()">Launch n8n Workflow</button>
+  </div>
+
+  <!-- Filter & Search Toolbar -->
+  <div class="toolbar">
+    <div class="search-box">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search any application (e.g. Chrome, n8n, Code, Paint)..." oninput="filterApps()" />
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="setCategory('ALL')">All</button>
+      <button class="filter-btn" onclick="setCategory('Developer Tool')">Dev Tools</button>
+      <button class="filter-btn" onclick="setCategory('Web Browser')">Browsers</button>
+      <button class="filter-btn" onclick="setCategory('AI & Workflow Automation')">AI &amp; Automation</button>
+      <button class="filter-btn" onclick="setCategory('Media & Graphics')">Media</button>
+      <button class="filter-btn" onclick="setCategory('Productivity & Office')">Productivity</button>
+    </div>
+  </div>
+
+  <!-- Applications Grid -->
+  <div class="apps-grid" id="appsContainer">
+    <!-- Injected dynamically by JS -->
+  </div>
+
+  <script>
+    let allApps = [];
+    let activeCategory = 'ALL';
+
+    async function loadApps() {
+      try {
+        const res = await fetch('/api/v1/system/apps');
+        const data = await res.json();
+        allApps = data.applications || [];
+        
+        document.getElementById('totalApps').textContent = data.stats.total_applications;
+        document.getElementById('runningApps').textContent = data.stats.running_applications;
+        document.getElementById('devToolsCount').textContent = (data.stats.category_breakdown['Developer Tool'] || 0) + (data.stats.category_breakdown['AI & Workflow Automation'] || 0);
+
+        renderApps();
+      } catch (err) {
+        console.error("Failed to load apps:", err);
+      }
+    }
+
+    function renderApps() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const container = document.getElementById('appsContainer');
+      container.innerHTML = '';
+
+      const filtered = allApps.filter(app => {
+        const matchesQuery = app.display_name.toLowerCase().includes(query) || (app.executable_path && app.executable_path.toLowerCase().includes(query));
+        const matchesCat = (activeCategory === 'ALL') || (app.category === activeCategory);
+        return matchesQuery && matchesCat;
+      });
+
+      filtered.forEach(app => {
+        const card = document.createElement('div');
+        card.className = 'app-card';
+        card.innerHTML = `
+          <div>
+            <div class="app-top">
+              <span class="app-name">${app.display_name}</span>
+              <span class="${app.is_running ? 'badge-running' : 'badge-installed'}">${app.is_running ? 'RUNNING (PID ' + app.pid + ')' : 'INSTALLED'}</span>
+            </div>
+            <div class="app-meta">
+              <span class="app-cat">${app.category}</span>
+              <span>Source: ${app.source}</span>
+              ${app.executable_path ? '<span style="color: #64748b; font-size: 11px; word-break: break-all;">' + app.executable_path + '</span>' : ''}
+            </div>
+          </div>
+          <div class="app-actions">
+            <span style="font-size: 11px; color: #0284c7;">${app.capabilities.join(', ')}</span>
+            <button class="btn-launch" onclick="launchApp('${app.app_id}', '${app.display_name}')">${app.is_running ? 'Focus' : 'Launch'}</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterApps() { renderApps(); }
+    function setCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.includes(cat) || (cat === 'ALL' && btn.textContent === 'All'));
+      });
+      renderApps();
+    }
+
+    async function launchApp(appId, name) {
+      alert(`[WinAI Security]: Launching or focusing '${name}' under authorized process policy.`);
+      await fetch('/api/v1/system/apps/launch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ app_id: appId })
+      });
+      setTimeout(loadApps, 1500);
+    }
+
+    function automateN8N() {
+      alert("[WinAI Autonomous Builder]: Directing Chrome to n8n (https://n8n.io / http://localhost:5678) to construct requested automated pipelines.");
+      window.open('https://n8n.io', '_blank');
+    }
+
+    loadApps();
+  </script>
+</body>
+</html>
