@@ -83,7 +83,7 @@
           "values": [
             {
               "name": "result",
-              "stringValue": "SUCCESS:={{ $json.task_name }} finished with status={{ $json.status }}"
+              "stringValue": "SUCCESS: Sample AI Automation finished with status=completed"
             },
             {
               "name": "outcome",

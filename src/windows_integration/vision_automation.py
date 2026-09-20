@@ -162,3 +162,88 @@ class DynamicVisionDetector:
                     "box": (x, y, w, h),
                 })
         return buttons
+
+
+class VisualButtonInteractor:
+    """Uses vision to identify any button in an open application and clicks it."""
+
+    def __init__(self, cursor_controller: Optional[HumanCursorController] = None):
+        self.cursor = cursor_controller or HumanCursorController()
+
+    async def identify_and_click_button(
+        self,
+        hwnd: int,
+        button_label: str,
+        gemini_api_key: str,
+    ) -> Dict[str, Any]:
+        """Locates button on screen by label, smoothly moves cursor, clicks, and verifies."""
+        from pathlib import Path
+        import base64
+        import httpx
+        import re
+
+        # 1. Bring window to foreground
+        cur_thread = kernel32.GetCurrentThreadId()
+        fg_hwnd = user32.GetForegroundWindow()
+        fg_thread = user32.GetWindowThreadProcessId(fg_hwnd, None)
+        user32.AttachThreadInput(cur_thread, fg_thread, True)
+        user32.ShowWindow(hwnd, 3) # Maximize
+        user32.SetForegroundWindow(hwnd)
+        user32.BringWindowToTop(hwnd)
+        user32.AttachThreadInput(cur_thread, fg_thread, False)
+        time.sleep(1.0)
+
+        # 2. Capture screenshot of window
+        rect = RECT()
+        user32.GetWindowRect(hwnd, ctypes.byref(rect))
+        img = ImageGrab.grab(bbox=(max(0, rect.left), max(0, rect.top), rect.right, rect.bottom))
+        snap_path = Path(f"button_search_{int(time.time()*1000)}.png")
+        img.save(snap_path)
+
+        # 3. Ask Gemini Vision for exact coordinates of button
+        b64 = base64.b64encode(snap_path.read_bytes()).decode("utf-8")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={gemini_api_key}"
+        prompt = (
+            f"Look at this screenshot of the window. Find the button labeled '{button_label}'. "
+            f"Return ONLY its center X and Y pixel coordinates within this image in the format: X, Y. "
+            f"Do not write any other words."
+        )
+        payload = {
+            "contents": [{
+                "role": "user",
+                "parts": [
+                    {"text": prompt},
+                    {"inline_data": {"mime_type": "image/png", "data": b64}}
+                ]
+            }]
+        }
+
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            res = await client.post(url, json=payload)
+            if res.status_code != 200:
+                return {"success": False, "error": f"API error: {res.status_code}"}
+
+            coords_text = res.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+            m = re.search(r"(\d+)\s*,\s*(\d+)", coords_text)
+            if not m:
+                return {"success": False, "error": f"Could not parse coordinates: '{coords_text}'"}
+
+            target_x = int(m.group(1)) + max(0, rect.left)
+            target_y = int(m.group(2)) + max(0, rect.top)
+
+            # 4. Smoothly move cursor and click
+            self.cursor.click_smooth(target_x, target_y, duration=0.8)
+            time.sleep(2.0)
+
+            # 5. Capture post-action verification
+            post_img = ImageGrab.grab(bbox=(max(0, rect.left), max(0, rect.top), rect.right, rect.bottom))
+            post_snap = Path(f"post_click_{int(time.time()*1000)}.png")
+            post_img.save(post_snap)
+
+            return {
+                "success": True,
+                "button_label": button_label,
+                "detected_coordinates": (target_x, target_y),
+                "pre_snapshot": str(snap_path),
+                "post_snapshot": str(post_snap),
+            }
