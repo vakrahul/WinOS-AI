@@ -95,7 +95,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0073 | Error contracts and fail-closed handling — Core implementation | DONE | `src/orchestrator/errors.py` hierarchy; `tests/unit/test_phase_0073_error_hierarchy.py` 1/1 passed |
 | PHASE 0074 | Error contracts and fail-closed handling — Hardening, edge cases and security review | DONE | traceback-free payloads; `tests/unit/test_phase_0074_error_hardening.py` 2/2 passed |
 | PHASE 0075 | Error contracts and fail-closed handling — Integration, regression tests and sign-off | DONE | live 404 denial surface; `tests/unit/test_phase_0075_error_signoff.py` 1/1 passed |
-| PHASE 0076–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0076 | Async task supervision and cancellation — Inventory and current-state audit | DONE | `docs/PHASE_0076_REPORT.md`; `tests/unit/test_phase_0076_supervision_audit.py` 1/1 passed |
+| PHASE 0077 | Async task supervision and cancellation — Design specification and acceptance criteria | DONE | `docs/ASYNC_SUPERVISION_SPEC.md`; `tests/unit/test_phase_0077_supervision_spec.py` 1/1 passed |
+| PHASE 0078 | Async task supervision and cancellation — Core implementation | DONE | `TaskCoordinator.cancel_plan()`; `tests/unit/test_phase_0078_cancel_plan.py` 1/1 passed |
+| PHASE 0079 | Async task supervision and cancellation — Hardening, edge cases and security review | DONE | timeout fail-closed gates; `tests/unit/test_phase_0079_timeout_hardening.py` 1/1 passed |
+| PHASE 0080 | Async task supervision and cancellation — Integration, regression tests and sign-off | DONE | full mock execution verified; `tests/unit/test_phase_0080_supervision_signoff.py` 1/1 passed |
+| PHASE 0081–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

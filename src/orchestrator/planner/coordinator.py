@@ -55,6 +55,16 @@ class TaskCoordinator:
         cached = self.checkpoints.get(plan_id)
         return cached.model_copy(deep=True) if cached else None
 
+    def cancel_plan(self, plan: TaskPlan, reason: str = "Cancelled by user") -> TaskPlan:
+        """Cancel all incomplete subtasks and record a checkpoint."""
+        for subtask in plan.subtasks:
+            if subtask.state in (TaskState.PENDING, TaskState.IN_PROGRESS):
+                subtask.state = TaskState.CANCELLED
+                subtask.error = reason
+        plan.state = TaskState.CANCELLED
+        self.save_checkpoint(plan)
+        return plan
+
     async def execute_plan(
         self,
         plan: TaskPlan,
