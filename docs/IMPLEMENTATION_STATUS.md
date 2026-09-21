@@ -135,7 +135,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0113 | Main conversation workspace — Core implementation | DONE | `scripts/check_chat_contract.py`; `tests/unit/test_phase_0113_chat_contract.py` 1/1 passed |
 | PHASE 0114 | Main conversation workspace — Hardening, edge cases and security review | DONE | hostile-role rejection; `tests/unit/test_phase_0114_role_hardening.py` 2/2 passed |
 | PHASE 0115 | Main conversation workspace — Integration, regression tests and sign-off | DONE | CLI + mock round-trip; `tests/unit/test_phase_0115_chat_signoff.py` 2/2 passed |
-| PHASE 0116–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0116 | Agent activity panel — Inventory and current-state audit | DONE | `docs/PHASE_0116_REPORT.md`; `tests/unit/test_phase_0116_activity_audit.py` 1/1 passed |
+| PHASE 0117 | Agent activity panel — Design specification and acceptance criteria | DONE | `docs/AGENT_ACTIVITY_SPEC.md`; `tests/unit/test_phase_0117_activity_spec.py` 1/1 passed |
+| PHASE 0118 | Agent activity panel — Core implementation | DONE | panel status vocabulary + gate; `tests/unit/test_phase_0118_panel_status.py` 1/1 passed |
+| PHASE 0119 | Agent activity panel — Hardening, edge cases and security review | DONE | case-sensitive rejection; `tests/unit/test_phase_0119_panel_hardening.py` 1/1 passed |
+| PHASE 0120 | Agent activity panel — Integration, regression tests and sign-off | DONE | C#/Python vocabulary mirror; `tests/unit/test_phase_0120_activity_signoff.py` 1/1 passed |
+| PHASE 0121–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

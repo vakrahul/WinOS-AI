@@ -22,6 +22,24 @@ class ExecutionStage(str, Enum):
     CANCELLED = "CANCELLED"
 
 
+AGENT_PANEL_STATUSES = (
+    "Idle",
+    "Planning",
+    "ExecutingTool",
+    "AwaitingApproval",
+    "Completed",
+    "Failed",
+    "Terminated",
+)
+
+TERMINAL_PANEL_STATUSES = ("Completed", "Failed", "Terminated")
+
+
+def is_known_panel_status(status: str) -> bool:
+    """Return True for recognized agent activity panel states."""
+    return status in AGENT_PANEL_STATUSES
+
+
 class VerificationVerdict(str, Enum):
     COMPLETED_AND_VERIFIED = "COMPLETED_AND_VERIFIED"
     COMPLETED_UNVERIFIED = "COMPLETED_UNVERIFIED"
