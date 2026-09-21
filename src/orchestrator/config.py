@@ -89,6 +89,16 @@ class AppConfig(BaseSettings):
         """Resolve symbolic links and relative tokens to absolute paths."""
         return v.resolve()
 
+    def public_config_dict(self) -> dict:
+        """Return the safe, non-secret subset for client-facing endpoints."""
+        return {
+            "environment": self.environment,
+            "security_level": self.security_level,
+            "workspace_root": str(self.workspace_root),
+            "default_provider": self.default_provider,
+            "default_model": self.default_model,
+        }
+
 
 def get_config(**overrides) -> AppConfig:
     """Load and return application settings with optional runtime overrides."""

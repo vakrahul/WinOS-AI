@@ -118,13 +118,7 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
 
     @app.get("/api/v1/config")
     async def get_system_config():
-        return {
-            "environment": app_config.environment,
-            "security_level": app_config.security_level,
-            "workspace_root": str(app_config.workspace_root),
-            "default_provider": app_config.default_provider,
-            "default_model": app_config.default_model,
-        }
+        return app_config.public_config_dict()
 
     dispatcher = AutonomousTaskDispatcher(workspace_root=app_config.workspace_root)
 
