@@ -110,7 +110,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0088 | Graceful shutdown and resource cleanup — Core implementation | DONE | `create_server_config()`; `tests/unit/test_phase_0088_server_config.py` 1/1 passed |
 | PHASE 0089 | Graceful shutdown and resource cleanup — Hardening, edge cases and security review | DONE | non-loopback rejection gates; `tests/unit/test_phase_0089_server_hardening.py` 1/1 passed |
 | PHASE 0090 | Graceful shutdown and resource cleanup — Integration, regression tests and sign-off | DONE | import-safe entry module; `tests/unit/test_phase_0090_shutdown_signoff.py` 1/1 passed |
-| PHASE 0091–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0091 | Dependency versioning and reproducibility — Inventory and current-state audit | DONE | `docs/PHASE_0091_REPORT.md`; `tests/unit/test_phase_0091_drift_audit.py` 1/1 passed |
+| PHASE 0092 | Dependency versioning and reproducibility — Design specification and acceptance criteria | DONE | `docs/DEPENDENCY_REPRO_SPEC.md`; `tests/unit/test_phase_0092_repro_spec.py` 1/1 passed |
+| PHASE 0093 | Dependency versioning and reproducibility — Core implementation | DONE | `scripts/check_dependency_drift.py`; `tests/unit/test_phase_0093_drift_check.py` 1/1 passed |
+| PHASE 0094 | Dependency versioning and reproducibility — Hardening, edge cases and security review | DONE | bidirectional drift detection; `tests/unit/test_phase_0094_drift_hardening.py` 1/1 passed |
+| PHASE 0095 | Dependency versioning and reproducibility — Integration, regression tests and sign-off | DONE | CLI exit 0; `tests/unit/test_phase_0095_drift_signoff.py` 1/1 passed |
+| PHASE 0096–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
