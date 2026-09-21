@@ -34,7 +34,8 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0012 | FastAPI entry point and app factory — Design specification and acceptance criteria | DONE | `docs/ENTRYPOINT_SPEC.md`; `tests/unit/test_phase_0012_entrypoint_spec.py` 2/2 passed; regression `test_config.py` 5/5 passed |
 | PHASE 0013 | FastAPI entry point and app factory — Core implementation | DONE | `list_registered_routes()` in `src/orchestrator/main.py`; `tests/unit/test_phase_0013_route_inventory.py` 1/1 passed; regression `test_vertical_slice.py` 6/6 passed |
 | PHASE 0014 | FastAPI entry point and app factory — Hardening, edge cases and security review | DONE | secret-hygiene gates on `/health` and `/api/v1/config`; `tests/unit/test_phase_0014_config_hygiene.py` 2/2 passed |
-| PHASE 0015–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0015 | FastAPI entry point and app factory — Integration, regression tests and sign-off | DONE | core route surface sign-off; `tests/unit/test_phase_0015_entry_signoff.py` 1/1 passed; baseline 3/3 passed |
+| PHASE 0016–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
