@@ -1,4 +1,4 @@
-"""PHASE 0003: enforce the normative top-level repository layout.
+"""Enforce the normative top-level repository layout (PHASE 0003, hardened 0004).
 
 Validates `docs/REPO_LAYOUT_SPEC.md` section 1 and 3 without modifying
 runtime behavior. Exits 0 when compliant, 1 with violation list otherwise.
@@ -39,18 +39,46 @@ GITIGNORE_TOKENS = (
 )
 
 
+REQUIRED_DIRS = ("src", "tests", "docs", "scripts")
+REQUIRED_FILES = (
+    "pyproject.toml",
+    "requirements.txt",
+    "pytest.ini",
+    "run_vertical_slice.py",
+    ".gitignore",
+    "README.md",
+)
+
+FORBIDDEN_COMMITTED_NAMES = (".env", "id_rsa", "id_ed25519", "secrets.json")
+
+
 def check_layout(root: Path = ROOT) -> list:
     violations = []
     for name in REQUIRED_ENTRIES:
         if not (root / name).exists():
             violations.append(f"missing required top-level entry: {name}")
+    for name in REQUIRED_DIRS:
+        p = root / name
+        if p.exists() and not p.is_dir():
+            violations.append(f"required directory is not a directory: {name}")
+    for name in REQUIRED_FILES:
+        p = root / name
+        if p.exists() and not p.is_file():
+            violations.append(f"required file is not a regular file: {name}")
     for name in REQUIRED_DOCS:
         if not (root / "docs" / name).exists():
             violations.append(f"missing required doc: {name}")
-    gitignore = (root / ".gitignore").read_text(encoding="utf-8")
+    gitignore_path = root / ".gitignore"
+    if not gitignore_path.is_file():
+        violations.append("missing required top-level entry: .gitignore")
+        return violations
+    gitignore = gitignore_path.read_text(encoding="utf-8")
     for token in GITIGNORE_TOKENS:
         if token not in gitignore:
             violations.append(f".gitignore must exclude {token}")
+    for name in FORBIDDEN_COMMITTED_NAMES:
+        if (root / name).exists():
+            violations.append(f"secret-like file must not be committed at top level: {name}")
     return violations
 
 
