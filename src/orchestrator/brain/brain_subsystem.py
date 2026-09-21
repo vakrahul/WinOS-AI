@@ -21,6 +21,10 @@ class BrainSubsystem:
         self.project = ProjectMemory(workspace_root=self.workspace_root)
         self.prioritizer = ContextPrioritizer()
 
+    def tier_names(self) -> list:
+        """Return the active memory tier names for diagnostics (no content)."""
+        return ["working", "persistent", "semantic", "project", "prioritizer"]
+
     def assemble_context(self, query: str, max_tokens: int = 4096) -> str:
         """Retrieve and prioritize context across all tiers for an incoming query."""
         working_ctx = self.working.get_context_summary()

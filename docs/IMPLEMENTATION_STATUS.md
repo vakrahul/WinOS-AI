@@ -50,7 +50,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0028 | Provider adapters and resilience — Core implementation | DONE | `ProviderRegistry.registered_ids()`; `tests/unit/test_phase_0028_registry_ids.py` 1/1 passed |
 | PHASE 0029 | Provider adapters and resilience — Hardening, edge cases and security review | DONE | breaker transition + registration guards; `tests/unit/test_phase_0029_resilience_hardening.py` 2/2 passed |
 | PHASE 0030 | Provider adapters and resilience — Integration, regression tests and sign-off | DONE | 5-adapter registry surface verified; `tests/unit/test_phase_0030_adapter_signoff.py` 1/1 passed |
-| PHASE 0031–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0031 | Brain memory tiers and context engine — Inventory and current-state audit | DONE | `docs/PHASE_0031_REPORT.md`; `tests/unit/test_phase_0031_brain_audit.py` 2/2 passed |
+| PHASE 0032 | Brain memory tiers and context engine — Design specification and acceptance criteria | DONE | `docs/BRAIN_MEMORY_SPEC.md`; `tests/unit/test_phase_0032_brain_spec.py` 1/1 passed |
+| PHASE 0033 | Brain memory tiers and context engine — Core implementation | DONE | `BrainSubsystem.tier_names()`; `tests/unit/test_phase_0033_tier_names.py` 1/1 passed |
+| PHASE 0034 | Brain memory tiers and context engine — Hardening, edge cases and security review | DONE | empty-state and unknown-ID guards; `tests/unit/test_phase_0034_brain_hardening.py` 2/2 passed |
+| PHASE 0035 | Brain memory tiers and context engine — Integration, regression tests and sign-off | DONE | store/retrieve round-trip verified; `tests/unit/test_phase_0035_brain_signoff.py` 1/1 passed |
+| PHASE 0036–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
