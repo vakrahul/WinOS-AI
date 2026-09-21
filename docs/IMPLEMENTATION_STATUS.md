@@ -26,7 +26,8 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0007 | Python packaging and dependency pins — Design specification and acceptance criteria | DONE | `docs/PACKAGING_SPEC.md`; `tests/unit/test_phase_0007_packaging_spec.py` 1/1 passed |
 | PHASE 0008 | Python packaging and dependency pins — Core implementation | DONE | `scripts/check_packaging.py`; `tests/unit/test_phase_0008_packaging_check.py` 1/1 passed |
 | PHASE 0009 | Python packaging and dependency pins — Hardening, edge cases and security review | DONE | hardened `scripts/check_packaging.py`; `tests/unit/test_phase_0009_packaging_hardening.py` 2/2 passed |
-| PHASE 0010–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0010 | Python packaging and dependency pins — Integration, regression tests and sign-off | DONE | CLI `scripts/check_packaging.py` exit 0; `tests/unit/test_phase_0010_packaging_signoff.py` 1/1 passed |
+| PHASE 0011–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
