@@ -107,16 +107,37 @@ Unlike conventional chatbots or unconstrained desktop automation scripts, **WinA
 
 ## 4. Test Suite & Verification Net
 
-The system maintains an automated test net of **82 tests with a 100% pass rate**:
+The system maintains an automated test net of **407 tests with a 100% pass rate**:
 
 ```powershell
 python -m pytest tests
-============================= 82 passed in 34.36s =============================
+============================= 407 passed =============================
 ```
 
 * **Unit Tests (44):** Configuration, logging, DPAPI vault, multi-provider contracts, brain memory tiers, error reflection, token optimization, and specialized agent registries.
 * **Integration Tests (26):** FastAPI orchestrator endpoints, WebSocket streaming, scoped file rollback, subprocess runner env-scrubbing, project builder lifecycle, and browser session locking.
 * **Security & Adversarial Tests (12):** Directory traversal attempts, null-byte injections, schema tampering, approval nonce forgery/replay, prompt-injection taint tracking, privilege escalation blocking, and emergency kill-switch responsiveness.
+* **JEV Decision-Layer Tests:** Abstraction, routing, agent/model advisors, security gateway, context packing, usage tracking, UI service, benchmarks, and validation gaps — all additive alongside the baseline.
+
+---
+
+## 4b. JEV Decision Layer (TypeSafe AI Jev Integration)
+
+Jev is a fast, non-generative **System One decision model** used here strictly as an
+**advisory classifier** (task routing, agent/model/tool selection, guardrails,
+context pruning). It never generates content, never authorizes actions, and never
+bypasses the security policy engine.
+
+* **Code:** `src/orchestrator/jev/` (abstraction, mock adapter, router, agent/model
+  advisors, security gateway, context packer, usage tracker, service, benchmarks).
+* **Docs:** `docs/jev/` (audit, abstraction, routing, agents, model routing, security,
+  context, usage, UI, plus Stage-12 architecture/configuration/testing/benchmarks/
+  troubleshooting guides).
+* **Status:** Provider abstraction + mock adapter verified; live TypeSafe AI API is
+  early-access, so production traffic uses the clearly labelled `mock-jev` simulator
+  until verified credentials are configured. Disable anytime via the dashboard JEV
+  card or `POST /api/v1/jev/config {"enabled": false}` — the application runs
+  identically without it.
 
 ---
 
