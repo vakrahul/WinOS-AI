@@ -20,6 +20,11 @@ DEV_ONLY = ("pytest", "pytest-asyncio", "ruff", "mypy")
 
 def check_packaging(root: Path = ROOT) -> list:
     violations = []
+    for manifest in ("pyproject.toml", "requirements.txt", "requirements-dev.txt"):
+        if not (root / manifest).is_file():
+            violations.append(f"missing required manifest: {manifest}")
+    if violations:
+        return violations
     try:
         data = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
     except Exception as e:
@@ -37,6 +42,10 @@ def check_packaging(root: Path = ROOT) -> list:
     for tool in DEV_ONLY:
         if tool in req:
             violations.append(f"dev-only package leaked into requirements.txt: {tool}")
+    for label, text in (("requirements.txt", req), ("requirements-dev.txt", dev)):
+        lines = [ln.strip() for ln in text.splitlines() if ln.strip() and not ln.strip().startswith("#")]
+        if len(lines) != len(set(lines)):
+            violations.append(f"duplicate entries detected in {label}")
     for manifest in ("pyproject.toml", "requirements.txt", "requirements-dev.txt"):
         text = (root / manifest).read_text(encoding="utf-8").lower()
         for bad in ("password", "secret", "http://", "@"):
