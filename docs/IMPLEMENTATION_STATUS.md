@@ -65,7 +65,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0043 | Windows integration and security core — Core implementation | DONE | `ScopedFileService.safe_join()`; `tests/unit/test_phase_0043_safe_join.py` 1/1 passed |
 | PHASE 0044 | Windows integration and security core — Hardening, edge cases and security review | DONE | traversal/rollback guards; `tests/unit/test_phase_0044_fs_hardening.py` 2/2 passed |
 | PHASE 0045 | Windows integration and security core — Integration, regression tests and sign-off | DONE | write/read/rollback + policy round-trip; `tests/unit/test_phase_0045_fs_signoff.py` 1/1 passed |
-| PHASE 0046–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0046 | Test suite health and docs baseline — Inventory and current-state audit | DONE | `docs/PHASE_0046_REPORT.md`; `tests/unit/test_phase_0046_test_inventory.py` 2/2 passed |
+| PHASE 0047 | Test suite health and docs baseline — Design specification and acceptance criteria | DONE | `docs/TEST_HEALTH_SPEC.md`; `tests/unit/test_phase_0047_test_spec.py` 1/1 passed |
+| PHASE 0048 | Test suite health and docs baseline — Core implementation | DONE | `scripts/check_test_inventory.py`; `tests/unit/test_phase_0048_test_check.py` 1/1 passed |
+| PHASE 0049 | Test suite health and docs baseline — Hardening, edge cases and security review | DONE | missing-fixture detection; `tests/unit/test_phase_0049_inventory_hardening.py` 2/2 passed |
+| PHASE 0050 | Test suite health and docs baseline — Integration, regression tests and sign-off | DONE | CLI exit 0 + suite counts; `tests/unit/test_phase_0050_health_signoff.py` 2/2 passed |
+| PHASE 0051–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
