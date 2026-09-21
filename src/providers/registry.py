@@ -22,6 +22,10 @@ class ProviderRegistry:
 
     def register_provider(self, provider_id: str, provider: BaseModelProvider) -> None:
         """Register a new provider adapter instance."""
+        if not isinstance(provider, BaseModelProvider):
+            raise TypeError(
+                f"Refused to register '{provider_id}': not a BaseModelProvider."
+            )
         self._providers[provider_id] = provider
 
     def has_provider(self, provider_id: str) -> bool:
