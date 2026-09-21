@@ -193,7 +193,7 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
                     await websocket.send_json({"event": "done"})
 
                 elif action == "cancel":
-                    await websocket.send_json({"event": "cancelled"})
+                    await websocket.send_json(build_cancelled_event())
 
         except WebSocketDisconnect:
             pass
@@ -208,6 +208,11 @@ WS_INBOUND_ACTIONS = ("chat", "cancel")
 def is_known_ws_event(event: str) -> bool:
     """Return True for protocol-defined outbound websocket events."""
     return event in WS_OUTBOUND_EVENTS
+
+
+def build_cancelled_event() -> dict:
+    """Build the idempotent cancellation acknowledgement frame."""
+    return {"event": "cancelled"}
 
 
 def build_health_payload(

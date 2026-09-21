@@ -180,7 +180,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0158 | Streaming token pipeline — Core implementation | DONE | `collect_stream()` with truncation; `tests/unit/test_phase_0158_collect_stream.py` 2/2 passed |
 | PHASE 0159 | Streaming token pipeline — Hardening, edge cases and security review | DONE | empty-stream + cancellation gates; `tests/unit/test_phase_0159_stream_hardening.py` 2/2 passed |
 | PHASE 0160 | Streaming token pipeline — Integration, regression tests and sign-off | DONE | live mock collection; `tests/unit/test_phase_0160_stream_signoff.py` 1/1 passed |
-| PHASE 0161–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0161 | Cancellation and stop generation — Inventory and current-state audit | DONE | `docs/PHASE_0161_REPORT.md`; `tests/unit/test_phase_0161_cancel_audit.py` 1/1 passed |
+| PHASE 0162 | Cancellation and stop generation — Design specification and acceptance criteria | DONE | `docs/CANCELLATION_SPEC.md`; `tests/unit/test_phase_0162_cancel_spec.py` 1/1 passed |
+| PHASE 0163 | Cancellation and stop generation — Core implementation | DONE | `build_cancelled_event()` wired into endpoint; `tests/unit/test_phase_0163_cancel_event.py` 1/1 passed |
+| PHASE 0164 | Cancellation and stop generation — Hardening, edge cases and security review | DONE | double-cancel safety; `tests/unit/test_phase_0164_cancel_hardening.py` 1/1 passed |
+| PHASE 0165 | Cancellation and stop generation — Integration, regression tests and sign-off | DONE | live cancel round-trip; `tests/unit/test_phase_0165_cancel_signoff.py` 1/1 passed |
+| PHASE 0166–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
