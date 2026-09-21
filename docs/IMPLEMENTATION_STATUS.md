@@ -125,7 +125,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0103 | WinUI 3 shell and app manifest — Core implementation | DONE | `scripts/check_client_shell.py`; `tests/unit/test_phase_0103_shell_check.py` 1/1 passed |
 | PHASE 0104 | WinUI 3 shell and app manifest — Hardening, edge cases and security review | DONE | malformed-XML detection; `tests/unit/test_phase_0104_shell_hardening.py` 2/2 passed |
 | PHASE 0105 | WinUI 3 shell and app manifest — Integration, regression tests and sign-off | DONE | CLI exit 0; `tests/unit/test_phase_0105_shell_signoff.py` 1/1 passed |
-| PHASE 0106–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0106 | Navigation shell and routing — Inventory and current-state audit | DONE | `docs/PHASE_0106_REPORT.md`; `tests/unit/test_phase_0106_nav_audit.py` 1/1 passed |
+| PHASE 0107 | Navigation shell and routing — Design specification and acceptance criteria | DONE | `docs/NAVIGATION_SPEC.md`; `tests/unit/test_phase_0107_nav_spec.py` 1/1 passed |
+| PHASE 0108 | Navigation shell and routing — Core implementation | DONE | `scripts/check_navigation.py`; `tests/unit/test_phase_0108_nav_check.py` 1/1 passed |
+| PHASE 0109 | Navigation shell and routing — Hardening, edge cases and security review | DONE | unknown-destination rejection; `tests/unit/test_phase_0109_nav_hardening.py` 2/2 passed |
+| PHASE 0110 | Navigation shell and routing — Integration, regression tests and sign-off | DONE | CLI exit 0; `tests/unit/test_phase_0110_nav_signoff.py` 1/1 passed |
+| PHASE 0111–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
