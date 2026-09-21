@@ -100,7 +100,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0078 | Async task supervision and cancellation — Core implementation | DONE | `TaskCoordinator.cancel_plan()`; `tests/unit/test_phase_0078_cancel_plan.py` 1/1 passed |
 | PHASE 0079 | Async task supervision and cancellation — Hardening, edge cases and security review | DONE | timeout fail-closed gates; `tests/unit/test_phase_0079_timeout_hardening.py` 1/1 passed |
 | PHASE 0080 | Async task supervision and cancellation — Integration, regression tests and sign-off | DONE | full mock execution verified; `tests/unit/test_phase_0080_supervision_signoff.py` 1/1 passed |
-| PHASE 0081–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0081 | Loopback IPC and WebSocket streaming — Inventory and current-state audit | DONE | `docs/PHASE_0081_REPORT.md`; `tests/unit/test_phase_0081_ws_audit.py` 1/1 passed |
+| PHASE 0082 | Loopback IPC and WebSocket streaming — Design specification and acceptance criteria | DONE | `docs/WEBSOCKET_SPEC.md`; `tests/unit/test_phase_0082_ws_spec.py` 1/1 passed |
+| PHASE 0083 | Loopback IPC and WebSocket streaming — Core implementation | DONE | `WS_OUTBOUND_EVENTS` + `is_known_ws_event()`; `tests/unit/test_phase_0083_ws_vocabulary.py` 1/1 passed |
+| PHASE 0084 | Loopback IPC and WebSocket streaming — Hardening, edge cases and security review | DONE | injection-styled event rejection; `tests/unit/test_phase_0084_ws_hardening.py` 2/2 passed |
+| PHASE 0085 | Loopback IPC and WebSocket streaming — Integration, regression tests and sign-off | DONE | live cancel round-trip; `tests/unit/test_phase_0085_ws_signoff.py` 1/1 passed |
+| PHASE 0086–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

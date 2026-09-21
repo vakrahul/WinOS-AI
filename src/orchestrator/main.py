@@ -201,6 +201,15 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     return app
 
 
+WS_OUTBOUND_EVENTS = ("token", "tool_proposal", "done", "cancelled")
+WS_INBOUND_ACTIONS = ("chat", "cancel")
+
+
+def is_known_ws_event(event: str) -> bool:
+    """Return True for protocol-defined outbound websocket events."""
+    return event in WS_OUTBOUND_EVENTS
+
+
 def build_health_payload(
     *,
     provider_healthy: bool,
