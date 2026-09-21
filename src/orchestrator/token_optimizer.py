@@ -1,4 +1,5 @@
 """Unified Token Optimization and Cost Control Subsystem (Module 1)."""
+import time
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Tuple
 from src.orchestrator.cost_tracker import CostEstimator
 from src.orchestrator.prompt_cache import PromptCache
@@ -111,5 +112,24 @@ class TokenOptimizer:
         }
         return response, metrics
 
+    def get_telemetry_summary(self) -> Dict[str, Any]:
+        """Aggregate global token metrics, financial spend/savings, and cache telemetry."""
+        global_usage = self.tracker.get_global_summary()
+        cost_summary = self.cost_estimator.get_summary()
+        cache_stats = self.cache.get_stats()
 
-import time
+        total_saved_tokens = cache_stats.get("estimated_tokens_saved", 0) + global_usage.get("total_cached_prompt_tokens", 0)
+        total_tokens_evaluated = global_usage.get("grand_total_tokens", 0) + total_saved_tokens
+        savings_percentage = round((total_saved_tokens / total_tokens_evaluated * 100), 1) if total_tokens_evaluated > 0 else 0.0
+
+        return {
+            "token_accounting": global_usage,
+            "financial_summary": cost_summary,
+            "cache_stats": cache_stats,
+            "savings_overview": {
+                "total_tokens_saved": total_saved_tokens,
+                "total_tokens_evaluated": total_tokens_evaluated,
+                "reduction_percentage": savings_percentage,
+            },
+        }
+

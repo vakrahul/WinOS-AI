@@ -366,6 +366,19 @@
         </div>
       </div>
 
+      <!-- Token Cost & Optimization Telemetry Card -->
+      <div class="n8n-card" id="tokenCostCard" style="border-color: rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(15, 23, 42, 0.6));">
+        <div style="flex: 1;">
+          <h3>💰 Token Cost &amp; Optimization Telemetry <span id="tokenSavingsBadge" style="font-size: 10px; background: rgba(16, 185, 129, 0.25); color: #10b981; padding: 2px 8px; border-radius: 6px; font-weight: 700;">ACTIVE TELEMETRY</span></h3>
+          <p id="tokenSpendLine" style="color: #f1f5f9; font-size: 13px; font-weight: 600; margin: 4px 0;">Spend: $0.000000 (₹0.00) • Saved: $0.000000 (₹0.00)</p>
+          <p id="tokenStatsLine" style="font-size: 11px; color: #94a3b8; margin: 2px 0;">Consumed: 0 tokens • Saved via Optimization: 0 tokens (0% reduction)</p>
+          <div id="cacheDetailLine" style="font-size: 11px; color: #38bdf8; margin-top: 4px;">Exact Cache: Active • Semantic Cache: Active • Prefix Alignment: Enabled</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; min-width: 110px; text-align: right;">
+          <button class="btn-act" onclick="loadTokenTelemetry()" style="color: #10b981; border-color: rgba(16, 185, 129, 0.3);">Refresh Cost</button>
+        </div>
+      </div>
+
       <!-- Toolbar -->
       <div class="apps-toolbar">
         <input type="text" id="searchInput" class="search-input" placeholder="Search 119 applications (e.g. Chrome, VS Code, n8n, Paint)..." oninput="filterApps()" />
@@ -577,10 +590,46 @@
         ? `🧠 JEV test decision: <strong>${data.selected}</strong> (${(data.confidence * 100).toFixed(0)}%).${data.is_mock ? ' <em>Mock result — simulated, not real JEV.</em>' : ''}`
         : `🧠 JEV test skipped: ${data.reason}`);
       loadJevStatus();
+      loadTokenTelemetry();
+    }
+
+    async function loadTokenTelemetry() {
+      try {
+        const res = await fetch('/api/v1/telemetry/tokens');
+        if (!res.ok) return;
+        const data = await res.json();
+        const fin = data.financial_summary || {};
+        const accounting = data.token_accounting || {};
+        const cache = data.cache_stats || {};
+        const savings = data.savings_overview || {};
+
+        const spendUsd = (fin.total_spent_usd || 0).toFixed(6);
+        const spendInr = (fin.total_spent_inr || 0).toFixed(2);
+        const savedUsd = (fin.total_saved_usd || 0).toFixed(6);
+        const savedInr = (fin.total_saved_inr || 0).toFixed(2);
+
+        document.getElementById('tokenSpendLine').innerHTML =
+          `Spend: <span style="color: #f87171; font-weight: 700;">$${spendUsd} (₹${spendInr})</span> • Saved: <span style="color: #4ade80; font-weight: 700;">$${savedUsd} (₹${savedInr})</span>`;
+
+        const consumed = (accounting.grand_total_tokens || 0).toLocaleString();
+        const savedTokens = (savings.total_tokens_saved || 0).toLocaleString();
+        const pct = savings.reduction_percentage || 0;
+
+        document.getElementById('tokenStatsLine').textContent =
+          `Consumed: ${consumed} tokens • Saved via Optimization: ${savedTokens} tokens (${pct}% reduction)`;
+
+        document.getElementById('cacheDetailLine').textContent =
+          `Exact Hits: ${cache.exact_hits || 0} • Semantic Hits: ${cache.semantic_hits || 0} • Cached Entries: ${cache.cached_entries_count || 0} • Requests: ${accounting.total_requests || 0}`;
+      } catch (err) {
+        console.error("Failed to load token telemetry:", err);
+      }
     }
 
     loadApps();
     loadJevStatus();
+    loadTokenTelemetry();
+    setInterval(loadTokenTelemetry, 10000);
+  </script>
   </script>
 </body>
 </html>

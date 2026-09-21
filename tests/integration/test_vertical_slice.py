@@ -59,6 +59,18 @@ def test_chat_completion_flow(client_app):
     assert "Mock response to: 'Hello AI environment'" in data["content"]
     assert data["model_name"] == "mock-gpt-4o"
 
+    # Second identical request should hit cache and update telemetry
+    response2 = client.post("/api/v1/chat", json=payload)
+    assert response2.status_code == 200
+
+    telemetry_resp = client.get("/api/v1/telemetry/tokens")
+    assert telemetry_resp.status_code == 200
+    telemetry = telemetry_resp.json()
+    assert "token_accounting" in telemetry
+    assert "financial_summary" in telemetry
+    assert "savings_overview" in telemetry
+    assert telemetry["token_accounting"]["total_requests"] >= 1
+
 
 @pytest.mark.integration
 def test_path_confinement_security(client_app):

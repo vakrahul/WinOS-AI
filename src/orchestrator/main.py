@@ -91,6 +91,9 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     app_scanner = SystemAppScanner()
     app_manager = AppManager()
 
+    from src.orchestrator.token_optimizer import TokenOptimizer
+    token_optimizer = TokenOptimizer()
+
     from src.orchestrator.jev.service import JevService
 
     jev_service = JevService()
@@ -112,6 +115,10 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     @app.get("/api/v1/jev/decisions")
     async def jev_decisions(limit: int = 10):
         return {"decisions": jev_service.recent_decisions(max(1, min(limit, 50)))}
+
+    @app.get("/api/v1/telemetry/tokens")
+    async def get_token_telemetry():
+        return token_optimizer.get_telemetry_summary()
 
     @app.post("/api/v1/jev/config")
     async def jev_config(payload: JevConfigPayload):
@@ -159,10 +166,12 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     @app.post("/api/v1/chat", response_model=ProviderResponse)
     async def complete_chat(request: ChatRequest):
         provider = get_target_provider(request.provider)
-        response = await provider.complete(
+        response, _ = await token_optimizer.execute_optimized_request(
+            provider=provider,
             messages=request.messages,
             temperature=request.temperature,
             max_tokens=request.max_tokens,
+            model_name=request.model,
         )
         return response
 

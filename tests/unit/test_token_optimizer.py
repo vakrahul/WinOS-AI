@@ -120,3 +120,13 @@ async def test_token_optimizer_end_to_end():
     assert metrics2["tokens_consumed"] == 0
     assert resp2.content == resp1.content
     assert metrics2["tokens_saved"] > 0
+
+    # Verify consolidated telemetry summary
+    telemetry = optimizer.get_telemetry_summary()
+    assert "token_accounting" in telemetry
+    assert "financial_summary" in telemetry
+    assert "cache_stats" in telemetry
+    assert "savings_overview" in telemetry
+    assert telemetry["cache_stats"]["exact_hits"] >= 1
+    assert telemetry["savings_overview"]["total_tokens_saved"] > 0
+
