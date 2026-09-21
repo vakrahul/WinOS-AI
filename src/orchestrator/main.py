@@ -208,4 +208,15 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     return app
 
 
+def list_registered_routes(app: FastAPI) -> list:
+    """Return sorted (path, methods) pairs for the registered HTTP routes."""
+    entries = []
+    for route in app.routes:
+        path = getattr(route, "path", "")
+        methods = sorted(getattr(route, "methods", set()) or set())
+        if path:
+            entries.append((path, methods))
+    return sorted(entries)
+
+
 app = create_app()

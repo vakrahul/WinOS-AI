@@ -32,7 +32,8 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0010 | Python packaging and dependency pins — Integration, regression tests and sign-off | DONE | CLI `scripts/check_packaging.py` exit 0; `tests/unit/test_phase_0010_packaging_signoff.py` 1/1 passed |
 | PHASE 0011 | FastAPI entry point and app factory — Inventory and current-state audit | DONE | `docs/PHASE_0011_REPORT.md`; `tests/unit/test_phase_0011_entry_audit.py` 2/2 passed; regression `test_vertical_slice.py` 6/6 passed |
 | PHASE 0012 | FastAPI entry point and app factory — Design specification and acceptance criteria | DONE | `docs/ENTRYPOINT_SPEC.md`; `tests/unit/test_phase_0012_entrypoint_spec.py` 2/2 passed; regression `test_config.py` 5/5 passed |
-| PHASE 0013–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0013 | FastAPI entry point and app factory — Core implementation | DONE | `list_registered_routes()` in `src/orchestrator/main.py`; `tests/unit/test_phase_0013_route_inventory.py` 1/1 passed; regression `test_vertical_slice.py` 6/6 passed |
+| PHASE 0014–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
