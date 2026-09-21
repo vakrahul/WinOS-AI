@@ -70,7 +70,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0048 | Test suite health and docs baseline — Core implementation | DONE | `scripts/check_test_inventory.py`; `tests/unit/test_phase_0048_test_check.py` 1/1 passed |
 | PHASE 0049 | Test suite health and docs baseline — Hardening, edge cases and security review | DONE | missing-fixture detection; `tests/unit/test_phase_0049_inventory_hardening.py` 2/2 passed |
 | PHASE 0050 | Test suite health and docs baseline — Integration, regression tests and sign-off | DONE | CLI exit 0 + suite counts; `tests/unit/test_phase_0050_health_signoff.py` 2/2 passed |
-| PHASE 0051–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0051 | FastAPI application lifecycle and startup ordering — Inventory and current-state audit | DONE | `docs/PHASE_0051_REPORT.md`; `tests/unit/test_phase_0051_lifecycle_audit.py` 1/1 passed |
+| PHASE 0052 | FastAPI application lifecycle and startup ordering — Design specification and acceptance criteria | DONE | `docs/LIFECYCLE_SPEC.md`; `tests/unit/test_phase_0052_lifecycle_spec.py` 1/1 passed |
+| PHASE 0053 | FastAPI application lifecycle and startup ordering — Core implementation | DONE | `describe_startup_order()`; `tests/unit/test_phase_0053_startup_order.py` 1/1 passed |
+| PHASE 0054 | FastAPI application lifecycle and startup ordering — Hardening, edge cases and security review | DONE | factory isolation gates; `tests/unit/test_phase_0054_lifecycle_hardening.py` 2/2 passed |
+| PHASE 0055 | FastAPI application lifecycle and startup ordering — Integration, regression tests and sign-off | DONE | live boot + route check; `tests/unit/test_phase_0055_lifecycle_signoff.py` 1/1 passed |
+| PHASE 0056–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

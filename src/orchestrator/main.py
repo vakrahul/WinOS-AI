@@ -213,4 +213,21 @@ def list_registered_routes(app: FastAPI) -> list:
     return sorted(entries)
 
 
+STARTUP_ORDER = (
+    "config",
+    "security_policy",
+    "credential_vault",
+    "provider_registry",
+    "system_scanner",
+    "app_manager",
+    "routes",
+    "task_dispatcher",
+)
+
+
+def describe_startup_order() -> tuple:
+    """Return the normative subsystem initialization order (no side effects)."""
+    return STARTUP_ORDER
+
+
 app = create_app()
