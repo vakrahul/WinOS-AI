@@ -55,7 +55,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0033 | Brain memory tiers and context engine — Core implementation | DONE | `BrainSubsystem.tier_names()`; `tests/unit/test_phase_0033_tier_names.py` 1/1 passed |
 | PHASE 0034 | Brain memory tiers and context engine — Hardening, edge cases and security review | DONE | empty-state and unknown-ID guards; `tests/unit/test_phase_0034_brain_hardening.py` 2/2 passed |
 | PHASE 0035 | Brain memory tiers and context engine — Integration, regression tests and sign-off | DONE | store/retrieve round-trip verified; `tests/unit/test_phase_0035_brain_signoff.py` 1/1 passed |
-| PHASE 0036–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0036 | Planner, coordinator and agent factory — Inventory and current-state audit | DONE | `docs/PHASE_0036_REPORT.md`; `tests/unit/test_phase_0036_planner_audit.py` 2/2 passed |
+| PHASE 0037 | Planner, coordinator and agent factory — Design specification and acceptance criteria | DONE | `docs/PLANNER_SPEC.md`; `tests/unit/test_phase_0037_planner_spec.py` 1/1 passed |
+| PHASE 0038 | Planner, coordinator and agent factory — Core implementation | DONE | `TaskPlan.ready_subtasks()`; `tests/unit/test_phase_0038_ready_subtasks.py` 1/1 passed |
+| PHASE 0039 | Planner, coordinator and agent factory — Hardening, edge cases and security review | DONE | DAG rejection gates; `tests/unit/test_phase_0039_planner_hardening.py` 3/3 passed |
+| PHASE 0040 | Planner, coordinator and agent factory — Integration, regression tests and sign-off | DONE | decompose/validate/checkpoint verified; `tests/unit/test_phase_0040_planner_signoff.py` 1/1 passed |
+| PHASE 0041–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

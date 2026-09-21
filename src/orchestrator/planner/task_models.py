@@ -45,6 +45,16 @@ class TaskPlan(BaseModel):
                 return st
         return None
 
+    def ready_subtasks(self) -> List[SubTask]:
+        """Return PENDING subtasks whose dependencies are all COMPLETED."""
+        done = {st.id for st in self.subtasks if st.state == TaskState.COMPLETED}
+        return [
+            st
+            for st in self.subtasks
+            if st.state == TaskState.PENDING
+            and all(dep in done for dep in st.dependencies)
+        ]
+
     def validate_plan_dag(self) -> Tuple[bool, str]:
         """Verify plan has no cycles and dependencies exist."""
         subtask_ids = {st.id for st in self.subtasks}
