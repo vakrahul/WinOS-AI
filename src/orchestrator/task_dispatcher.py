@@ -36,6 +36,27 @@ class TaskDispatchResult(BaseModel):
     observable_evidence: List[str] = []
 
 
+_SECRET_KEYS = ("api_key", "secret", "password", "token", "private_key")
+
+
+def render_tool_summary(tool_name: str, arguments: Dict[str, Any], max_chars: int = 200) -> str:
+    """Render a redacted one-line tool summary for logs and UI panels."""
+    parts = []
+    for key, value in arguments.items():
+        lowered = key.lower()
+        if any(s in lowered for s in _SECRET_KEYS):
+            shown = "[REDACTED]"
+        else:
+            shown = str(value)
+            if len(shown) > 60:
+                shown = shown[:57] + "..."
+        parts.append(f"{key}={shown}")
+    line = f"{tool_name}({', '.join(parts)})"
+    if len(line) > max_chars:
+        line = line[: max_chars - 3] + "..."
+    return line
+
+
 class AutonomousTaskDispatcher:
     """Executes real Windows and browser actions requested through the chat interface."""
 

@@ -195,7 +195,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0173 | Prompt construction and prefix reuse — Core implementation | DONE | `invalidate_model()`; `tests/unit/test_phase_0173_invalidate.py` 1/1 passed |
 | PHASE 0174 | Prompt construction and prefix reuse — Hardening, edge cases and security review | DONE | TTL/hash gates; `tests/unit/test_phase_0174_ttl_hardening.py` 2/2 passed |
 | PHASE 0175 | Prompt construction and prefix reuse — Integration, regression tests and sign-off | DONE | store/hit/align flow; `tests/unit/test_phase_0175_prefix_signoff.py` 1/1 passed |
-| PHASE 0176–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0176 | Tool-call rendering and confirmation — Inventory and current-state audit | DONE | `docs/PHASE_0176_REPORT.md`; `tests/unit/test_phase_0176_render_audit.py` 1/1 passed |
+| PHASE 0177 | Tool-call rendering and confirmation — Design specification and acceptance criteria | DONE | `docs/TOOL_RENDER_SPEC.md`; `tests/unit/test_phase_0177_render_spec.py` 1/1 passed |
+| PHASE 0178 | Tool-call rendering and confirmation — Core implementation | DONE | `render_tool_summary()`; `tests/unit/test_phase_0178_render_summary.py` 1/1 passed |
+| PHASE 0179 | Tool-call rendering and confirmation — Hardening, edge cases and security review | DONE | case-insensitive redaction; `tests/unit/test_phase_0179_render_hardening.py` 2/2 passed |
+| PHASE 0180 | Tool-call rendering and confirmation — Integration, regression tests and sign-off | DONE | fallback dispatch verified; `tests/unit/test_phase_0180_render_signoff.py` 1/1 passed |
+| PHASE 0181–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
