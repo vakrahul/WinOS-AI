@@ -45,6 +45,14 @@ class TaskPlan(BaseModel):
                 return st
         return None
 
+    def progress(self) -> Tuple[int, int, float]:
+        """Return (completed, total, percent) without ever dividing by zero."""
+        total = len(self.subtasks)
+        if total == 0:
+            return (0, 0, 0.0)
+        done = sum(1 for st in self.subtasks if st.state == TaskState.COMPLETED)
+        return (done, total, round(done / total * 100.0, 1))
+
     def ready_subtasks(self) -> List[SubTask]:
         """Return PENDING subtasks whose dependencies are all COMPLETED."""
         done = {st.id for st in self.subtasks if st.state == TaskState.COMPLETED}

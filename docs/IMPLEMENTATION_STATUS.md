@@ -140,7 +140,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0118 | Agent activity panel — Core implementation | DONE | panel status vocabulary + gate; `tests/unit/test_phase_0118_panel_status.py` 1/1 passed |
 | PHASE 0119 | Agent activity panel — Hardening, edge cases and security review | DONE | case-sensitive rejection; `tests/unit/test_phase_0119_panel_hardening.py` 1/1 passed |
 | PHASE 0120 | Agent activity panel — Integration, regression tests and sign-off | DONE | C#/Python vocabulary mirror; `tests/unit/test_phase_0120_activity_signoff.py` 1/1 passed |
-| PHASE 0121–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0121 | Task center views — Inventory and current-state audit | DONE | `docs/PHASE_0121_REPORT.md`; `tests/unit/test_phase_0121_taskcenter_audit.py` 1/1 passed |
+| PHASE 0122 | Task center views — Design specification and acceptance criteria | DONE | `docs/TASK_CENTER_SPEC.md`; `tests/unit/test_phase_0122_taskcenter_spec.py` 1/1 passed |
+| PHASE 0123 | Task center views — Core implementation | DONE | `TaskPlan.progress()`; `tests/unit/test_phase_0123_progress.py` 1/1 passed |
+| PHASE 0124 | Task center views — Hardening, edge cases and security review | DONE | zero-division guards; `tests/unit/test_phase_0124_progress_hardening.py` 2/2 passed |
+| PHASE 0125 | Task center views — Integration, regression tests and sign-off | DONE | 0%→100% with checkpoint; `tests/unit/test_phase_0125_taskcenter_signoff.py` 1/1 passed |
+| PHASE 0126–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
