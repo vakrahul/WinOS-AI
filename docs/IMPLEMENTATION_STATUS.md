@@ -18,7 +18,8 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | Phase | Title | Status | Evidence |
 |---|---|---|---|
 | PHASE 0001 | Top-level repository layout and documentation index — Inventory and current-state audit | DONE | `docs/PHASE_0001_REPORT.md`; `tests/unit/test_phase_0001_baseline.py` 3/3 passed; regression `test_config.py` + `test_environment.py` 7/7 passed |
-| PHASE 0002–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0002 | Top-level repository layout and documentation index — Design specification and acceptance criteria | DONE | `docs/REPO_LAYOUT_SPEC.md`; `tests/unit/test_phase_0002_layout_spec.py` 3/3 passed; regression `test_environment.py` 2/2 passed |
+| PHASE 0003–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
