@@ -352,6 +352,20 @@
         <button class="btn-n8n" onclick="automateN8N()">Open n8n Hub</button>
       </div>
 
+      <!-- JEV Decision Layer -->
+      <div class="n8n-card" id="jevCard" style="border-color: rgba(56, 189, 248, 0.3);">
+        <div style="flex: 1;">
+          <h3>🧠 JEV Decision Layer <span id="jevMockBadge" style="font-size: 10px; background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 2px 8px; border-radius: 6px;">MOCK MODE</span></h3>
+          <p id="jevStatusLine">Status: checking…</p>
+          <p id="jevMetricsLine" style="font-size: 11px; color: #64748b;"></p>
+          <div id="jevDecisions" style="font-size: 11px; color: #cbd5e1; margin-top: 6px;"></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button class="btn-act" id="jevToggleBtn" onclick="toggleJev()">Disable</button>
+          <button class="btn-act" onclick="testJevDecision()">Test decision</button>
+        </div>
+      </div>
+
       <!-- Toolbar -->
       <div class="apps-toolbar">
         <input type="text" id="searchInput" class="search-input" placeholder="Search 119 applications (e.g. Chrome, VS Code, n8n, Paint)..." oninput="filterApps()" />
@@ -514,7 +528,59 @@
       }
     }
 
+    async function loadJevStatus() {
+      try {
+        const res = await fetch('/api/v1/jev/status');
+        const s = await res.json();
+        document.getElementById('jevStatusLine').textContent =
+          `Status: ${s.enabled ? 'enabled' : 'disabled'} • ${s.provider_name} • ${s.healthy ? 'healthy' : 'unreachable'} • budget: ${s.budget_remaining}`;
+        document.getElementById('jevMockBadge').style.display = s.is_mock ? 'inline' : 'none';
+        document.getElementById('jevToggleBtn').textContent = s.enabled ? 'Disable' : 'Enable';
+        if (s.mock_warning) {
+          document.getElementById('jevStatusLine').textContent += ` • ${s.mock_warning}`;
+        }
+        const mres = await fetch('/api/v1/jev/metrics');
+        const m = await mres.json();
+        const usage = m.usage[s.provider_name];
+        document.getElementById('jevMetricsLine').textContent = usage
+          ? `Requests: ${usage.requests} • Success rate: ${(usage.success_rate * 100).toFixed(0)}% • Fallbacks: ${(usage.fallback_rate * 100).toFixed(0)}% • Spend: $${usage.total_cost_usd.toFixed(6)}`
+          : 'No usage recorded yet.';
+        const dres = await fetch('/api/v1/jev/decisions?limit=5');
+        const d = await dres.json();
+        document.getElementById('jevDecisions').innerHTML = (d.decisions || [])
+          .map(x => `• ${x.kind} → <strong>${x.selected}</strong> (${(x.confidence * 100).toFixed(0)}%)`)
+          .join('<br>');
+      } catch (err) {
+        document.getElementById('jevStatusLine').textContent = 'Status: unreachable';
+      }
+    }
+
+    async function toggleJev() {
+      const btn = document.getElementById('jevToggleBtn');
+      const enable = btn.textContent === 'Enable';
+      await fetch('/api/v1/jev/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: enable })
+      });
+      loadJevStatus();
+    }
+
+    async function testJevDecision() {
+      const res = await fetch('/api/v1/jev/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context: 'Classify this dashboard connectivity check.' })
+      });
+      const data = await res.json();
+      appendAIMessage(data.executed
+        ? `🧠 JEV test decision: <strong>${data.selected}</strong> (${(data.confidence * 100).toFixed(0)}%).${data.is_mock ? ' <em>Mock result — simulated, not real JEV.</em>' : ''}`
+        : `🧠 JEV test skipped: ${data.reason}`);
+      loadJevStatus();
+    }
+
     loadApps();
+    loadJevStatus();
   </script>
 </body>
 </html>

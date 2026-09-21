@@ -91,6 +91,36 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     app_scanner = SystemAppScanner()
     app_manager = AppManager()
 
+    from src.orchestrator.jev.service import JevService
+
+    jev_service = JevService()
+
+    class JevConfigPayload(BaseModel):
+        enabled: bool
+
+    class JevTestPayload(BaseModel):
+        context: str = Field(default="Summarize the quarterly notes.", min_length=1, max_length=2000)
+
+    @app.get("/api/v1/jev/status")
+    async def jev_status():
+        return await jev_service.status_dict()
+
+    @app.get("/api/v1/jev/metrics")
+    async def jev_metrics():
+        return jev_service.metrics_dict()
+
+    @app.get("/api/v1/jev/decisions")
+    async def jev_decisions(limit: int = 10):
+        return {"decisions": jev_service.recent_decisions(max(1, min(limit, 50)))}
+
+    @app.post("/api/v1/jev/config")
+    async def jev_config(payload: JevConfigPayload):
+        return {"enabled": jev_service.set_enabled(payload.enabled)}
+
+    @app.post("/api/v1/jev/test")
+    async def jev_test(payload: JevTestPayload):
+        return await jev_service.test_decision(payload.context)
+
     @app.get("/", response_class=HTMLResponse)
     @app.get("/dashboard", response_class=HTMLResponse)
     async def get_dashboard():
