@@ -17,9 +17,10 @@ def test_roadmap_has_exactly_1000_sequenced_phases():
     assert phases[-1]["phase_id"] == "PHASE 1000"
     assert len({p["phase_id"] for p in phases}) == 1000
     assert len({p["title"] for p in phases}) == 1000
-    for stage_no in range(1, 21):
+    assert payload.get("stages") == 10
+    for stage_no in range(1, 11):
         stage_phases = [p for p in phases if p["stage_number"] == stage_no]
-        assert len(stage_phases) == 50
+        assert len(stage_phases) == 100
 
 
 def test_required_roadmap_tracking_docs_exist():

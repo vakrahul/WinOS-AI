@@ -1,110 +1,60 @@
 # WinAI-OE — Master Roadmap (Exactly 1,000 Development Phases)
 
 Product: Secure, adaptive, autonomous Windows AI environment (WinAI-OE).
-Organization: 20 stages x 50 phases. Each phase is independently verifiable.
+Organization: 10 stages x 100 phases. Each phase is independently verifiable.
 
 ## Stage Index
 
-- STAGE 01 — Repository Audit and Engineering Baseline (PHASE 0001–0050)
-- STAGE 02 — Core Architecture and Service Reliability (PHASE 0051–0100)
-- STAGE 03 — Premium Native Windows Application (PHASE 0101–0150)
-- STAGE 04 — Conversational Intelligence and Interaction (PHASE 0151–0200)
-- STAGE 05 — Persistent Context and Memory (PHASE 0201–0250)
-- STAGE 06 — Planning and Task Decomposition (PHASE 0251–0300)
-- STAGE 07 — Multi-Agent Orchestration (PHASE 0301–0350)
-- STAGE 08 — Adaptive Application Integration (PHASE 0351–0400)
-- STAGE 09 — Browser and Web Automation (PHASE 0401–0450)
-- STAGE 10 — Windows Desktop Execution (PHASE 0451–0500)
-- STAGE 11 — Autonomous Software Engineering (PHASE 0501–0550)
-- STAGE 12 — Git, Pull Requests, and Code Review (PHASE 0551–0600)
-- STAGE 13 — External Tools and Workflow Automation (PHASE 0601–0650)
-- STAGE 14 — Security, Trust, and Permission Enforcement (PHASE 0651–0700)
-- STAGE 15 — Verification, Recovery, and Self-Healing (PHASE 0701–0750)
-- STAGE 16 — Performance, Model Routing, and Cost Control (PHASE 0751–0800)
-- STAGE 17 — Personalization and Adaptive Intelligence (PHASE 0801–0850)
-- STAGE 18 — Observability, Testing, and Quality Engineering (PHASE 0851–0900)
-- STAGE 19 — Production Hardening and Distribution Readiness (PHASE 0901–0950)
-- STAGE 20 — Advanced Capabilities and Long-Term Evolution (PHASE 0951–1000)
+- STAGE 01 — Repository Audit, Architecture and Service Reliability (PHASE 0001–0100)
+- STAGE 02 — Premium Windows Application and Conversational Intelligence (PHASE 0101–0200)
+- STAGE 03 — Persistent Memory, Planning and Task Decomposition (PHASE 0201–0300)
+- STAGE 04 — Multi-Agent Orchestration and Adaptive Integration (PHASE 0301–0400)
+- STAGE 05 — Browser Automation and Windows Desktop Execution (PHASE 0401–0500)
+- STAGE 06 — Software Engineering, Git and Code Review (PHASE 0501–0600)
+- STAGE 07 — Workflow Automation, Security and Trust (PHASE 0601–0700)
+- STAGE 08 — Verification, Recovery, Performance and Cost (PHASE 0701–0800)
+- STAGE 09 — Personalization, Observability and Quality (PHASE 0801–0900)
+- STAGE 10 — Production Hardening and Long-Term Evolution (PHASE 0901–1000)
 
-## STAGE 01 — Repository Audit and Engineering Baseline
+## STAGE 01 — Repository Audit, Architecture and Service Reliability
 
-Phases 0001–0050 | Category: Audit & Baseline
+Phases 0001–0100
 
-## STAGE 02 — Core Architecture and Service Reliability
+## STAGE 02 — Premium Windows Application and Conversational Intelligence
 
-Phases 0051–0100 | Category: Architecture
+Phases 0101–0200
 
-## STAGE 03 — Premium Native Windows Application
+## STAGE 03 — Persistent Memory, Planning and Task Decomposition
 
-Phases 0101–0150 | Category: Desktop UI
+Phases 0201–0300
 
-## STAGE 04 — Conversational Intelligence and Interaction
+## STAGE 04 — Multi-Agent Orchestration and Adaptive Integration
 
-Phases 0151–0200 | Category: Conversation
+Phases 0301–0400
 
-## STAGE 05 — Persistent Context and Memory
+## STAGE 05 — Browser Automation and Windows Desktop Execution
 
-Phases 0201–0250 | Category: Memory
+Phases 0401–0500
 
-## STAGE 06 — Planning and Task Decomposition
+## STAGE 06 — Software Engineering, Git and Code Review
 
-Phases 0251–0300 | Category: Planning
+Phases 0501–0600
 
-## STAGE 07 — Multi-Agent Orchestration
+## STAGE 07 — Workflow Automation, Security and Trust
 
-Phases 0301–0350 | Category: Agents
+Phases 0601–0700
 
-## STAGE 08 — Adaptive Application Integration
+## STAGE 08 — Verification, Recovery, Performance and Cost
 
-Phases 0351–0400 | Category: Adaptation
+Phases 0701–0800
 
-## STAGE 09 — Browser and Web Automation
+## STAGE 09 — Personalization, Observability and Quality
 
-Phases 0401–0450 | Category: Browser
+Phases 0801–0900
 
-## STAGE 10 — Windows Desktop Execution
+## STAGE 10 — Production Hardening and Long-Term Evolution
 
-Phases 0451–0500 | Category: Desktop Exec
-
-## STAGE 11 — Autonomous Software Engineering
-
-Phases 0501–0550 | Category: Software Eng
-
-## STAGE 12 — Git, Pull Requests, and Code Review
-
-Phases 0551–0600 | Category: Git & Review
-
-## STAGE 13 — External Tools and Workflow Automation
-
-Phases 0601–0650 | Category: Workflows
-
-## STAGE 14 — Security, Trust, and Permission Enforcement
-
-Phases 0651–0700 | Category: Security
-
-## STAGE 15 — Verification, Recovery, and Self-Healing
-
-Phases 0701–0750 | Category: Recovery
-
-## STAGE 16 — Performance, Model Routing, and Cost Control
-
-Phases 0751–0800 | Category: Perf & Cost
-
-## STAGE 17 — Personalization and Adaptive Intelligence
-
-Phases 0801–0850 | Category: Personalize
-
-## STAGE 18 — Observability, Testing, and Quality Engineering
-
-Phases 0851–0900 | Category: Quality
-
-## STAGE 19 — Production Hardening and Distribution Readiness
-
-Phases 0901–0950 | Category: Production
-
-## STAGE 20 — Advanced Capabilities and Long-Term Evolution
-
-Phases 0951–1000 | Category: Future
+Phases 0901–1000
 
 ### PHASE 0001
 Title: Top-level repository layout and documentation index — Inventory and current-state audit

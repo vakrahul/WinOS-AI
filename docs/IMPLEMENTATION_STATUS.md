@@ -1,7 +1,10 @@
 # WinAI-OE — Implementation Status
 
-Roadmap: `docs/MASTER_ROADMAP_1000_PHASES.json` (1,000 phases) and
-`docs/MASTER_ROADMAP_1000_PHASES.md` (human-readable).
+Roadmap: `docs/MASTER_ROADMAP_1000_PHASES.json` (1,000 phases, 10 stages
+x 100 phases) and `docs/MASTER_ROADMAP_1000_PHASES.md` (human-readable).
+Layout change note: the roadmap was regrouped from 20x50 to the approved
+10x100 organization via `scripts/regroup_roadmap_10x100.py` with phase
+numbers, titles, and content preserved; only stage grouping changed.
 Policy: `docs/PHASE_COMPLETION_POLICY.md`.
 Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 
@@ -41,5 +44,7 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 ## Update Protocol
 
 After each phase, append or update exactly one row above with the phase
-report reference and commit hash. Never advance the next phase without
-explicit user approval.
+report reference and commit hash. Default mode requires explicit user
+approval per phase; autonomous continuation across phases is active only
+while the user’s standing “continue, don’t ask” instruction remains in
+effect.
