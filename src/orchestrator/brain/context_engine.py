@@ -237,6 +237,22 @@ class AdvancedContextEngine:
         return [c[0] for c in candidates[:top_k]]
 
     # --- E. Lossless Security-Preserving Context Compaction ---
+    @staticmethod
+    def window_messages(messages: list, max_messages: int = 20) -> list:
+        """Keep the system head plus the newest turns within budget.
+
+        System messages are never trimmed; non-system turns are cut from
+        the middle (oldest first). Non-positive budgets yield [].
+        """
+        if max_messages <= 0:
+            return []
+        head = [m for m in messages if m.role == "system"]
+        tail = [m for m in messages if m.role != "system"]
+        room = max_messages - len(head)
+        if room <= 0:
+            return head[:max_messages] if max_messages < len(head) else head
+        return head + tail[-room:] if room < len(tail) else head + tail
+
     def build_compacted_context(self, max_tokens: int = 2048) -> str:
         """Assembles compacted prompt context. Never compacts away security rules or user goals."""
         sections = []

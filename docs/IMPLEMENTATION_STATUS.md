@@ -210,7 +210,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0188 | Empty, error and retry states — Core implementation | DONE | `is_retryable_status()`; `tests/unit/test_phase_0188_retryable_status.py` 1/1 passed |
 | PHASE 0189 | Empty, error and retry states — Hardening, edge cases and security review | DONE | non-retryable fast-fail; `tests/unit/test_phase_0189_retry_hardening.py` 2/2 passed |
 | PHASE 0190 | Empty, error and retry states — Integration, regression tests and sign-off | DONE | transient recovery verified; `tests/unit/test_phase_0190_retry_signoff.py` 1/1 passed |
-| PHASE 0191–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0191 | Multi-turn context windowing — Inventory and current-state audit | DONE | `docs/PHASE_0191_REPORT.md`; `tests/unit/test_phase_0191_window_audit.py` 2/2 passed |
+| PHASE 0192 | Multi-turn context windowing — Design specification and acceptance criteria | DONE | `docs/WINDOWING_SPEC.md`; `tests/unit/test_phase_0192_windowing_spec.py` 1/1 passed |
+| PHASE 0193 | Multi-turn context windowing — Core implementation | DONE | `window_messages()`; `tests/unit/test_phase_0193_window_messages.py` 1/1 passed |
+| PHASE 0194 | Multi-turn context windowing — Hardening, edge cases and security review | DONE | empty/budget guards; `tests/unit/test_phase_0194_window_hardening.py` 1/1 passed |
+| PHASE 0195 | Multi-turn context windowing — Integration, regression tests and sign-off | DONE | budget-fit verified; `tests/unit/test_phase_0195_window_signoff.py` 1/1 passed |
+| PHASE 0196–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
