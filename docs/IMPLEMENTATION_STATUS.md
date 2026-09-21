@@ -120,7 +120,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0098 | Service diagnostics and startup self-check — Core implementation | DONE | `scripts/diagnostics.py`; `tests/unit/test_phase_0098_diagnostics.py` 1/1 passed |
 | PHASE 0099 | Service diagnostics and startup self-check — Hardening, edge cases and security review | DONE | secret-free output gate; `tests/unit/test_phase_0099_diag_hardening.py` 1/1 passed |
 | PHASE 0100 | Service diagnostics and startup self-check — Integration, regression tests and sign-off | DONE | STAGE 01 holds 100 phases; `tests/unit/test_phase_0100_stage01_signoff.py` 1/1 passed |
-| PHASE 0101–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0101 | WinUI 3 shell and app manifest — Inventory and current-state audit | DONE | `docs/PHASE_0101_REPORT.md`; `tests/unit/test_phase_0101_shell_audit.py` 2/2 passed |
+| PHASE 0102 | WinUI 3 shell and app manifest — Design specification and acceptance criteria | DONE | `docs/WINUI_SHELL_SPEC.md`; `tests/unit/test_phase_0102_shell_spec.py` 1/1 passed |
+| PHASE 0103 | WinUI 3 shell and app manifest — Core implementation | DONE | `scripts/check_client_shell.py`; `tests/unit/test_phase_0103_shell_check.py` 1/1 passed |
+| PHASE 0104 | WinUI 3 shell and app manifest — Hardening, edge cases and security review | DONE | malformed-XML detection; `tests/unit/test_phase_0104_shell_hardening.py` 2/2 passed |
+| PHASE 0105 | WinUI 3 shell and app manifest — Integration, regression tests and sign-off | DONE | CLI exit 0; `tests/unit/test_phase_0105_shell_signoff.py` 1/1 passed |
+| PHASE 0106–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
