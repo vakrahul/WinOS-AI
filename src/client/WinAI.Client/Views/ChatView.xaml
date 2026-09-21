@@ -42,8 +42,8 @@
                      Text="{x:Bind ViewModel.InputMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      AcceptsReturn="True" MaxHeight="120" AutomationProperties.Name="Chat Input Box" />
 
-            <Button Grid.Column="1" Content="Send" Click="Send_Click" IsEnabled="{x:Bind ViewModel.IsGenerating, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" />
-            <Button Grid.Column="2" Content="Cancel" Click="Cancel_Click" IsEnabled="{x:Bind ViewModel.IsGenerating, Mode=OneWay}" />
+            <Button Grid.Column="1" Content="Send" Click="Send_Click" AutomationProperties.Name="Send Message" IsEnabled="{x:Bind ViewModel.IsGenerating, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" />
+            <Button Grid.Column="2" Content="Cancel" Click="Cancel_Click" AutomationProperties.Name="Cancel Generation" IsEnabled="{x:Bind ViewModel.IsGenerating, Mode=OneWay}" />
         </Grid>
     </Grid>
 </Page>

@@ -165,7 +165,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0143 | Memory and model configuration views — Core implementation | DONE | `BrainSubsystem.memory_stats()`; `tests/unit/test_phase_0143_memory_stats.py` 1/1 passed |
 | PHASE 0144 | Memory and model configuration views — Hardening, edge cases and security review | DONE | empty/unknown-ID guards; `tests/unit/test_phase_0144_stats_hardening.py` 2/2 passed |
 | PHASE 0145 | Memory and model configuration views — Integration, regression tests and sign-off | DONE | stats/export/correct/delete flow; `tests/unit/test_phase_0145_memory_signoff.py` 1/1 passed |
-| PHASE 0146–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0146 | Settings, theming and accessibility — Inventory and current-state audit | DONE | `docs/PHASE_0146_REPORT.md`; `tests/unit/test_phase_0146_a11y_audit.py` 1/1 passed |
+| PHASE 0147 | Settings, theming and accessibility — Design specification and acceptance criteria | DONE | `docs/ACCESSIBILITY_SPEC.md`; `tests/unit/test_phase_0147_a11y_spec.py` 1/1 passed |
+| PHASE 0148 | Settings, theming and accessibility — Core implementation | DONE | `scripts/check_accessibility.py` + named Send/Cancel buttons in `ChatView.xaml`; `tests/unit/test_phase_0148_a11y_check.py` 1/1 passed |
+| PHASE 0149 | Settings, theming and accessibility — Hardening, edge cases and security review | DONE | unnamed/malformed XAML detection; `tests/unit/test_phase_0149_a11y_hardening.py` 2/2 passed |
+| PHASE 0150 | Settings, theming and accessibility — Integration, regression tests and sign-off | DONE | CLI exit 0; `tests/unit/test_phase_0150_a11y_signoff.py` 1/1 passed |
+| PHASE 0151–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
