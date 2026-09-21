@@ -54,6 +54,14 @@ class CircuitBreaker:
         return False
 
 
+RETRYABLE_HTTP_STATUSES = (408, 429, 500, 502, 503, 504)
+
+
+def is_retryable_status(status_code: int) -> bool:
+    """Return True for transient HTTP statuses worth retrying."""
+    return status_code in RETRYABLE_HTTP_STATUSES
+
+
 async def retry_with_backoff(
     func: Callable[[], Coroutine[Any, Any, Any]],
     max_retries: int = 3,

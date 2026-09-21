@@ -205,7 +205,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0183 | Approval request UX flow — Core implementation | DONE | `describe_request()`; `tests/unit/test_phase_0183_describe_request.py` 1/1 passed |
 | PHASE 0184 | Approval request UX flow — Hardening, edge cases and security review | DONE | nonce/param leak gates; `tests/unit/test_phase_0184_describe_hardening.py` 1/1 passed |
 | PHASE 0185 | Approval request UX flow — Integration, regression tests and sign-off | DONE | describe/consume flow; `tests/unit/test_phase_0185_ux_signoff.py` 1/1 passed |
-| PHASE 0186–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0186 | Empty, error and retry states — Inventory and current-state audit | DONE | `docs/PHASE_0186_REPORT.md`; `tests/unit/test_phase_0186_retry_audit.py` 1/1 passed |
+| PHASE 0187 | Empty, error and retry states — Design specification and acceptance criteria | DONE | `docs/EMPTY_ERROR_RETRY_SPEC.md`; `tests/unit/test_phase_0187_retry_spec.py` 1/1 passed |
+| PHASE 0188 | Empty, error and retry states — Core implementation | DONE | `is_retryable_status()`; `tests/unit/test_phase_0188_retryable_status.py` 1/1 passed |
+| PHASE 0189 | Empty, error and retry states — Hardening, edge cases and security review | DONE | non-retryable fast-fail; `tests/unit/test_phase_0189_retry_hardening.py` 2/2 passed |
+| PHASE 0190 | Empty, error and retry states — Integration, regression tests and sign-off | DONE | transient recovery verified; `tests/unit/test_phase_0190_retry_signoff.py` 1/1 passed |
+| PHASE 0191–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
