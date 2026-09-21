@@ -105,7 +105,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0083 | Loopback IPC and WebSocket streaming — Core implementation | DONE | `WS_OUTBOUND_EVENTS` + `is_known_ws_event()`; `tests/unit/test_phase_0083_ws_vocabulary.py` 1/1 passed |
 | PHASE 0084 | Loopback IPC and WebSocket streaming — Hardening, edge cases and security review | DONE | injection-styled event rejection; `tests/unit/test_phase_0084_ws_hardening.py` 2/2 passed |
 | PHASE 0085 | Loopback IPC and WebSocket streaming — Integration, regression tests and sign-off | DONE | live cancel round-trip; `tests/unit/test_phase_0085_ws_signoff.py` 1/1 passed |
-| PHASE 0086–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0086 | Graceful shutdown and resource cleanup — Inventory and current-state audit | DONE | `docs/PHASE_0086_REPORT.md`; `tests/unit/test_phase_0086_shutdown_audit.py` 1/1 passed |
+| PHASE 0087 | Graceful shutdown and resource cleanup — Design specification and acceptance criteria | DONE | `docs/SHUTDOWN_SPEC.md`; `tests/unit/test_phase_0087_shutdown_spec.py` 1/1 passed |
+| PHASE 0088 | Graceful shutdown and resource cleanup — Core implementation | DONE | `create_server_config()`; `tests/unit/test_phase_0088_server_config.py` 1/1 passed |
+| PHASE 0089 | Graceful shutdown and resource cleanup — Hardening, edge cases and security review | DONE | non-loopback rejection gates; `tests/unit/test_phase_0089_server_hardening.py` 1/1 passed |
+| PHASE 0090 | Graceful shutdown and resource cleanup — Integration, regression tests and sign-off | DONE | import-safe entry module; `tests/unit/test_phase_0090_shutdown_signoff.py` 1/1 passed |
+| PHASE 0091–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
