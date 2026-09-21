@@ -89,6 +89,15 @@ class AppConfig(BaseSettings):
         """Resolve symbolic links and relative tokens to absolute paths."""
         return v.resolve()
 
+    def resource_limits_dict(self) -> dict:
+        """Return the enforced subprocess and context budgets (no secrets)."""
+        return {
+            "subprocess_timeout_seconds": self.subprocess_timeout_seconds,
+            "subprocess_max_memory_mb": self.subprocess_max_memory_mb,
+            "subprocess_max_output_bytes": self.subprocess_max_output_bytes,
+            "context_window_tokens": self.context_window_tokens,
+        }
+
     def public_config_dict(self) -> dict:
         """Return the safe, non-secret subset for client-facing endpoints."""
         return {

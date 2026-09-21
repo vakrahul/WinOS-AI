@@ -75,7 +75,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0053 | FastAPI application lifecycle and startup ordering — Core implementation | DONE | `describe_startup_order()`; `tests/unit/test_phase_0053_startup_order.py` 1/1 passed |
 | PHASE 0054 | FastAPI application lifecycle and startup ordering — Hardening, edge cases and security review | DONE | factory isolation gates; `tests/unit/test_phase_0054_lifecycle_hardening.py` 2/2 passed |
 | PHASE 0055 | FastAPI application lifecycle and startup ordering — Integration, regression tests and sign-off | DONE | live boot + route check; `tests/unit/test_phase_0055_lifecycle_signoff.py` 1/1 passed |
-| PHASE 0056–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0056 | Strict configuration validation and safe defaults — Inventory and current-state audit | DONE | `docs/PHASE_0056_REPORT.md`; `tests/unit/test_phase_0056_validation_audit.py` 1/1 passed |
+| PHASE 0057 | Strict configuration validation and safe defaults — Design specification and acceptance criteria | DONE | `docs/CONFIG_VALIDATION_MATRIX.md`; `tests/unit/test_phase_0057_validation_matrix.py` 1/1 passed |
+| PHASE 0058 | Strict configuration validation and safe defaults — Core implementation | DONE | `AppConfig.resource_limits_dict()`; `tests/unit/test_phase_0058_resource_limits.py` 1/1 passed |
+| PHASE 0059 | Strict configuration validation and safe defaults — Hardening, edge cases and security review | DONE | budget-bound rejection gates; `tests/unit/test_phase_0059_limits_hardening.py` 1/1 passed |
+| PHASE 0060 | Strict configuration validation and safe defaults — Integration, regression tests and sign-off | DONE | env-override end-to-end; `tests/unit/test_phase_0060_validation_signoff.py` 1/1 passed |
+| PHASE 0061–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
