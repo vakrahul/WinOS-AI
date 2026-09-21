@@ -31,6 +31,11 @@ class ScopedFileService:
             raise PermissionError(f"Path traversal blocked: '{target}' escapes workspace '{self.workspace_root}'")
         return target
 
+    def safe_join(self, *parts: str) -> Path:
+        """Join path parts and verify confinement without touching the filesystem."""
+        rel = str(Path(*parts)) if parts else "."
+        return self._resolve_safe_path(rel)
+
     def read_file(self, rel_path: str, max_bytes: int = 1048576) -> str:
         safe_path = self._resolve_safe_path(rel_path)
         if not safe_path.exists():

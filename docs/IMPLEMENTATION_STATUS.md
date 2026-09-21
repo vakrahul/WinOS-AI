@@ -60,7 +60,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0038 | Planner, coordinator and agent factory — Core implementation | DONE | `TaskPlan.ready_subtasks()`; `tests/unit/test_phase_0038_ready_subtasks.py` 1/1 passed |
 | PHASE 0039 | Planner, coordinator and agent factory — Hardening, edge cases and security review | DONE | DAG rejection gates; `tests/unit/test_phase_0039_planner_hardening.py` 3/3 passed |
 | PHASE 0040 | Planner, coordinator and agent factory — Integration, regression tests and sign-off | DONE | decompose/validate/checkpoint verified; `tests/unit/test_phase_0040_planner_signoff.py` 1/1 passed |
-| PHASE 0041–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0041 | Windows integration and security core — Inventory and current-state audit | DONE | `docs/PHASE_0041_REPORT.md`; `tests/unit/test_phase_0041_security_audit.py` 2/2 passed |
+| PHASE 0042 | Windows integration and security core — Design specification and acceptance criteria | DONE | `docs/WINDOWS_SECURITY_SPEC.md`; `tests/unit/test_phase_0042_windows_security_spec.py` 1/1 passed |
+| PHASE 0043 | Windows integration and security core — Core implementation | DONE | `ScopedFileService.safe_join()`; `tests/unit/test_phase_0043_safe_join.py` 1/1 passed |
+| PHASE 0044 | Windows integration and security core — Hardening, edge cases and security review | DONE | traversal/rollback guards; `tests/unit/test_phase_0044_fs_hardening.py` 2/2 passed |
+| PHASE 0045 | Windows integration and security core — Integration, regression tests and sign-off | DONE | write/read/rollback + policy round-trip; `tests/unit/test_phase_0045_fs_signoff.py` 1/1 passed |
+| PHASE 0046–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
