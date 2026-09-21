@@ -80,7 +80,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0058 | Strict configuration validation and safe defaults — Core implementation | DONE | `AppConfig.resource_limits_dict()`; `tests/unit/test_phase_0058_resource_limits.py` 1/1 passed |
 | PHASE 0059 | Strict configuration validation and safe defaults — Hardening, edge cases and security review | DONE | budget-bound rejection gates; `tests/unit/test_phase_0059_limits_hardening.py` 1/1 passed |
 | PHASE 0060 | Strict configuration validation and safe defaults — Integration, regression tests and sign-off | DONE | env-override end-to-end; `tests/unit/test_phase_0060_validation_signoff.py` 1/1 passed |
-| PHASE 0061–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0061 | Health, readiness and liveness endpoints — Inventory and current-state audit | DONE | `docs/PHASE_0061_REPORT.md`; `tests/unit/test_phase_0061_health_audit.py` 1/1 passed |
+| PHASE 0062 | Health, readiness and liveness endpoints — Design specification and acceptance criteria | DONE | `docs/HEALTH_ENDPOINT_SPEC.md`; `tests/unit/test_phase_0062_health_spec.py` 1/1 passed |
+| PHASE 0063 | Health, readiness and liveness endpoints — Core implementation | DONE | `build_health_payload()` wired into `GET /health`; `tests/unit/test_phase_0063_health_payload.py` 1/1 passed |
+| PHASE 0064 | Health, readiness and liveness endpoints — Hardening, edge cases and security review | DONE | secret-free health surface; `tests/unit/test_phase_0064_health_hardening.py` 1/1 passed |
+| PHASE 0065 | Health, readiness and liveness endpoints — Integration, regression tests and sign-off | DONE | live payload shape verified; `tests/unit/test_phase_0065_health_signoff.py` 1/1 passed |
+| PHASE 0066–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

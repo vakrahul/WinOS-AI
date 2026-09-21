@@ -79,15 +79,14 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     async def health_check():
         active_prov = get_target_provider()
         provider_healthy = await active_prov.health_check()
-        return {
-            "status": "healthy" if provider_healthy else "degraded",
-            "app": app_config.app_name,
-            "version": app_config.app_version,
-            "environment": app_config.environment,
-            "provider": active_prov.get_capabilities().provider_name,
-            "provider_healthy": provider_healthy,
-            "configured_providers": provider_registry.list_providers(),
-        }
+        return build_health_payload(
+            provider_healthy=provider_healthy,
+            app_name=app_config.app_name,
+            app_version=app_config.app_version,
+            environment=app_config.environment,
+            provider_name=active_prov.get_capabilities().provider_name,
+            configured_providers=provider_registry.list_providers(),
+        )
 
     app_scanner = SystemAppScanner()
     app_manager = AppManager()
@@ -200,6 +199,27 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
             pass
 
     return app
+
+
+def build_health_payload(
+    *,
+    provider_healthy: bool,
+    app_name: str,
+    app_version: str,
+    environment: Any,
+    provider_name: str,
+    configured_providers: list,
+) -> dict:
+    """Build the GET /health payload (degraded on provider outage, never secret-bearing)."""
+    return {
+        "status": "healthy" if provider_healthy else "degraded",
+        "app": app_name,
+        "version": app_version,
+        "environment": environment,
+        "provider": provider_name,
+        "provider_healthy": provider_healthy,
+        "configured_providers": configured_providers,
+    }
 
 
 def list_registered_routes(app: FastAPI) -> list:
