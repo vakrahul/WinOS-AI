@@ -85,7 +85,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0063 | Health, readiness and liveness endpoints — Core implementation | DONE | `build_health_payload()` wired into `GET /health`; `tests/unit/test_phase_0063_health_payload.py` 1/1 passed |
 | PHASE 0064 | Health, readiness and liveness endpoints — Hardening, edge cases and security review | DONE | secret-free health surface; `tests/unit/test_phase_0064_health_hardening.py` 1/1 passed |
 | PHASE 0065 | Health, readiness and liveness endpoints — Integration, regression tests and sign-off | DONE | live payload shape verified; `tests/unit/test_phase_0065_health_signoff.py` 1/1 passed |
-| PHASE 0066–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0066 | Structured logging foundation — Inventory and current-state audit | DONE | `docs/PHASE_0066_REPORT.md`; `tests/unit/test_phase_0066_logging_audit.py` 1/1 passed |
+| PHASE 0067 | Structured logging foundation — Design specification and acceptance criteria | DONE | `docs/LOGGING_SPEC.md`; `tests/unit/test_phase_0067_logging_spec.py` 1/1 passed |
+| PHASE 0068 | Structured logging foundation — Core implementation | DONE | `AuditLogger.event_count()`; `tests/unit/test_phase_0068_event_count.py` 1/1 passed |
+| PHASE 0069 | Structured logging foundation — Hardening, edge cases and security review | DONE | corrupt-line fail-closed verification; `tests/unit/test_phase_0069_corrupt_line.py` 1/1 passed |
+| PHASE 0070 | Structured logging foundation — Integration, regression tests and sign-off | DONE | redaction + chain round-trip; `tests/unit/test_phase_0070_logging_signoff.py` 1/1 passed |
+| PHASE 0071–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

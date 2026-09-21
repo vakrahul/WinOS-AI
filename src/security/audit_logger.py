@@ -150,6 +150,13 @@ class AuditLogger:
             f.write(json.dumps(event.to_dict()) + "\n")
         return event
 
+    def event_count(self) -> int:
+        """Return the number of non-empty records in the log file."""
+        if not self.log_file.exists():
+            return 0
+        with open(self.log_file, "r", encoding="utf-8") as f:
+            return sum(1 for line in f if line.strip())
+
     def verify_integrity(self) -> bool:
         """Verify that every entry in the log chain has a valid SHA-256 hash matching its predecessor."""
         if not self.log_file.exists():
@@ -160,7 +167,10 @@ class AuditLogger:
                 clean_line = line.strip()
                 if not clean_line:
                     continue
-                record = json.loads(clean_line)
+                try:
+                    record = json.loads(clean_line)
+                except json.JSONDecodeError:
+                    return False
                 if record.get("prev_hash") != expected_prev_hash:
                     return False
                 # Recompute hash
