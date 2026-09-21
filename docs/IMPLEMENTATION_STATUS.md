@@ -190,7 +190,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0168 | Conversation history management — Core implementation | DONE | `recent_observations()`; `tests/unit/test_phase_0168_recent_obs.py` 1/1 passed |
 | PHASE 0169 | Conversation history management — Hardening, edge cases and security review | DONE | empty/negative-limit guards; `tests/unit/test_phase_0169_history_hardening.py` 1/1 passed |
 | PHASE 0170 | Conversation history management — Integration, regression tests and sign-off | DONE | goal/observe/summary flow; `tests/unit/test_phase_0170_history_signoff.py` 1/1 passed |
-| PHASE 0171–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0171 | Prompt construction and prefix reuse — Inventory and current-state audit | DONE | `docs/PHASE_0171_REPORT.md`; `tests/unit/test_phase_0171_prefix_audit.py` 1/1 passed |
+| PHASE 0172 | Prompt construction and prefix reuse — Design specification and acceptance criteria | DONE | `docs/PREFIX_CACHE_SPEC.md`; `tests/unit/test_phase_0172_prefix_spec.py` 1/1 passed |
+| PHASE 0173 | Prompt construction and prefix reuse — Core implementation | DONE | `invalidate_model()`; `tests/unit/test_phase_0173_invalidate.py` 1/1 passed |
+| PHASE 0174 | Prompt construction and prefix reuse — Hardening, edge cases and security review | DONE | TTL/hash gates; `tests/unit/test_phase_0174_ttl_hardening.py` 2/2 passed |
+| PHASE 0175 | Prompt construction and prefix reuse — Integration, regression tests and sign-off | DONE | store/hit/align flow; `tests/unit/test_phase_0175_prefix_signoff.py` 1/1 passed |
+| PHASE 0176–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

@@ -100,6 +100,16 @@ class PromptCache:
             embedding=emb,
         )
 
+    def invalidate_model(self, model_name: str) -> int:
+        """Purge all cached entries for a model; returns removed count."""
+        doomed = [
+            key for key, entry in self._exact_cache.items()
+            if entry.model_name == model_name
+        ]
+        for key in doomed:
+            del self._exact_cache[key]
+        return len(doomed)
+
     def get_stats(self) -> Dict[str, Any]:
         return {
             "cached_entries_count": len(self._exact_cache),
