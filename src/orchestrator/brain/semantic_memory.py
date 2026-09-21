@@ -1,8 +1,19 @@
 """Semantic Memory: Vector retrieval and conceptual similarity search."""
+import hashlib
 import math
 import re
 from typing import Dict, List, Optional, Tuple
 from src.orchestrator.brain.models import MemoryEntry, MemoryType, VerificationStatus
+
+
+def _stable_token_index(token: str, dimensions: int) -> int:
+    """Map a token to a bucket deterministically across processes.
+
+    NOTE: Python's builtin hash() is salted per process, so it must never
+    be used here; MD5 keeps embeddings stable between restarts.
+    """
+    digest = hashlib.md5(token.encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], "little") % dimensions
 
 
 def simple_embedding(text: str, dimensions: int = 64) -> List[float]:
@@ -13,7 +24,7 @@ def simple_embedding(text: str, dimensions: int = 64) -> List[float]:
         return vec
 
     for token in tokens:
-        idx = hash(token) % dimensions
+        idx = _stable_token_index(token, dimensions)
         vec[idx] += 1.0
 
     # L2 normalize

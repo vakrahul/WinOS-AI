@@ -42,6 +42,14 @@ class BrainSubsystem:
 
     # --- Phase 40: User Memory Controls ---
 
+    def memory_stats(self) -> Dict[str, int]:
+        """Return per-tier memory counts for dashboard cards (no content)."""
+        counts: Dict[str, int] = {t.value: 0 for t in MemoryType}
+        for entry in self.inspect_memory():
+            counts[entry.memory_type.value] = counts.get(entry.memory_type.value, 0) + 1
+        counts["total"] = sum(v for k, v in counts.items() if k != "total")
+        return counts
+
     def inspect_memory(self, memory_type: Optional[MemoryType] = None) -> List[MemoryEntry]:
         """Inspect stored memories, optionally filtered by type."""
         all_entries = self.persistent.get_all() + self.semantic.get_all()

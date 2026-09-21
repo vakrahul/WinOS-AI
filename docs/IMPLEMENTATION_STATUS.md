@@ -160,7 +160,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0138 | Security and approval center — Core implementation | DONE | `ApprovalBroker.pending_count()`; `tests/unit/test_phase_0138_pending_count.py` 1/1 passed |
 | PHASE 0139 | Security and approval center — Hardening, edge cases and security review | DONE | forgery/mismatch/replay gates; `tests/unit/test_phase_0139_approval_hardening.py` 2/2 passed |
 | PHASE 0140 | Security and approval center — Integration, regression tests and sign-off | DONE | session revocation verified; `tests/unit/test_phase_0140_approval_signoff.py` 1/1 passed |
-| PHASE 0141–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0141 | Memory and model configuration views — Inventory and current-state audit | DONE | `docs/PHASE_0141_REPORT.md`; `tests/unit/test_phase_0141_memory_views_audit.py` 2/2 passed |
+| PHASE 0142 | Memory and model configuration views — Design specification and acceptance criteria | DONE | `docs/MEMORY_MODEL_CONFIG_SPEC.md`; `tests/unit/test_phase_0142_memory_model_spec.py` 1/1 passed |
+| PHASE 0143 | Memory and model configuration views — Core implementation | DONE | `BrainSubsystem.memory_stats()`; `tests/unit/test_phase_0143_memory_stats.py` 1/1 passed |
+| PHASE 0144 | Memory and model configuration views — Hardening, edge cases and security review | DONE | empty/unknown-ID guards; `tests/unit/test_phase_0144_stats_hardening.py` 2/2 passed |
+| PHASE 0145 | Memory and model configuration views — Integration, regression tests and sign-off | DONE | stats/export/correct/delete flow; `tests/unit/test_phase_0145_memory_signoff.py` 1/1 passed |
+| PHASE 0146–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
