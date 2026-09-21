@@ -21,7 +21,8 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0002 | Top-level repository layout and documentation index — Design specification and acceptance criteria | DONE | `docs/REPO_LAYOUT_SPEC.md`; `tests/unit/test_phase_0002_layout_spec.py` 3/3 passed; regression `test_environment.py` 2/2 passed |
 | PHASE 0003 | Top-level repository layout and documentation index — Core implementation | DONE | `scripts/check_repo_layout.py`; `tests/unit/test_phase_0003_layout_check.py` 1/1 passed; regression `test_environment.py` 2/2 passed |
 | PHASE 0004 | Top-level repository layout and documentation index — Hardening, edge cases and security review | DONE | hardened `scripts/check_repo_layout.py` (dir/file types, secret hygiene); `tests/unit/test_phase_0004_layout_hardening.py` 3/3 passed |
-| PHASE 0005–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0005 | Top-level repository layout and documentation index — Integration, regression tests and sign-off | DONE | CLI `scripts/check_repo_layout.py` exit 0; `tests/unit/test_phase_0005_layout_signoff.py` 1/1 passed; regression baseline 5/5 passed |
+| PHASE 0006–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
