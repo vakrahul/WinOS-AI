@@ -45,7 +45,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0023 | Provider base contracts and registry — Core implementation | DONE | `ProviderRegistry.has_provider()`; `tests/unit/test_phase_0023_registry_helper.py` 1/1 passed; regression `test_providers_stage3.py` 5/5 passed |
 | PHASE 0024 | Provider base contracts and registry — Hardening, edge cases and security review | DONE | registry type-guard rejects non-providers; `tests/unit/test_phase_0024_registry_hardening.py` 1/1 passed |
 | PHASE 0025 | Provider base contracts and registry — Integration, regression tests and sign-off | DONE | registry capability surface verified; `tests/unit/test_phase_0025_provider_signoff.py` 1/1 passed |
-| PHASE 0026–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0026 | Provider adapters and resilience — Inventory and current-state audit | DONE | `docs/PHASE_0026_REPORT.md`; `tests/unit/test_phase_0026_adapter_audit.py` 2/2 passed |
+| PHASE 0027 | Provider adapters and resilience — Design specification and acceptance criteria | DONE | `docs/ADAPTER_RESILIENCE_SPEC.md`; `tests/unit/test_phase_0027_adapter_spec.py` 1/1 passed |
+| PHASE 0028 | Provider adapters and resilience — Core implementation | DONE | `ProviderRegistry.registered_ids()`; `tests/unit/test_phase_0028_registry_ids.py` 1/1 passed |
+| PHASE 0029 | Provider adapters and resilience — Hardening, edge cases and security review | DONE | breaker transition + registration guards; `tests/unit/test_phase_0029_resilience_hardening.py` 2/2 passed |
+| PHASE 0030 | Provider adapters and resilience — Integration, regression tests and sign-off | DONE | 5-adapter registry surface verified; `tests/unit/test_phase_0030_adapter_signoff.py` 1/1 passed |
+| PHASE 0031–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

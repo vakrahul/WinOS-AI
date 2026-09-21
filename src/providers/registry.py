@@ -32,6 +32,10 @@ class ProviderRegistry:
         """Return True when the provider ID is registered (no secrets exposed)."""
         return provider_id in self._providers
 
+    def registered_ids(self) -> list:
+        """Return sorted registered provider IDs (capability metadata only)."""
+        return sorted(self._providers)
+
     def get_provider(self, provider_id: Optional[str] = None) -> BaseModelProvider:
         """Retrieve provider adapter by ID or return the active provider."""
         pid = provider_id or self._active_provider_id
