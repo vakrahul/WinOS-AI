@@ -37,6 +37,11 @@ class ProviderResponse(BaseModel):
     finish_reason: str = "stop"
     usage: Dict[str, int] = Field(default_factory=dict)
 
+    @property
+    def has_tool_calls(self) -> bool:
+        """Return True when the model proposed at least one tool invocation."""
+        return len(self.tool_calls) > 0
+
 
 class BaseModelProvider(ABC):
     """Abstract base class for all AI provider adapters."""
