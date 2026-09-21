@@ -130,7 +130,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0108 | Navigation shell and routing — Core implementation | DONE | `scripts/check_navigation.py`; `tests/unit/test_phase_0108_nav_check.py` 1/1 passed |
 | PHASE 0109 | Navigation shell and routing — Hardening, edge cases and security review | DONE | unknown-destination rejection; `tests/unit/test_phase_0109_nav_hardening.py` 2/2 passed |
 | PHASE 0110 | Navigation shell and routing — Integration, regression tests and sign-off | DONE | CLI exit 0; `tests/unit/test_phase_0110_nav_signoff.py` 1/1 passed |
-| PHASE 0111–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0111 | Main conversation workspace — Inventory and current-state audit | DONE | `docs/PHASE_0111_REPORT.md`; `tests/unit/test_phase_0111_chat_audit.py` 1/1 passed |
+| PHASE 0112 | Main conversation workspace — Design specification and acceptance criteria | DONE | `docs/CHAT_WORKSPACE_SPEC.md`; `tests/unit/test_phase_0112_chat_spec.py` 1/1 passed |
+| PHASE 0113 | Main conversation workspace — Core implementation | DONE | `scripts/check_chat_contract.py`; `tests/unit/test_phase_0113_chat_contract.py` 1/1 passed |
+| PHASE 0114 | Main conversation workspace — Hardening, edge cases and security review | DONE | hostile-role rejection; `tests/unit/test_phase_0114_role_hardening.py` 2/2 passed |
+| PHASE 0115 | Main conversation workspace — Integration, regression tests and sign-off | DONE | CLI + mock round-trip; `tests/unit/test_phase_0115_chat_signoff.py` 2/2 passed |
+| PHASE 0116–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
