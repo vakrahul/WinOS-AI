@@ -74,6 +74,15 @@ class PersistentMemoryStore:
             )
             return [self._row_to_entry(r) for r in cur.fetchall()]
 
+    def count_by_type(self, memory_type: MemoryType) -> int:
+        """Return the record count for a memory tier without loading content."""
+        with self._get_connection() as conn:
+            cur = conn.execute(
+                "SELECT COUNT(*) AS n FROM memories WHERE memory_type = ?;",
+                (memory_type.value,),
+            )
+            return int(cur.fetchone()["n"])
+
     def delete_entry(self, entry_id: str) -> bool:
         with self._get_connection() as conn:
             cur = conn.execute("DELETE FROM memories WHERE id = ?;", (entry_id,))

@@ -215,7 +215,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0193 | Multi-turn context windowing — Core implementation | DONE | `window_messages()`; `tests/unit/test_phase_0193_window_messages.py` 1/1 passed |
 | PHASE 0194 | Multi-turn context windowing — Hardening, edge cases and security review | DONE | empty/budget guards; `tests/unit/test_phase_0194_window_hardening.py` 1/1 passed |
 | PHASE 0195 | Multi-turn context windowing — Integration, regression tests and sign-off | DONE | budget-fit verified; `tests/unit/test_phase_0195_window_signoff.py` 1/1 passed |
-| PHASE 0196–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0196 | Conversation persistence across restarts — Inventory and current-state audit | DONE | `docs/PHASE_0196_REPORT.md`; `tests/unit/test_phase_0196_persist_audit.py` 1/1 passed |
+| PHASE 0197 | Conversation persistence across restarts — Design specification and acceptance criteria | DONE | `docs/PERSISTENCE_SPEC.md`; `tests/unit/test_phase_0197_persist_spec.py` 1/1 passed |
+| PHASE 0198 | Conversation persistence across restarts — Core implementation | DONE | `count_by_type()`; `tests/unit/test_phase_0198_count_by_type.py` 1/1 passed |
+| PHASE 0199 | Conversation persistence across restarts — Hardening, edge cases and security review | DONE | unknown-ID guards; `tests/unit/test_phase_0199_persist_hardening.py` 1/1 passed |
+| PHASE 0200 | Conversation persistence across restarts — Integration, regression tests and sign-off | DONE | restart round-trip; `tests/unit/test_phase_0200_persist_signoff.py` 1/1 passed, STAGE 02 complete |
+| PHASE 0201–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
