@@ -36,6 +36,24 @@ class ProviderRegistry:
         """Return sorted registered provider IDs (capability metadata only)."""
         return sorted(self._providers)
 
+    def describe_connection(self, provider_id: str) -> Dict[str, Any]:
+        """Return synchronous connection metadata for the integration center.
+
+        Reports identity and capability flags only; health probing stays
+        asynchronous and no secret material is included.
+        """
+        adapter = self.get_provider(provider_id)
+        caps = adapter.get_capabilities()
+        return {
+            "id": provider_id,
+            "provider_name": caps.provider_name,
+            "model_name": caps.model_name,
+            "is_active": provider_id == self._active_provider_id,
+            "is_local": caps.provider_name == "local",
+            "supports_streaming": caps.supports_streaming,
+            "supports_tools": caps.supports_tools,
+        }
+
     def get_provider(self, provider_id: Optional[str] = None) -> BaseModelProvider:
         """Retrieve provider adapter by ID or return the active provider."""
         pid = provider_id or self._active_provider_id

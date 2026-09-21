@@ -150,7 +150,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0128 | Project workspace views — Core implementation | DONE | `WorkspaceDescriptor` mirror; `tests/unit/test_phase_0128_workspace_model.py` 1/1 passed |
 | PHASE 0129 | Project workspace views — Hardening, edge cases and security review | DONE | root/tool/level rejection; `tests/unit/test_phase_0129_workspace_hardening.py` 3/3 passed |
 | PHASE 0130 | Project workspace views — Integration, regression tests and sign-off | DONE | strict least-privilege default; `tests/unit/test_phase_0130_workspace_signoff.py` 1/1 passed |
-| PHASE 0131–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0131 | Application integration center — Inventory and current-state audit | DONE | `docs/PHASE_0131_REPORT.md`; `tests/unit/test_phase_0131_integration_audit.py` 2/2 passed |
+| PHASE 0132 | Application integration center — Design specification and acceptance criteria | DONE | `docs/INTEGRATION_CENTER_SPEC.md`; `tests/unit/test_phase_0132_integration_spec.py` 1/1 passed |
+| PHASE 0133 | Application integration center — Core implementation | DONE | `describe_connection()`; `tests/unit/test_phase_0133_connection_summary.py` 1/1 passed |
+| PHASE 0134 | Application integration center — Hardening, edge cases and security review | DONE | unknown-provider + local-flag gates; `tests/unit/test_phase_0134_connection_hardening.py` 2/2 passed |
+| PHASE 0135 | Application integration center — Integration, regression tests and sign-off | DONE | vault-backed registry surface; `tests/unit/test_phase_0135_integration_signoff.py` 1/1 passed |
+| PHASE 0136–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
