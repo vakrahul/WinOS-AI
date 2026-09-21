@@ -155,7 +155,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0133 | Application integration center — Core implementation | DONE | `describe_connection()`; `tests/unit/test_phase_0133_connection_summary.py` 1/1 passed |
 | PHASE 0134 | Application integration center — Hardening, edge cases and security review | DONE | unknown-provider + local-flag gates; `tests/unit/test_phase_0134_connection_hardening.py` 2/2 passed |
 | PHASE 0135 | Application integration center — Integration, regression tests and sign-off | DONE | vault-backed registry surface; `tests/unit/test_phase_0135_integration_signoff.py` 1/1 passed |
-| PHASE 0136–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0136 | Security and approval center — Inventory and current-state audit | DONE | `docs/PHASE_0136_REPORT.md`; `tests/unit/test_phase_0136_approval_audit.py` 2/2 passed |
+| PHASE 0137 | Security and approval center — Design specification and acceptance criteria | DONE | `docs/APPROVAL_CENTER_SPEC.md`; `tests/unit/test_phase_0137_approval_spec.py` 1/1 passed |
+| PHASE 0138 | Security and approval center — Core implementation | DONE | `ApprovalBroker.pending_count()`; `tests/unit/test_phase_0138_pending_count.py` 1/1 passed |
+| PHASE 0139 | Security and approval center — Hardening, edge cases and security review | DONE | forgery/mismatch/replay gates; `tests/unit/test_phase_0139_approval_hardening.py` 2/2 passed |
+| PHASE 0140 | Security and approval center — Integration, regression tests and sign-off | DONE | session revocation verified; `tests/unit/test_phase_0140_approval_signoff.py` 1/1 passed |
+| PHASE 0141–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

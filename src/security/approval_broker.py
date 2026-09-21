@@ -77,6 +77,17 @@ class ApprovalBroker:
 
         return self._pending.pop(nonce)
 
+    def pending_count(self, session_id: str | None = None) -> int:
+        """Return the number of unexpired pending approvals, optionally per session."""
+        now = time.time()
+        if session_id is None:
+            return sum(1 for r in self._pending.values() if now - r.created_at <= r.ttl_seconds)
+        return sum(
+            1
+            for r in self._pending.values()
+            if r.session_id == session_id and now - r.created_at <= r.ttl_seconds
+        )
+
     def revoke_all_for_session(self, session_id: str) -> int:
         """Revoke and invalidate all pending approvals for a session."""
         to_remove = [k for k, v in self._pending.items() if v.session_id == session_id]
