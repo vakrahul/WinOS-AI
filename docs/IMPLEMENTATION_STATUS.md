@@ -145,7 +145,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0123 | Task center views — Core implementation | DONE | `TaskPlan.progress()`; `tests/unit/test_phase_0123_progress.py` 1/1 passed |
 | PHASE 0124 | Task center views — Hardening, edge cases and security review | DONE | zero-division guards; `tests/unit/test_phase_0124_progress_hardening.py` 2/2 passed |
 | PHASE 0125 | Task center views — Integration, regression tests and sign-off | DONE | 0%→100% with checkpoint; `tests/unit/test_phase_0125_taskcenter_signoff.py` 1/1 passed |
-| PHASE 0126–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0126 | Project workspace views — Inventory and current-state audit | DONE | `docs/PHASE_0126_REPORT.md`; `tests/unit/test_phase_0126_workspace_audit.py` 2/2 passed |
+| PHASE 0127 | Project workspace views — Design specification and acceptance criteria | DONE | `docs/PROJECT_WORKSPACE_SPEC.md`; `tests/unit/test_phase_0127_workspace_spec.py` 1/1 passed |
+| PHASE 0128 | Project workspace views — Core implementation | DONE | `WorkspaceDescriptor` mirror; `tests/unit/test_phase_0128_workspace_model.py` 1/1 passed |
+| PHASE 0129 | Project workspace views — Hardening, edge cases and security review | DONE | root/tool/level rejection; `tests/unit/test_phase_0129_workspace_hardening.py` 3/3 passed |
+| PHASE 0130 | Project workspace views — Integration, regression tests and sign-off | DONE | strict least-privilege default; `tests/unit/test_phase_0130_workspace_signoff.py` 1/1 passed |
+| PHASE 0131–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
