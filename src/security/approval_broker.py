@@ -77,6 +77,18 @@ class ApprovalBroker:
 
         return self._pending.pop(nonce)
 
+    def describe_request(self, nonce: str) -> Optional[Dict[str, str]]:
+        """Return display-safe fields for a pending request (no nonce/params)."""
+        req = self._pending.get(nonce)
+        if not req:
+            return None
+        return {
+            "tool_name": req.tool_name,
+            "target_resource": req.target_resource,
+            "risk_tier": req.risk_tier,
+            "reason": req.reason,
+        }
+
     def pending_count(self, session_id: str | None = None) -> int:
         """Return the number of unexpired pending approvals, optionally per session."""
         now = time.time()

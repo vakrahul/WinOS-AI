@@ -200,7 +200,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0178 | Tool-call rendering and confirmation — Core implementation | DONE | `render_tool_summary()`; `tests/unit/test_phase_0178_render_summary.py` 1/1 passed |
 | PHASE 0179 | Tool-call rendering and confirmation — Hardening, edge cases and security review | DONE | case-insensitive redaction; `tests/unit/test_phase_0179_render_hardening.py` 2/2 passed |
 | PHASE 0180 | Tool-call rendering and confirmation — Integration, regression tests and sign-off | DONE | fallback dispatch verified; `tests/unit/test_phase_0180_render_signoff.py` 1/1 passed |
-| PHASE 0181–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0181 | Approval request UX flow — Inventory and current-state audit | DONE | `docs/PHASE_0181_REPORT.md`; `tests/unit/test_phase_0181_approval_ux_audit.py` 1/1 passed |
+| PHASE 0182 | Approval request UX flow — Design specification and acceptance criteria | DONE | `docs/APPROVAL_UX_SPEC.md`; `tests/unit/test_phase_0182_approval_ux_spec.py` 1/1 passed |
+| PHASE 0183 | Approval request UX flow — Core implementation | DONE | `describe_request()`; `tests/unit/test_phase_0183_describe_request.py` 1/1 passed |
+| PHASE 0184 | Approval request UX flow — Hardening, edge cases and security review | DONE | nonce/param leak gates; `tests/unit/test_phase_0184_describe_hardening.py` 1/1 passed |
+| PHASE 0185 | Approval request UX flow — Integration, regression tests and sign-off | DONE | describe/consume flow; `tests/unit/test_phase_0185_ux_signoff.py` 1/1 passed |
+| PHASE 0186–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
