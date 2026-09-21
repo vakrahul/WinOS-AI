@@ -17,7 +17,8 @@ from src.orchestrator.jev.base import (
     BaseJevProvider,
     JevDecisionKind,
     JevDecisionRequest,
-    JevError,
+    JevTimeoutError,
+    JevValidationError,
     decide_with_timeout,
 )
 
@@ -127,9 +128,13 @@ class JevDecisionRouter:
         )
         try:
             response = await decide_with_timeout(self.provider, request)
-        except JevError as e:
-            timed_out = e.__class__.__name__ == "JevTimeoutError"
-            return _fallback(f"JEV failure ({e.__class__.__name__})", timeout=timed_out, invalid=not timed_out)
+        except JevTimeoutError as e:
+            return _fallback(f"JEV timeout ({e})", timeout=True)
+        except JevValidationError as e:
+            return _fallback(f"JEV invalid response ({e})", invalid=True)
+        except Exception as e:
+            # A misbehaving provider must never crash the caller.
+            return _fallback(f"JEV provider failure ({e.__class__.__name__})")
 
         if response.confidence < self.config.confidence_threshold:
             return _fallback(
