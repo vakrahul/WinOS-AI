@@ -39,7 +39,8 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0017 | Configuration and environment validation — Design specification and acceptance criteria | DONE | `docs/CONFIG_SPEC.md`; `tests/unit/test_phase_0017_config_spec.py` 1/1 passed; regression `test_config.py` 5/5 passed |
 | PHASE 0018 | Configuration and environment validation — Core implementation | DONE | `AppConfig.public_config_dict()` wired into `GET /api/v1/config`; `tests/unit/test_phase_0018_public_config.py` 1/1 passed |
 | PHASE 0019 | Configuration and environment validation — Hardening, edge cases and security review | DONE | hostile-host rejection gates; `tests/unit/test_phase_0019_config_hardening.py` 2/2 passed |
-| PHASE 0020–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0020 | Configuration and environment validation — Integration, regression tests and sign-off | DONE | live `/api/v1/config` surface verified; `tests/unit/test_phase_0020_config_signoff.py` 1/1 passed |
+| PHASE 0021–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
