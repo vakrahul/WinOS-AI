@@ -115,7 +115,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0093 | Dependency versioning and reproducibility — Core implementation | DONE | `scripts/check_dependency_drift.py`; `tests/unit/test_phase_0093_drift_check.py` 1/1 passed |
 | PHASE 0094 | Dependency versioning and reproducibility — Hardening, edge cases and security review | DONE | bidirectional drift detection; `tests/unit/test_phase_0094_drift_hardening.py` 1/1 passed |
 | PHASE 0095 | Dependency versioning and reproducibility — Integration, regression tests and sign-off | DONE | CLI exit 0; `tests/unit/test_phase_0095_drift_signoff.py` 1/1 passed |
-| PHASE 0096–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0096 | Service diagnostics and startup self-check — Inventory and current-state audit | DONE | `docs/PHASE_0096_REPORT.md`; `tests/unit/test_phase_0096_diagnostics_audit.py` 1/1 passed |
+| PHASE 0097 | Service diagnostics and startup self-check — Design specification and acceptance criteria | DONE | `docs/DIAGNOSTICS_SPEC.md`; `tests/unit/test_phase_0097_diagnostics_spec.py` 1/1 passed |
+| PHASE 0098 | Service diagnostics and startup self-check — Core implementation | DONE | `scripts/diagnostics.py`; `tests/unit/test_phase_0098_diagnostics.py` 1/1 passed |
+| PHASE 0099 | Service diagnostics and startup self-check — Hardening, edge cases and security review | DONE | secret-free output gate; `tests/unit/test_phase_0099_diag_hardening.py` 1/1 passed |
+| PHASE 0100 | Service diagnostics and startup self-check — Integration, regression tests and sign-off | DONE | STAGE 01 holds 100 phases; `tests/unit/test_phase_0100_stage01_signoff.py` 1/1 passed |
+| PHASE 0101–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
