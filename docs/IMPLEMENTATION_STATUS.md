@@ -175,7 +175,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0153 | Chat message contracts and roles — Core implementation | DONE | `ProviderResponse.has_tool_calls`; `tests/unit/test_phase_0153_tool_presence.py` 1/1 passed |
 | PHASE 0154 | Chat message contracts and roles — Hardening, edge cases and security review | DONE | non-dict/blank-role rejection; `tests/unit/test_phase_0154_message_hardening.py` 2/2 passed |
 | PHASE 0155 | Chat message contracts and roles — Integration, regression tests and sign-off | DONE | tool-call flow verified; `tests/unit/test_phase_0155_message_signoff.py` 1/1 passed |
-| PHASE 0156–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0156 | Streaming token pipeline — Inventory and current-state audit | DONE | `docs/PHASE_0156_REPORT.md`; `tests/unit/test_phase_0156_stream_audit.py` 1/1 passed |
+| PHASE 0157 | Streaming token pipeline — Design specification and acceptance criteria | DONE | `docs/STREAMING_SPEC.md`; `tests/unit/test_phase_0157_streaming_spec.py` 1/1 passed |
+| PHASE 0158 | Streaming token pipeline — Core implementation | DONE | `collect_stream()` with truncation; `tests/unit/test_phase_0158_collect_stream.py` 2/2 passed |
+| PHASE 0159 | Streaming token pipeline — Hardening, edge cases and security review | DONE | empty-stream + cancellation gates; `tests/unit/test_phase_0159_stream_hardening.py` 2/2 passed |
+| PHASE 0160 | Streaming token pipeline — Integration, regression tests and sign-off | DONE | live mock collection; `tests/unit/test_phase_0160_stream_signoff.py` 1/1 passed |
+| PHASE 0161–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

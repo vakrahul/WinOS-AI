@@ -77,3 +77,30 @@ class BaseModelProvider(ABC):
     async def health_check(self) -> bool:
         """Return True if provider endpoint is reachable and authenticated."""
         pass
+
+
+async def collect_stream(
+    provider: "BaseModelProvider",
+    messages: List[ChatMessage],
+    max_chars: int = 50000,
+    **kwargs: Any,
+) -> str:
+    """Collect a provider stream into text, truncated at max_chars.
+
+    Cancellation propagates to the caller; no secrets are logged.
+    """
+    chunks: List[str] = []
+    total = 0
+    async for chunk in provider.stream(messages, **kwargs):
+        if not chunk:
+            continue
+        remaining = max_chars - total
+        if remaining <= 0:
+            break
+        if len(chunk) > remaining:
+            chunks.append(chunk[:remaining])
+            total = max_chars
+            break
+        chunks.append(chunk)
+        total += len(chunk)
+    return "".join(chunks)
