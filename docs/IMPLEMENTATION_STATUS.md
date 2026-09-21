@@ -185,7 +185,12 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0163 | Cancellation and stop generation — Core implementation | DONE | `build_cancelled_event()` wired into endpoint; `tests/unit/test_phase_0163_cancel_event.py` 1/1 passed |
 | PHASE 0164 | Cancellation and stop generation — Hardening, edge cases and security review | DONE | double-cancel safety; `tests/unit/test_phase_0164_cancel_hardening.py` 1/1 passed |
 | PHASE 0165 | Cancellation and stop generation — Integration, regression tests and sign-off | DONE | live cancel round-trip; `tests/unit/test_phase_0165_cancel_signoff.py` 1/1 passed |
-| PHASE 0166–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0166 | Conversation history management — Inventory and current-state audit | DONE | `docs/PHASE_0166_REPORT.md`; `tests/unit/test_phase_0166_history_audit.py` 1/1 passed |
+| PHASE 0167 | Conversation history management — Design specification and acceptance criteria | DONE | `docs/HISTORY_SPEC.md`; `tests/unit/test_phase_0167_history_spec.py` 1/1 passed |
+| PHASE 0168 | Conversation history management — Core implementation | DONE | `recent_observations()`; `tests/unit/test_phase_0168_recent_obs.py` 1/1 passed |
+| PHASE 0169 | Conversation history management — Hardening, edge cases and security review | DONE | empty/negative-limit guards; `tests/unit/test_phase_0169_history_hardening.py` 1/1 passed |
+| PHASE 0170 | Conversation history management — Integration, regression tests and sign-off | DONE | goal/observe/summary flow; `tests/unit/test_phase_0170_history_signoff.py` 1/1 passed |
+| PHASE 0171–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 

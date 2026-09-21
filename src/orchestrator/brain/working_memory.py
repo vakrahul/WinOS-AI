@@ -39,6 +39,12 @@ class WorkingMemory:
         self.observations.append(entry)
         return entry
 
+    def recent_observations(self, limit: int = 5) -> List[MemoryEntry]:
+        """Return the newest observations first, capped at limit."""
+        if limit <= 0:
+            return []
+        return list(reversed(self.observations[-limit:]))
+
     def get_context_summary(self) -> str:
         """Produce condensed working memory prompt string."""
         lines = []
