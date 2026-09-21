@@ -24,6 +24,10 @@ class ProviderRegistry:
         """Register a new provider adapter instance."""
         self._providers[provider_id] = provider
 
+    def has_provider(self, provider_id: str) -> bool:
+        """Return True when the provider ID is registered (no secrets exposed)."""
+        return provider_id in self._providers
+
     def get_provider(self, provider_id: Optional[str] = None) -> BaseModelProvider:
         """Retrieve provider adapter by ID or return the active provider."""
         pid = provider_id or self._active_provider_id

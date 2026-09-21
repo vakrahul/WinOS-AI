@@ -42,7 +42,8 @@ Dependencies: `docs/ROADMAP_DEPENDENCIES.md`.
 | PHASE 0020 | Configuration and environment validation — Integration, regression tests and sign-off | DONE | live `/api/v1/config` surface verified; `tests/unit/test_phase_0020_config_signoff.py` 1/1 passed |
 | PHASE 0021 | Provider base contracts and registry — Inventory and current-state audit | DONE | `docs/PHASE_0021_REPORT.md`; `tests/unit/test_phase_0021_provider_audit.py` 2/2 passed; regression `test_providers_stage3.py` 5/5 passed |
 | PHASE 0022 | Provider base contracts and registry — Design specification and acceptance criteria | DONE | `docs/PROVIDER_CONTRACT_SPEC.md`; `tests/unit/test_phase_0022_provider_spec.py` 1/1 passed; regression `test_providers_stage3.py` 5/5 passed |
-| PHASE 0023–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
+| PHASE 0023 | Provider base contracts and registry — Core implementation | DONE | `ProviderRegistry.has_provider()`; `tests/unit/test_phase_0023_registry_helper.py` 1/1 passed; regression `test_providers_stage3.py` 5/5 passed |
+| PHASE 0024–PHASE 1000 | Per `docs/MASTER_ROADMAP_1000_PHASES.json` | PENDING | — |
 
 ## Baseline Metrics (Audit Date)
 
