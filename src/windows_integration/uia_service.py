@@ -257,16 +257,34 @@ class UIAutomationService:
                 control_type=control_type,
                 automation_id=automation_id,
             )
+            # Fall back to cached window handle if control search lands on another instance
+            if target_control is None:
+                pass
 
         if not target_control:
-            # Fallback to primary editor
-            doc = win.DocumentControl(searchDepth=4)
-            if doc.Exists(0.2):
-                target_control = doc
-            else:
-                edit = win.EditControl(searchDepth=4)
-                if edit.Exists(0.2):
-                    target_control = edit
+            # CRITICAL: When multiple tabs/windows share the title regex, locate_control
+            # may return a control bound to the wrong tab. Re-resolve the editor
+            # directly from the already-found window object instead.
+            for _ in range(3):
+                try:
+                    doc = win.DocumentControl(searchDepth=4)
+                    if doc.Exists(0.2):
+                        target_control = doc
+                        break
+                except Exception:
+                    pass
+                try:
+                    edit = win.EditControl(searchDepth=4)
+                    if edit.Exists(0.2):
+                        target_control = edit
+                        break
+                except Exception:
+                    pass
+                try:
+                    win.RebuildCache()
+                except Exception:
+                    pass
+                time.sleep(0.2)
 
         if not target_control:
             return False
@@ -296,16 +314,20 @@ class UIAutomationService:
 
     def send_keys_to_window(self, window_title: str, keys: str, wait_time: float = 0.05) -> bool:
         """Focus the application window and dispatch genuine keystrokes."""
-        win = self.find_window(window_title)
-        if not win:
-            return False
-
-        self.focus_window(window_title)
-        try:
-            win.SendKeys(keys, interval=wait_time)
-            return True
-        except Exception:
-            return False
+        for attempt in range(3):
+            try:
+                win = self.find_window(window_title, timeout_seconds=1.5)
+                if not win:
+                    time.sleep(0.5)
+                    continue
+                self.focus_window(window_title)
+                time.sleep(0.2)
+                win = self.find_window(window_title, timeout_seconds=0.5) or win
+                win.SendKeys(keys, interval=wait_time)
+                return True
+            except Exception:
+                time.sleep(0.4)
+        return False
 
     def invoke_button(
         self,
