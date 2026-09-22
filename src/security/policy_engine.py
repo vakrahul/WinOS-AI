@@ -193,7 +193,7 @@ class SecurityPolicyEngine:
         # 4. Windows Desktop Application & Control Tools
         elif tool_name == "app_launch":
             app_id = arguments.get("app_id", "")
-            approved_apps = {"notepad", "calc", "chrome", "vscode"}
+            approved_apps = {"notepad", "calc", "chrome", "vscode", "edge"}
             if app_id not in approved_apps:
                 return ActionEvaluationResult(
                     decision=PolicyDecision.DENY,
@@ -269,6 +269,9 @@ class SecurityPolicyEngine:
             "process_get_info",
             "window_list",
             "window_get_foreground",
+            "browser_get_url",
+            "browser_get_heading",
+            "window_get_text",
         ]:
             return ActionEvaluationResult(
                 decision=PolicyDecision.ALLOW,

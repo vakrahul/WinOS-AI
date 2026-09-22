@@ -42,6 +42,12 @@ class AppManager:
             binary_path=os.path.expandvars(r"%LocalAppData%\Programs\Microsoft VS Code\Code.exe"),
             requires_approval=False,
         ),
+        ApprovedApp(
+            app_id="edge",
+            display_name="Microsoft Edge",
+            binary_path=r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+            requires_approval=False,
+        ),
     ]
 
     def __init__(self):

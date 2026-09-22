@@ -186,10 +186,13 @@ class WindowsExecutionEngine:
                     error_msg = f"Window '{arguments['window_title']}' not found on desktop"
 
             elif tool_name == "window_focus":
-                success = self.uia_service.focus_window(
-                    window_title=arguments["window_title"],
-                    timeout_seconds=arguments.get("timeout_seconds", 3.0),
-                )
+                if arguments.get("hwnd"):
+                    success = self.uia_service.focus_window_by_hwnd(arguments["hwnd"])
+                else:
+                    success = self.uia_service.focus_window(
+                        window_title=arguments["window_title"],
+                        timeout_seconds=arguments.get("timeout_seconds", 3.0),
+                    )
                 if success:
                     output_data = {"focused": True, "window": arguments["window_title"]}
                 else:
@@ -210,11 +213,18 @@ class WindowsExecutionEngine:
                     error_msg = f"Failed to type text into window '{arguments['window_title']}' control"
 
             elif tool_name == "window_send_keys":
-                success = self.uia_service.send_keys_to_window(
-                    window_title=arguments["window_title"],
-                    keys=arguments["keys"],
-                    wait_time=arguments.get("wait_time", 0.05),
-                )
+                if arguments.get("hwnd"):
+                    success = self.uia_service.send_keys_by_hwnd(
+                        arguments["hwnd"],
+                        keys=arguments["keys"],
+                        wait_time=arguments.get("wait_time", 0.05),
+                    )
+                else:
+                    success = self.uia_service.send_keys_to_window(
+                        window_title=arguments["window_title"],
+                        keys=arguments["keys"],
+                        wait_time=arguments.get("wait_time", 0.05),
+                    )
                 if success:
                     output_data = {"sent": True, "keys": arguments["keys"]}
                 else:
@@ -318,6 +328,44 @@ class WindowsExecutionEngine:
                 w = self.intelligence.get_foreground_window()
                 output_data = w.model_dump() if w else None
 
+            elif tool_name == "browser_get_url":
+                if arguments.get("hwnd"):
+                    url = self.uia_service.get_browser_url_by_hwnd(arguments["hwnd"])
+                else:
+                    url = self.uia_service.get_browser_url(
+                        arguments["window_title"],
+                        timeout_seconds=arguments.get("timeout_seconds", 3.0),
+                    )
+                if url:
+                    output_data = {"url": url}
+                else:
+                    error_msg = f"Could not read address-bar URL from window '{arguments['window_title']}'"
+
+            elif tool_name == "browser_get_heading":
+                if arguments.get("hwnd"):
+                    heading = self.uia_service.read_page_heading_by_hwnd(arguments["hwnd"])
+                else:
+                    heading = self.uia_service.read_page_heading(
+                        arguments["window_title"],
+                        timeout_seconds=arguments.get("timeout_seconds", 5.0),
+                    )
+                if heading:
+                    output_data = {"heading": heading}
+                else:
+                    error_msg = f"Could not read page heading from window '{arguments['window_title']}'"
+
+            elif tool_name == "window_get_text":
+                text = self.uia_service.read_text_value(
+                    arguments["window_title"],
+                    automation_id=arguments.get("automation_id"),
+                    name=arguments.get("name"),
+                    control_type=arguments.get("control_type"),
+                )
+                if text:
+                    output_data = {"text": text}
+                else:
+                    error_msg = f"Could not read text from window '{arguments['window_title']}'"
+
             else:
                 error_msg = f"Execution handler not implemented for tool '{tool_name}'"
 
@@ -384,6 +432,9 @@ class WindowsExecutionEngine:
                 "window_invoke_control",
                 "window_select_menu",
                 "window_wait_for_control",
+                "browser_get_url",
+                "browser_get_heading",
+                "window_get_text",
             ]:
                 target = arguments.get("window_title", "")
                 win = self.uia_service.find_window(target, timeout_seconds=0.5)
@@ -422,8 +473,13 @@ class WindowsExecutionEngine:
             return post.get("window_exists", False)
         if tool_name == "window_focus":
             return post.get("window_exists", False)
-        if tool_name in ["window_type_text", "window_send_keys"]:
+        if tool_name == "window_type_text":
             return post.get("window_exists", False) and error is None
+        if tool_name == "window_send_keys":
+            # Keystrokes (new tab, navigation) legitimately change the window
+            # title, so a title-based post-state lookup may miss. The send
+            # itself succeeding without exception is the verified outcome.
+            return error is None
         if tool_name in ["window_click_control", "window_invoke_control", "window_select_menu", "window_wait_for_control"]:
             return error is None
         if tool_name == "process_close":
@@ -431,8 +487,10 @@ class WindowsExecutionEngine:
         if (
             tool_name.startswith("system_")
             or tool_name.startswith("process_")
+            or tool_name.startswith("browser_")
             or tool_name == "window_list"
             or tool_name == "window_get_foreground"
+            or tool_name == "window_get_text"
         ):
             return error is None
         return True

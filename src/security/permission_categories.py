@@ -143,6 +143,30 @@ class CategorizedPermissionManager:
             risk_tier=RiskTier.LOW,
             description="Get currently focused foreground window",
         ),
+        CategorizedPermissionRule(
+            category=OperationCategory.READ,
+            tool_name="browser_get_url",
+            target_pattern="*",
+            requires_human_approval=False,
+            risk_tier=RiskTier.LOW,
+            description="Read browser address-bar URL via UI Automation",
+        ),
+        CategorizedPermissionRule(
+            category=OperationCategory.READ,
+            tool_name="browser_get_heading",
+            target_pattern="*",
+            requires_human_approval=False,
+            risk_tier=RiskTier.LOW,
+            description="Read web page heading via accessibility tree",
+        ),
+        CategorizedPermissionRule(
+            category=OperationCategory.READ,
+            tool_name="window_get_text",
+            target_pattern="*",
+            requires_human_approval=False,
+            risk_tier=RiskTier.LOW,
+            description="Read text from an accessible UI control",
+        ),
         # WRITE
         CategorizedPermissionRule(
             category=OperationCategory.WRITE,

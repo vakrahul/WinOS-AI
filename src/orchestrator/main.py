@@ -25,6 +25,10 @@ from src.windows_integration.system_app_scanner import SystemAppScanner
 from src.windows_integration.app_manager import AppManager
 from src.orchestrator.task_dispatcher import AutonomousTaskDispatcher
 
+import time as _time
+
+_APP_START_TIME = _time.time()
+
 
 class LaunchAppPayload(BaseModel):
     app_id: str
@@ -157,6 +161,61 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
         return app_config.public_config_dict()
 
     dispatcher = AutonomousTaskDispatcher(workspace_root=app_config.workspace_root)
+
+    @app.get("/api/v1/app/identity")
+    async def app_identity():
+        """Self-reported identity of the running WinAI-OE application process.
+
+        Reports only non-sensitive process facts: PID, executable, user,
+        elevation state, and subsystem initialization. Never secrets.
+        """
+        import ctypes
+        import getpass
+        import os
+        import sys
+        import time
+
+        try:
+            elevated = bool(ctypes.windll.shell32.IsUserAnAdmin())
+        except Exception:
+            elevated = False
+        try:
+            username = getpass.getuser()
+        except Exception:
+            username = "unknown"
+
+        engine = dispatcher.execution_engine
+        services = {
+            "policy_engine": isinstance(
+                engine.policy_engine, SecurityPolicyEngine
+            ),
+            "execution_engine": engine is not None,
+            "uia_service": getattr(engine, "uia_service", None) is not None,
+            "system_intelligence": getattr(engine, "intelligence", None) is not None,
+            "process_manager": getattr(engine, "process_manager", None) is not None,
+            "os_context": getattr(engine, "os_context", None) is not None,
+            "audit_logger": getattr(engine, "audit_logger", None) is not None,
+            "app_manager_approved_apps": len(engine.app_manager.list_approved_apps())
+            if getattr(engine, "app_manager", None) else 0,
+        }
+        return {
+            "process_id": os.getpid(),
+            "executable_path": sys.executable,
+            "entry_script": os.path.abspath(sys.argv[0]) if sys.argv else None,
+            "username": username,
+            "elevated_privileges": elevated,
+            "privilege_note": "normal user"
+            if not elevated
+            else "ELEVATED (administrator)",
+            "security_policy_mode": "approvals_required"
+            if engine.policy_engine.require_approvals
+            else "ambient_allow_per_policy",
+            "services_initialized": services,
+            "all_services_ok": all(
+                v for k, v in services.items() if k != "app_manager_approved_apps"
+            ),
+            "server_uptime_seconds": round(time.time() - _APP_START_TIME, 1),
+        }
 
     @app.post("/api/v1/tasks/dispatch")
     async def dispatch_task(payload: TaskDispatchPayload):

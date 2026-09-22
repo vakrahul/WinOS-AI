@@ -44,6 +44,7 @@ class WindowFocusSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
     window_title: str = Field(min_length=1)
     timeout_seconds: Optional[float] = Field(default=3.0, ge=0.1, le=30.0)
+    hwnd: Optional[int] = Field(default=None, ge=1)
 
 
 class WindowTypeTextSchema(BaseModel):
@@ -61,6 +62,7 @@ class WindowSendKeysSchema(BaseModel):
     window_title: str = Field(min_length=1)
     keys: str = Field(min_length=1)
     wait_time: Optional[float] = Field(default=0.05, ge=0.0, le=5.0)
+    hwnd: Optional[int] = Field(default=None, ge=1)
 
 
 class WindowClickControlSchema(BaseModel):
@@ -162,6 +164,9 @@ class ActionValidator:
         "process_close": ProcessCloseSchema,
         "window_list": WindowListSchema,
         "window_get_foreground": WindowGetForegroundSchema,
+        "browser_get_url": WindowFocusSchema,
+        "browser_get_heading": WindowFocusSchema,
+        "window_get_text": WindowClickControlSchema,
     }
 
     @classmethod

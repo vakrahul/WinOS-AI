@@ -452,3 +452,262 @@ class UIAutomationService:
                     return True
             time.sleep(0.2)
         return False
+
+    def get_window_title_by_hwnd(self, hwnd: int) -> Optional[str]:
+        """Resolve the current title of a known window handle (titles change on navigation)."""
+        try:
+            ctrl = auto.ControlFromHandle(hwnd)
+            try:
+                ctrl.RebuildCache()
+            except Exception:
+                pass
+            name = ctrl.Name
+            return name or None
+        except Exception:
+            return None
+
+    def _window_from_hwnd(self, hwnd: int) -> Optional[auto.Control]:
+        """Bind directly to a known window handle (deterministic across title changes)."""
+        try:
+            ctrl = auto.ControlFromHandle(hwnd)
+            if ctrl.Exists(maxSearchSeconds=0.5):
+                return ctrl
+        except Exception:
+            pass
+        return None
+
+    def focus_window_by_hwnd(self, hwnd: int) -> bool:
+        """Bring a known window handle to the foreground with input focus."""
+        try:
+            cur_thread = kernel32.GetCurrentThreadId()
+            fg_hwnd = user32.GetForegroundWindow()
+            fg_thread = user32.GetWindowThreadProcessId(fg_hwnd, None)
+            user32.AttachThreadInput(cur_thread, fg_thread, True)
+            user32.keybd_event(0x12, 0, 0, 0)
+            user32.keybd_event(0x12, 0, 2, 0)
+            user32.ShowWindow(hwnd, 9)
+            user32.BringWindowToTop(hwnd)
+            user32.SetForegroundWindow(hwnd)
+            user32.AttachThreadInput(cur_thread, fg_thread, False)
+            ctrl = self._window_from_hwnd(hwnd)
+            if ctrl:
+                try:
+                    ctrl.SetFocus()
+                except Exception:
+                    pass
+            time.sleep(0.2)
+            return True
+        except Exception:
+            return False
+
+    def send_keys_by_hwnd(self, hwnd: int, keys: str, wait_time: float = 0.05) -> bool:
+        """Dispatch keystrokes to a known window handle (no title matching).
+
+        Verifies foreground ownership before sending; retries when Windows
+        denies the foreground switch (e.g. during calls/media capture).
+        """
+        for attempt in range(4):
+            try:
+                ctrl = self._window_from_hwnd(hwnd)
+                if not ctrl:
+                    time.sleep(0.5)
+                    continue
+                try:
+                    already_foreground = user32.GetForegroundWindow() == hwnd
+                except Exception:
+                    already_foreground = False
+                if not already_foreground:
+                    # Focus dance only when needed: refocusing a window moves
+                    # keyboard focus out of controls (e.g. the address bar).
+                    self.focus_window_by_hwnd(hwnd)
+                    foregrounded = False
+                    for _ in range(10):
+                        try:
+                            if user32.GetForegroundWindow() == hwnd:
+                                foregrounded = True
+                                break
+                        except Exception:
+                            pass
+                        time.sleep(0.2)
+                    if not foregrounded:
+                        time.sleep(0.5)
+                        continue
+                    time.sleep(0.3)
+                    ctrl = self._window_from_hwnd(hwnd) or ctrl
+                ctrl.SendKeys(keys, interval=wait_time)
+                return True
+            except Exception:
+                time.sleep(0.5)
+        return False
+
+    def is_address_bar_focused(self) -> bool:
+        """Check whether keyboard focus currently sits in a browser address bar."""
+        try:
+            focused = auto.GetFocusedControl()
+            if not focused:
+                return False
+            if focused.ControlTypeName != "EditControl":
+                return False
+            return "address and search bar" in (focused.Name or "").lower()
+        except Exception:
+            return False
+
+    def get_browser_url_by_hwnd(self, hwnd: int) -> Optional[str]:
+        """Read a Chromium address bar by window handle (deterministic, no title matching)."""
+        try:
+            win = self._window_from_hwnd(hwnd)
+            if not win:
+                return None
+            for child, _ in auto.WalkControl(win, maxDepth=14):
+                try:
+                    if child.ControlTypeName != "EditControl":
+                        continue
+                    cname = child.Name or ""
+                    if "address and search bar" in cname.lower():
+                        vp = child.GetValuePattern()
+                        if vp:
+                            return vp.Value
+                except Exception:
+                    continue
+        except Exception:
+            pass
+        return None
+
+    def read_page_heading_by_hwnd(self, hwnd: int, timeout_seconds: float = 15.0) -> Optional[str]:
+        """Read a page heading by window handle through the accessibility tree.
+
+        Chromium only populates a page's accessibility subtree while its window
+        owns the foreground, so foreground is asserted (and re-asserted) before
+        each walk. Waits for async page rendering. No screenshots, no coordinates.
+        """
+        deadline = time.time() + timeout_seconds
+        while time.time() < deadline:
+            try:
+                self.focus_window_by_hwnd(hwnd)
+                fg_ok = False
+                for _ in range(10):
+                    try:
+                        if user32.GetForegroundWindow() == hwnd:
+                            fg_ok = True
+                            break
+                    except Exception:
+                        pass
+                    time.sleep(0.2)
+                if not fg_ok:
+                    time.sleep(0.5)
+                    continue
+                time.sleep(0.6)
+                win = self._window_from_hwnd(hwnd)
+                if not win:
+                    time.sleep(0.5)
+                    continue
+                try:
+                    win.RebuildCache()
+                except Exception:
+                    pass
+                # Scan every page document: background tabs expose empty trees,
+                # so the content-bearing (active tab) document must be selected
+                # by substance, not by position.
+                docs: List[Any] = []
+                try:
+                    for child, _ in auto.WalkControl(win, maxDepth=12):
+                        try:
+                            if (child.ControlTypeName or "") == "DocumentControl":
+                                docs.append(child)
+                        except Exception:
+                            continue
+                except Exception:
+                    pass
+                if not docs:
+                    time.sleep(0.5)
+                    continue
+                best_heading: Optional[str] = None
+                best_fallback: Optional[str] = None
+                best_count = -1
+                for doc in docs:
+                    try:
+                        headings: List[str] = []
+                        texts: List[str] = []
+                        for child, _ in auto.WalkControl(doc, maxDepth=18):
+                            try:
+                                ctype = child.ControlTypeName or ""
+                                cname = (child.Name or "").strip()
+                                if not cname:
+                                    continue
+                                if "heading" in ctype.lower() or "header" in ctype.lower():
+                                    headings.append(cname)
+                                elif ctype == "TextControl" and len(cname) >= 3:
+                                    texts.append(cname)
+                            except Exception:
+                                continue
+                        substance = len(headings) * 4 + len(texts)
+                        if substance > best_count:
+                            best_count = substance
+                            best_heading = headings[0] if headings else None
+                            best_fallback = texts[0] if texts else None
+                    except Exception:
+                        continue
+                if best_heading:
+                    return best_heading
+                if best_fallback:
+                    return best_fallback
+            except Exception:
+                pass
+            time.sleep(0.5)
+        return None
+
+    def get_browser_url(self, window_title: str, timeout_seconds: float = 3.0) -> Optional[str]:
+        """Read the current URL from a Chromium browser's address bar via UI Automation.
+
+        Locates the address-bar Edit control by accessible name (no screenshots,
+        no coordinates) and returns its ValuePattern text.
+        """
+        win = self.find_window(window_title, timeout_seconds=timeout_seconds)
+        if not win:
+            return None
+        try:
+            for child, _ in auto.WalkControl(win, maxDepth=14):
+                try:
+                    if child.ControlTypeName != "EditControl":
+                        continue
+                    cname = child.Name or ""
+                    if "address and search bar" in cname.lower():
+                        vp = child.GetValuePattern()
+                        if vp:
+                            return vp.Value
+                except Exception:
+                    continue
+        except Exception:
+            pass
+        return None
+
+    def read_page_heading(self, window_title: str, timeout_seconds: float = 5.0) -> Optional[str]:
+        """Read a web page's main heading through the accessibility tree.
+
+        Prefers real heading controls, then the first substantial text control
+        inside the page document. No screenshots, no coordinates.
+        """
+        win = self.find_window(window_title, timeout_seconds=timeout_seconds)
+        if not win:
+            return None
+        try:
+            doc = win.DocumentControl(searchDepth=10)
+            if not doc.Exists(1.0):
+                return None
+            fallback: Optional[str] = None
+            for child, _ in auto.WalkControl(doc, maxDepth=16):
+                try:
+                    ctype = child.ControlTypeName or ""
+                    cname = (child.Name or "").strip()
+                    if not cname:
+                        continue
+                    if "heading" in ctype.lower() or "header" in ctype.lower():
+                        return cname
+                    if fallback is None and ctype == "TextControl" and len(cname) >= 3:
+                        fallback = cname
+                except Exception:
+                    continue
+            return fallback
+        except Exception:
+            return None
+
