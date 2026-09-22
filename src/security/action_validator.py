@@ -27,6 +27,115 @@ class CmdExecSchema(BaseModel):
     timeout_seconds: Optional[int] = Field(default=60, ge=1, le=300)
 
 
+class AppLaunchSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    app_id: str = Field(min_length=1)
+    extra_args: Optional[List[str]] = Field(default_factory=list)
+
+
+class WindowFindSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    window_title: str = Field(min_length=1)
+    class_name: Optional[str] = None
+    timeout_seconds: Optional[float] = Field(default=5.0, ge=0.1, le=60.0)
+
+
+class WindowFocusSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    window_title: str = Field(min_length=1)
+    timeout_seconds: Optional[float] = Field(default=3.0, ge=0.1, le=30.0)
+
+
+class WindowTypeTextSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    window_title: str = Field(min_length=1)
+    text: str
+    automation_id: Optional[str] = None
+    name: Optional[str] = None
+    control_type: Optional[str] = None
+    clear_first: Optional[bool] = False
+
+
+class WindowSendKeysSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    window_title: str = Field(min_length=1)
+    keys: str = Field(min_length=1)
+    wait_time: Optional[float] = Field(default=0.05, ge=0.0, le=5.0)
+
+
+class WindowClickControlSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    window_title: str = Field(min_length=1)
+    name: Optional[str] = None
+    control_type: Optional[str] = None
+    automation_id: Optional[str] = None
+
+
+class WindowInvokeControlSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    window_title: str = Field(min_length=1)
+    name: Optional[str] = None
+    automation_id: Optional[str] = None
+
+
+class WindowSelectMenuSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    window_title: str = Field(min_length=1)
+    menu_path: str = Field(min_length=1)
+
+
+class WindowWaitForControlSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    window_title: str = Field(min_length=1)
+    name: Optional[str] = None
+    control_type: Optional[str] = None
+    automation_id: Optional[str] = None
+    timeout_seconds: Optional[float] = Field(default=5.0, ge=0.1, le=60.0)
+
+
+class SystemGetOverviewSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    detailed: Optional[bool] = False
+
+
+class SystemGetMemoryStatusSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    detailed: Optional[bool] = False
+
+
+class ProcessListSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    sort_by: Optional[str] = Field(default="memory", pattern="^(memory|cpu|name|pid)$")
+    limit: Optional[int] = Field(default=20, ge=1, le=200)
+
+
+class ProcessGetTopConsumersSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    metric: Optional[str] = Field(default="memory", pattern="^(memory|cpu)$")
+    limit: Optional[int] = Field(default=10, ge=1, le=50)
+
+
+class ProcessGetInfoSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    pid: int = Field(ge=0)
+
+
+class ProcessCloseSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    pid: Optional[int] = Field(default=None, ge=0)
+    app_name: Optional[str] = None
+    force: Optional[bool] = False
+
+
+class WindowListSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    visible_only: Optional[bool] = True
+
+
+class WindowGetForegroundSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
 class ActionValidator:
     """Validates raw tool call proposals against strict schemas and checks for injection."""
 
@@ -36,6 +145,23 @@ class ActionValidator:
         "fs_write_file": FsWriteFileSchema,
         "terminal_run": CmdExecSchema,
         "cmd_exec": CmdExecSchema,
+        "app_launch": AppLaunchSchema,
+        "window_find": WindowFindSchema,
+        "window_focus": WindowFocusSchema,
+        "window_type_text": WindowTypeTextSchema,
+        "window_send_keys": WindowSendKeysSchema,
+        "window_click_control": WindowClickControlSchema,
+        "window_invoke_control": WindowInvokeControlSchema,
+        "window_select_menu": WindowSelectMenuSchema,
+        "window_wait_for_control": WindowWaitForControlSchema,
+        "system_get_overview": SystemGetOverviewSchema,
+        "system_get_memory_status": SystemGetMemoryStatusSchema,
+        "process_list": ProcessListSchema,
+        "process_get_top_consumers": ProcessGetTopConsumersSchema,
+        "process_get_info": ProcessGetInfoSchema,
+        "process_close": ProcessCloseSchema,
+        "window_list": WindowListSchema,
+        "window_get_foreground": WindowGetForegroundSchema,
     }
 
     @classmethod

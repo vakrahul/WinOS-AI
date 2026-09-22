@@ -190,7 +190,136 @@ class SecurityPolicyEngine:
                 target_resource=url,
             )
 
-        # 4. Default Fail-Closed
+        # 4. Windows Desktop Application & Control Tools
+        elif tool_name == "app_launch":
+            app_id = arguments.get("app_id", "")
+            approved_apps = {"notepad", "calc", "chrome", "vscode"}
+            if app_id not in approved_apps:
+                return ActionEvaluationResult(
+                    decision=PolicyDecision.DENY,
+                    risk_tier=RiskTier.CRITICAL,
+                    reason=f"Application '{app_id}' is not in approved application whitelist.",
+                    target_resource=app_id,
+                )
+            if self.require_approvals:
+                nonce = secrets.token_hex(32)
+                self._pending_approvals[nonce] = {
+                    "tool_name": tool_name,
+                    "target": app_id,
+                    "session_id": session_id,
+                }
+                return ActionEvaluationResult(
+                    decision=PolicyDecision.REQUIRE_APPROVAL,
+                    risk_tier=RiskTier.LOW,
+                    reason=f"Application launch '{app_id}' requires confirmation",
+                    target_resource=app_id,
+                    approval_nonce=nonce,
+                )
+            return ActionEvaluationResult(
+                decision=PolicyDecision.ALLOW,
+                risk_tier=RiskTier.LOW,
+                reason=f"Application launch '{app_id}' approved by policy",
+                target_resource=app_id,
+            )
+
+        elif tool_name in ["window_find", "window_focus", "window_wait_for_control"]:
+            target_win = arguments.get("window_title", "")
+            return ActionEvaluationResult(
+                decision=PolicyDecision.ALLOW,
+                risk_tier=RiskTier.LOW,
+                reason="Window query/focus permitted by ambient policy",
+                target_resource=target_win,
+            )
+
+        elif tool_name in [
+            "window_type_text",
+            "window_send_keys",
+            "window_click_control",
+            "window_invoke_control",
+            "window_select_menu",
+        ]:
+            target_win = arguments.get("window_title", "")
+            if self.require_approvals:
+                nonce = secrets.token_hex(32)
+                self._pending_approvals[nonce] = {
+                    "tool_name": tool_name,
+                    "target": target_win,
+                    "session_id": session_id,
+                }
+                return ActionEvaluationResult(
+                    decision=PolicyDecision.REQUIRE_APPROVAL,
+                    risk_tier=RiskTier.MEDIUM,
+                    reason=f"Desktop UI interaction '{tool_name}' on '{target_win}' requires approval",
+                    target_resource=target_win,
+                    approval_nonce=nonce,
+                )
+            return ActionEvaluationResult(
+                decision=PolicyDecision.ALLOW,
+                risk_tier=RiskTier.MEDIUM,
+                reason=f"Desktop UI interaction '{tool_name}' permitted by ambient policy",
+                target_resource=target_win,
+            )
+
+        # 5. Windows System Intelligence & Process Management Tools
+        elif tool_name in [
+            "system_get_overview",
+            "system_get_memory_status",
+            "process_list",
+            "process_get_top_consumers",
+            "process_get_info",
+            "window_list",
+            "window_get_foreground",
+        ]:
+            return ActionEvaluationResult(
+                decision=PolicyDecision.ALLOW,
+                risk_tier=RiskTier.LOW,
+                reason="System intelligence inspection permitted by ambient policy",
+                target_resource="system",
+            )
+
+        elif tool_name == "process_close":
+            pid = arguments.get("pid")
+            app_name = (arguments.get("app_name") or "").lower()
+            critical_names = {
+                "system",
+                "system idle process",
+                "csrss.exe",
+                "lsass.exe",
+                "smss.exe",
+                "services.exe",
+                "explorer.exe",
+                "dwm.exe",
+                "wininit.exe",
+            }
+            if (pid is not None and pid <= 4) or app_name in critical_names:
+                return ActionEvaluationResult(
+                    decision=PolicyDecision.DENY,
+                    risk_tier=RiskTier.CRITICAL,
+                    reason="Termination of critical Windows system processes is strictly prohibited.",
+                    target_resource=str(pid or app_name),
+                )
+            if self.require_approvals:
+                nonce = secrets.token_hex(32)
+                self._pending_approvals[nonce] = {
+                    "tool_name": tool_name,
+                    "target": str(pid or app_name),
+                    "session_id": session_id,
+                }
+                return ActionEvaluationResult(
+                    decision=PolicyDecision.REQUIRE_APPROVAL,
+                    risk_tier=RiskTier.HIGH,
+                    reason=f"Closing application '{app_name or pid}' requires confirmation",
+                    target_resource=str(pid or app_name),
+                    approval_nonce=nonce,
+                )
+            return ActionEvaluationResult(
+                decision=PolicyDecision.ALLOW,
+                risk_tier=RiskTier.MEDIUM,
+                reason=f"Closing application '{app_name or pid}' permitted by policy",
+                target_resource=str(pid or app_name),
+            )
+
+        # 6. Default Fail-Closed
         return ActionEvaluationResult(
             decision=PolicyDecision.DENY,
             risk_tier=RiskTier.HIGH,

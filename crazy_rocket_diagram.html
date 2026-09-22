@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AEROSPACE-X // Heavy Orbital Launch Vehicle - Interactive Blueprint</title>
+  <style>
+    :root {
+      --bg: #050813;
+      --panel-bg: rgba(10, 16, 35, 0.85);
+      --cyan: #00f3ff;
+      --orange: #ff6b00;
+      --red: #ff2a4b;
+      --yellow: #ffd000;
+      --green: #00ff88;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --border: rgba(0, 243, 255, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Consolas', 'Courier New', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse at 50% 20%, rgba(0, 243, 255, 0.08) 0%, transparent 60%),
+        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+    }
+
+    /* HEADER HUD */
+    header {
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(5, 8, 19, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .hud-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .badge-classified {
+      background: rgba(255, 42, 75, 0.2);
+      border: 1px solid var(--red);
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      animation: pulse-red 2s infinite;
+    }
+
+    @keyframes pulse-red {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .hud-title h1 {
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .hud-title p {
+      font-size: 11px;
+      color: var(--cyan);
+      letter-spacing: 1px;
+    }
+
+    .system-status {
+      display: flex;
+      gap: 20px;
+      font-size: 12px;
+    }
+
+    .status-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .status-item span:first-child { color: var(--muted); font-size: 10px; }
+    .status-item span:last-child { color: var(--green); font-weight: bold; }
+
+    /* WORKSPACE GRID */
+    .blueprint-container {
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 24px;
+      padding: 24px 32px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header h2 {
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+
+    /* TELEMETRY GAUGES */
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+
+    .metric-label { font-size: 11px; color: var(--muted); }
+    .metric-value { font-size: 13px; font-weight: bold; color: var(--cyan); }
+
+    .meter-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .meter-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--orange));
+      width: 78%;
+      animation: pulse-meter 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse-meter {
+      0% { width: 72%; }
+      100% { width: 84%; }
+    }
+
+    /* CENTER ROCKET CANVAS */
+    .rocket-viewport {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 800px;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.05) 0%, transparent 70%);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* SVG ROCKET ANIMATIONS */
+    .plasma-flame {
+      transform-origin: center top;
+      animation: flicker 0.15s infinite alternate ease-in-out;
+    }
+
+    @keyframes flicker {
+      0% { transform: scaleY(1.0) scaleX(0.98); opacity: 0.92; filter: drop-shadow(0 0 15px #ff6b00); }
+      100% { transform: scaleY(1.12) scaleX(1.02); opacity: 1.0; filter: drop-shadow(0 0 35px #ffd000); }
+    }
+
+    .star-twinkle {
+      animation: twinkle 2s infinite ease-in-out alternate;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.3; transform: scale(0.8); }
+      100% { opacity: 1.0; transform: scale(1.2); }
+    }
+
+    .saturn-orbit {
+      animation: orbit 20s linear infinite;
+    }
+
+    @keyframes orbit {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* HOTSPOT LABELS */
+    .hotspot {
+      position: absolute;
+      background: rgba(0, 243, 255, 0.15);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hotspot:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 20px var(--cyan);
+      transform: scale(1.05);
+    }
+
+    .hotspot-line {
+      position: absolute;
+      border-top: 1px dashed var(--cyan);
+      pointer-events: none;
+    }
+
+    /* CONTROLS */
+    .btn-action {
+      background: rgba(0, 243, 255, 0.1);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 10px 16px;
+      width: 100%;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.2s;
+      text-transform: uppercase;
+    }
+
+    .btn-action:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 15px var(--cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="hud-title">
+      <span class="badge-classified">ORBITAL SCHEMATIC</span>
+      <div>
+        <h1>AEROSPACE-X // STAR-STRIKER MK-IV</h1>
+        <p>AUTONOMOUS DEEP SPACE LAUNCH VEHICLE • TECHNICAL SPECIFICATION</p>
+      </div>
+    </div>
+    <div class="system-status">
+      <div class="status-item">
+        <span>PROPULSION</span>
+        <span>RAPTOR-9 [READY]</span>
+      </div>
+      <div class="status-item">
+        <span>AVIONICS</span>
+        <span>NEURAL-NAV 4.2 [ONLINE]</span>
+      </div>
+      <div class="status-item">
+        <span>STAGE PRESSURE</span>
+        <span>312 BAR [NOMINAL]</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="blueprint-container">
+
+    <!-- LEFT TELEMETRY PANEL -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>FLIGHT TELEMETRY</h2>
+        <span style="color: var(--green); font-size: 10px;">● ACTIVE LINK</span>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">CURRENT ALTITUDE</div>
+          <div class="meter-bar"><div class="meter-fill" style="width: 65%;"></div></div>
+        </div>
+        <div class="metric-value">148.24 KM</div>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">VELOCITY (MACH)</div>
+          <div class="meter-bar"><div class="meter-fill" style="width: 82%;"></div></div>
+        </div>
+        <div class="metric-value">MACH 6.42</div>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">CHAMBER PRESSURE</div>
+          <div class="meter-bar"><div class="meter-fill" style="width: 78%;"></div></div>
+        </div>
+        <div class="metric-value">312.5 BAR</div>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">VACUUM THRUST</div>
+          <div class="meter-bar"><div class="meter-fill" style="width: 90%;"></div></div>
+        </div>
+        <div class="metric-value">8,450 KN</div>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">THRUST-TO-WEIGHT (TWR)</div>
+          <div class="meter-bar"><div class="meter-fill" style="width: 75%;"></div></div>
+        </div>
+        <div class="metric-value">1.94</div>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">PROPELLANT: LOX / CH4</div>
+          <div class="meter-bar"><div class="meter-fill" style="width: 62%;"></div></div>
+        </div>
+        <div class="metric-value">62% REMAINING</div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <div class="panel-header">
+          <h2>DIAGNOSTIC CONTROLS</h2>
+        </div>
+        <button class="btn-action" onclick="toggleOverdrive()">⚡ Thruster Overdrive</button>
+        <button class="btn-action" onclick="toggleThermalMode()">🔥 Thermal Heatmap</button>
+        <button class="btn-action" onclick="resetTelemetry()">↺ Recalibrate Sensors</button>
+      </div>
+    </div>
+
+    <!-- CENTER SVG VECTOR ROCKET BLUEPRINT -->
+    <div class="rocket-viewport">
+
+      <svg width="650" height="780" viewBox="0 0 650 780" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow-orange" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="10" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id="plasmaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff" />
+            <stop offset="25%" stop-color="#ffd000" />
+            <stop offset="60%" stop-color="#ff6b00" />
+            <stop offset="100%" stop-color="#ff1a1a" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="hullGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#e2e8f0" />
+            <stop offset="50%" stop-color="#f8fafc" />
+            <stop offset="100%" stop-color="#cbd5e1" />
+          </linearGradient>
+          <linearGradient id="noseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff3b30" />
+            <stop offset="100%" stop-color="#b80018" />
+          </linearGradient>
+          <linearGradient id="finGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff9500" />
+            <stop offset="100%" stop-color="#cc6600" />
+          </linearGradient>
+        </defs>
+
+        <!-- COSMIC BACKGROUND: SATURN & MOON -->
+        <g class="saturn-orbit">
+          <!-- Saturn Body -->
+          <circle cx="90" cy="140" r="28" fill="#d4b595" stroke="#1e293b" stroke-width="3"/>
+          <ellipse cx="90" cy="140" rx="55" ry="12" fill="none" stroke="#e2d4c0" stroke-width="6" transform="rotate(-20 90 140)"/>
+        </g>
+        <circle cx="560" cy="120" r="30" fill="#cbd5e1" stroke="#334155" stroke-width="4"/>
+        <circle cx="548" cy="110" r="6" fill="#94a3b8" opacity="0.5"/>
+        <circle cx="572" cy="132" r="8" fill="#94a3b8" opacity="0.5"/>
+
+        <!-- TWINKLING STARS -->
+        <path class="star-twinkle" d="M160 80 L163 95 L178 98 L163 101 L160 116 L157 101 L142 98 L157 95 Z" fill="#00f3ff"/>
+        <path class="star-twinkle" d="M510 240 L512 250 L522 252 L512 254 L510 264 L508 254 L498 252 L508 250 Z" fill="#00f3ff"/>
+        <path class="star-twinkle" d="M80 320 L82 330 L92 332 L82 334 L80 344 L78 334 L68 332 L78 330 Z" fill="#00f3ff"/>
+        <path class="star-twinkle" d="M570 380 L572 390 L582 392 L572 394 L570 404 L568 394 L558 392 L568 390 Z" fill="#00f3ff"/>
+
+        <!-- DYNAMIC PLASMA THRUSTER FLAMES -->
+        <g id="thrusterPlumes" class="plasma-flame" filter="url(#glow-orange)">
+          <!-- Outer Fire -->
+          <path d="M280 500 Q240 570 270 650 Q295 620 325 730 Q355 620 380 650 Q410 570 370 500 Z" fill="url(#plasmaGrad)"/>
+          <!-- Inner Core -->
+          <path d="M295 500 Q275 560 305 630 Q325 600 325 670 Q325 600 345 630 Q375 560 355 500 Z" fill="#fff" opacity="0.95"/>
+          <!-- Spark Embers -->
+          <circle cx="310" cy="745" r="4" fill="#ffd000"/>
+          <circle cx="340" cy="750" r="3" fill="#ff6b00"/>
+          <circle cx="325" cy="770" r="5" fill="#ffd000"/>
+        </g>
+
+        <!-- SWEPT DELTA BOOSTER FINS -->
+        <path d="M260 370 Q180 430 110 520 Q150 565 190 545 Q220 515 255 490 Z" fill="url(#finGrad)" stroke="#1e293b" stroke-width="5"/>
+        <path d="M390 370 Q470 430 540 520 Q500 565 460 545 Q430 515 395 490 Z" fill="url(#finGrad)" stroke="#1e293b" stroke-width="5"/>
+        <!-- Fin Internal Ribs -->
+        <line x1="240" y1="410" x2="155" y2="530" stroke="#b35900" stroke-width="3"/>
+        <line x1="410" y1="410" x2="495" y2="530" stroke="#b35900" stroke-width="3"/>
+
+        <!-- MAIN FUSELAGE HULL -->
+        <path d="M265 240 Q240 330 250 490 L400 490 Q410 330 385 240 Z" fill="url(#hullGrad)" stroke="#1e293b" stroke-width="6"/>
+
+        <!-- HULL STAGING SEAMS -->
+        <line x1="250" y1="450" x2="400" y2="450" stroke="#334155" stroke-width="4"/>
+        <line x1="255" y1="410" x2="395" y2="410" stroke="#334155" stroke-width="3"/>
+        <line x1="325" y1="410" x2="325" y2="490" stroke="#475569" stroke-width="3"/>
+
+        <!-- CRIMSON AERODYNAMIC NOSE CONE -->
+        <path d="M325 110 Q285 190 265 240 L385 240 Q365 190 325 110 Z" fill="url(#noseGrad)" stroke="#1e293b" stroke-width="6"/>
+        <path d="M305 150 L325 110 L345 150" stroke="#fff" stroke-width="2" opacity="0.6"/>
+
+        <!-- DUAL PORTHOLE VIEWPORTS -->
+        <!-- Top Porthole -->
+        <circle cx="325" cy="300" r="26" fill="#1e293b"/>
+        <circle cx="325" cy="300" r="20" fill="#00f3ff" stroke="#fff" stroke-width="2"/>
+        <path d="M315 292 Q325 285 335 292" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- Bottom Porthole -->
+        <circle cx="325" cy="365" r="22" fill="#1e293b"/>
+        <circle cx="325" cy="365" r="16" fill="#00f3ff" stroke="#fff" stroke-width="2"/>
+        <path d="M318 358 Q325 352 332 358" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+
+        <!-- ENGINE BELL NOZZLE -->
+        <path d="M285 490 L275 520 L375 520 L365 490 Z" fill="#334155" stroke="#0f172a" stroke-width="5"/>
+        <ellipse cx="325" cy="520" rx="50" ry="10" fill="#1e293b" stroke="#00f3ff" stroke-width="2"/>
+      </svg>
+
+      <!-- HOTSPOT LABELS -->
+      <div class="hotspot" style="top: 130px; left: 60px;" onclick="inspectPart('Nose Cone')">
+        <span>01</span> ABLATIVE HEAT SHIELD
+      </div>
+      <div class="hotspot" style="top: 290px; left: 40px;" onclick="inspectPart('Avionics')">
+        <span>02</span> DUAL CYAN VIEWPORTS
+      </div>
+      <div class="hotspot" style="top: 480px; left: 30px;" onclick="inspectPart('Delta Fins')">
+        <span>03</span> SWEPT DELTA BOOSTER WINGS
+      </div>
+      <div class="hotspot" style="top: 420px; right: 40px;" onclick="inspectPart('Cryo Tank')">
+        <span>04</span> LOX / CH4 CRYO TANK
+      </div>
+      <div class="hotspot" style="top: 610px; right: 50px;" onclick="inspectPart('Plasma Core')">
+        <span>05</span> SUPERSONIC PLASMA PLUME
+      </div>
+    </div>
+
+    <!-- RIGHT SPECIFICATION PANEL -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>SUBSYSTEM SCHEMATICS</h2>
+        <span style="color: var(--cyan); font-size: 10px;">STAGE 1-A</span>
+      </div>
+
+      <div id="subsystemDetails">
+        <div style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 8px;" id="partTitle">
+          AERODYNAMIC CRIMSON NOSE CONE
+        </div>
+        <p style="font-size: 11px; color: var(--muted); line-height: 1.6;" id="partDesc">
+          Ablative carbon-phenolic composite thermal shield engineered for trans-atmospheric reentry at Mach 6.5+. Withstands surface temperatures up to 2,800°C while maintaining pressurized avionics integrity.
+        </p>
+
+        <div style="margin-top: 18px;">
+          <div class="metric-row">
+            <span class="metric-label">MATERIAL MATRIX</span>
+            <span class="metric-value">CARBON-CARBON / TITANIUM</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">DRAG COEFFICIENT (Cd)</span>
+            <span class="metric-value">0.142 (HYPERSONIC)</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">PRESSURE RATING</span>
+            <span class="metric-value">4.5 ATMOSPHERES</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">MASS FRACTION</span>
+            <span class="metric-value">8.4% DRY MASS</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <div class="panel-header">
+          <h2>MISSION TIMELINE</h2>
+        </div>
+        <div style="font-size: 11px; color: var(--text); line-height: 1.8;">
+          <div><strong style="color: var(--green);">T+ 00:00</strong> Ignition &amp; Liftoff</div>
+          <div><strong style="color: var(--green);">T+ 01:14</strong> Max-Q (Maximum Dynamic Pressure)</div>
+          <div><strong style="color: var(--cyan);">T+ 02:42</strong> Main Engine Cutoff (MECO)</div>
+          <div><strong style="color: var(--orange);">T+ 02:46</strong> Stage Separation</div>
+          <div><strong style="color: var(--cyan);">T+ 08:30</strong> Orbital Insertion (240 km)</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const partInfo = {
+      'Nose Cone': {
+        title: '01. ABLATIVE THERMAL NOSE CONE',
+        desc: 'Reinforced ultra-high-temperature ceramic matrix composite engineered for atmospheric penetration. Houses inertial guidance and autonomous radar telemetry.',
+        mat: 'CARBON-CARBON / TITANIUM',
+        cd: '0.142',
+        rating: '2,800°C REENTRY'
+      },
+      'Avionics': {
+        title: '02. DUAL CYAN VIEWPORTS & COCKPIT',
+        desc: 'Multi-pane quartz glass with anti-reflective optical coatings. Pressurized cabin maintains 1.0 ATM atmosphere with redundant life-support scrubbers.',
+        mat: 'SYNTHETIC FUSED SILICA',
+        cd: '0.160',
+        rating: '7.5 ATM BURST'
+      },
+      'Delta Fins': {
+        title: '03. SWEPT DELTA BOOSTER WINGS',
+        desc: 'Broad aerodynamic delta wings providing passive aerodynamic stability through transonic buffeting and supersonic ascent phases.',
+        mat: 'HONEYCOMB ALUMINUM-LITHIUM',
+        cd: '0.088',
+        rating: '420 KN AERO LIFT'
+      },
+      'Cryo Tank': {
+        title: '04. LOX / CH4 CRYOGENIC PROPELLANT CELL',
+        desc: 'Common-bulkhead cryogenic fuel tanks storing subcooled liquid methane and liquid oxygen under 3.5 bar autogenous nitrogen blanket.',
+        mat: 'AL-LI 2195 CRYOGENIC ALLOY',
+        cd: 'N/A',
+        rating: '98.5% PROPELLANT EFFICIENCY'
+      },
+      'Plasma Core': {
+        title: '05. SUPERSONIC PLASMA EXHAUST PLUME',
+        desc: 'Full-flow staged combustion cycle generating Mach diamonds at 300 bar chamber pressure with 8,450 kN sea-level thrust output.',
+        mat: 'NIOBIUM C-103 ALLOY NOZZLE',
+        cd: 'EXPANSION RATIO 40:1',
+        rating: '3,350 M/S ISP'
+      }
+    };
+
+    function inspectPart(key) {
+      const info = partInfo[key];
+      if (!info) return;
+      document.getElementById('partTitle').textContent = info.title;
+      document.getElementById('partDesc').textContent = info.desc;
+    }
+
+    function toggleOverdrive() {
+      const plumes = document.getElementById('thrusterPlumes');
+      plumes.style.filter = plumes.style.filter.includes('blur') ? 'drop-shadow(0 0 50px #00f3ff)' : 'url(#glow-orange)';
+    }
+
+    function toggleThermalMode() {
+      document.body.style.filter = document.body.style.filter ? '' : 'hue-rotate(180deg) saturate(2)';
+    }
+
+    function resetTelemetry() {
+      document.body.style.filter = '';
+      alert('Sensor arrays zeroed and re-synchronized.');
+    }
+  </script>
+</body>
+</html>

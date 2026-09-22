@@ -24,7 +24,11 @@ from src.security.audit_logger import AuditLogger
 from src.security.policy_engine import ActionEvaluationResult, PolicyDecision, SecurityPolicyEngine
 from src.windows_integration.app_manager import AppManager
 from src.windows_integration.file_service import ScopedFileService
+from src.windows_integration.os_context import OSContextTracker
+from src.windows_integration.process_manager import ProcessCloseResult, WindowsProcessManager
 from src.windows_integration.process_runner import RestrictedProcessRunner
+from src.windows_integration.system_intelligence import WindowsSystemIntelligence
+from src.windows_integration.uia_service import UIAutomationService
 
 
 class ActionExecutionOutcome(str, Enum):
@@ -48,7 +52,7 @@ class ObservableExecutionResult(BaseModel):
 
 
 class WindowsExecutionEngine:
-    """Dispatches and verifies Windows operations with observable outcome validation."""
+    """Dispatches and verifies real Windows operations with observable outcome validation."""
 
     def __init__(
         self,
@@ -62,6 +66,10 @@ class WindowsExecutionEngine:
         self.file_service = ScopedFileService(self.workspace_root)
         self.process_runner = RestrictedProcessRunner(self.workspace_root)
         self.app_manager = AppManager()
+        self.uia_service = UIAutomationService()
+        self.intelligence = WindowsSystemIntelligence()
+        self.process_manager = WindowsProcessManager()
+        self.os_context = OSContextTracker(intelligence=self.intelligence)
 
     async def execute_action(
         self,
@@ -97,7 +105,6 @@ class WindowsExecutionEngine:
             )
 
         if policy_eval.decision == PolicyDecision.REQUIRE_APPROVAL:
-            # Check if user provided valid approval nonce
             if not approval_nonce:
                 duration = (time.perf_counter() - start_time) * 1000
                 return ObservableExecutionResult(
@@ -158,10 +165,161 @@ class WindowsExecutionEngine:
                 if cmd_res.exit_code != 0:
                     error_msg = f"Process exited with code {cmd_res.exit_code}: {cmd_res.stderr}"
             elif tool_name == "app_launch":
-                pid = self.app_manager.launch_app(arguments["app_id"])
-                output_data = {"launched_pid": pid}
+                pid = self.app_manager.launch_app(arguments["app_id"], arguments.get("extra_args"))
+                output_data = {"launched_pid": pid, "app_id": arguments["app_id"]}
+
+            # Real Native Windows UI Automation Handlers
+            elif tool_name == "window_find":
+                win = self.uia_service.find_window(
+                    window_title=arguments["window_title"],
+                    class_name=arguments.get("class_name"),
+                    timeout_seconds=arguments.get("timeout_seconds", 5.0),
+                )
+                if win:
+                    output_data = {
+                        "found": True,
+                        "window_title": win.Name,
+                        "class_name": win.ClassName,
+                        "handle": hex(win.NativeWindowHandle) if win.NativeWindowHandle else None,
+                    }
+                else:
+                    error_msg = f"Window '{arguments['window_title']}' not found on desktop"
+
+            elif tool_name == "window_focus":
+                success = self.uia_service.focus_window(
+                    window_title=arguments["window_title"],
+                    timeout_seconds=arguments.get("timeout_seconds", 3.0),
+                )
+                if success:
+                    output_data = {"focused": True, "window": arguments["window_title"]}
+                else:
+                    error_msg = f"Could not focus window '{arguments['window_title']}'"
+
+            elif tool_name == "window_type_text":
+                success = self.uia_service.set_text_value(
+                    window_title=arguments["window_title"],
+                    text=arguments["text"],
+                    automation_id=arguments.get("automation_id"),
+                    name=arguments.get("name"),
+                    control_type=arguments.get("control_type"),
+                    clear_first=arguments.get("clear_first", False),
+                )
+                if success:
+                    output_data = {"typed": True, "text_length": len(arguments["text"])}
+                else:
+                    error_msg = f"Failed to type text into window '{arguments['window_title']}' control"
+
+            elif tool_name == "window_send_keys":
+                success = self.uia_service.send_keys_to_window(
+                    window_title=arguments["window_title"],
+                    keys=arguments["keys"],
+                    wait_time=arguments.get("wait_time", 0.05),
+                )
+                if success:
+                    output_data = {"sent": True, "keys": arguments["keys"]}
+                else:
+                    error_msg = f"Failed to send keys to window '{arguments['window_title']}'"
+
+            elif tool_name == "window_click_control":
+                success = self.uia_service.click_control(
+                    window_title=arguments["window_title"],
+                    name=arguments.get("name"),
+                    control_type=arguments.get("control_type"),
+                    automation_id=arguments.get("automation_id"),
+                )
+                if success:
+                    output_data = {"clicked": True, "target": arguments.get("name") or arguments.get("automation_id")}
+                else:
+                    error_msg = f"Failed to click control in window '{arguments['window_title']}'"
+
+            elif tool_name == "window_invoke_control":
+                success = self.uia_service.invoke_button(
+                    window_title=arguments["window_title"],
+                    name=arguments.get("name"),
+                    automation_id=arguments.get("automation_id"),
+                )
+                if success:
+                    output_data = {"invoked": True, "target": arguments.get("name") or arguments.get("automation_id")}
+                else:
+                    error_msg = f"Failed to invoke control in window '{arguments['window_title']}'"
+
+            elif tool_name == "window_select_menu":
+                success = self.uia_service.select_menu_item(
+                    window_title=arguments["window_title"],
+                    menu_path=arguments["menu_path"],
+                )
+                if success:
+                    output_data = {"selected_menu": arguments["menu_path"]}
+                else:
+                    error_msg = f"Failed to select menu '{arguments['menu_path']}' in window '{arguments['window_title']}'"
+
+            elif tool_name == "window_wait_for_control":
+                success = self.uia_service.wait_for_control(
+                    window_title=arguments["window_title"],
+                    name=arguments.get("name"),
+                    control_type=arguments.get("control_type"),
+                    automation_id=arguments.get("automation_id"),
+                    timeout_seconds=arguments.get("timeout_seconds", 5.0),
+                )
+                if success:
+                    output_data = {"control_ready": True}
+                else:
+                    error_msg = f"Timed out waiting for control in window '{arguments['window_title']}'"
+
+            # Real Windows System Intelligence & Process Management Handlers
+            elif tool_name == "system_get_overview":
+                output_data = self.intelligence.get_system_overview().model_dump()
+
+            elif tool_name == "system_get_memory_status":
+                output_data = self.intelligence.get_system_memory_status().model_dump()
+
+            elif tool_name == "process_list":
+                procs = self.intelligence.list_processes(
+                    sort_by=arguments.get("sort_by", "memory"),
+                    limit=arguments.get("limit", 20),
+                )
+                output_data = [p.model_dump() for p in procs]
+
+            elif tool_name == "process_get_top_consumers":
+                procs = self.intelligence.get_top_resource_consumers(
+                    metric=arguments.get("metric", "memory"),
+                    limit=arguments.get("limit", 10),
+                )
+                output_data = [p.model_dump() for p in procs]
+
+            elif tool_name == "process_get_info":
+                p_info = self.intelligence.get_process_info(arguments["pid"])
+                if p_info:
+                    output_data = p_info.model_dump()
+                else:
+                    error_msg = f"Process PID {arguments['pid']} not found"
+
+            elif tool_name == "process_close":
+                if arguments.get("pid"):
+                    res = self.process_manager.close_process(arguments["pid"], force=arguments.get("force", False))
+                else:
+                    results = self.process_manager.close_application_by_name(
+                        arguments.get("app_name", ""), force=arguments.get("force", False)
+                    )
+                    res = results[0] if results else None
+
+                if res:
+                    output_data = res.model_dump()
+                    if not res.success and res.method != "AWAITING_CONFIRMATION":
+                        error_msg = res.message
+                else:
+                    error_msg = "No process targeted for closing"
+
+            elif tool_name == "window_list":
+                wins = self.intelligence.list_top_level_windows(visible_only=arguments.get("visible_only", True))
+                output_data = [w.model_dump() for w in wins]
+
+            elif tool_name == "window_get_foreground":
+                w = self.intelligence.get_foreground_window()
+                output_data = w.model_dump() if w else None
+
             else:
-                output_data = {"status": "executed"}
+                error_msg = f"Execution handler not implemented for tool '{tool_name}'"
 
         except Exception as e:
             error_msg = str(e)
@@ -200,16 +358,48 @@ class WindowsExecutionEngine:
         )
 
     def _capture_observable_state(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Inspect actual file/process state before and after execution."""
+        """Inspect actual file/process/window state before and after execution."""
         state = {}
-        if tool_name in ["fs_write_file", "fs_read_file"]:
-            p = (self.workspace_root / arguments.get("path", ".")).resolve()
-            state["file_exists"] = p.exists()
-            state["file_size"] = p.stat().st_size if p.exists() else 0
-            state["mtime"] = p.stat().st_mtime if p.exists() else 0
-        elif tool_name == "app_launch":
-            app_id = arguments.get("app_id", "")
-            state["is_running"] = self.app_manager.get_running_pid(app_id) is not None
+        try:
+            if tool_name in ["fs_write_file", "fs_read_file"]:
+                p = (self.workspace_root / arguments.get("path", ".")).resolve()
+                state["file_exists"] = p.exists()
+                state["file_size"] = p.stat().st_size if p.exists() else 0
+                state["mtime"] = p.stat().st_mtime if p.exists() else 0
+            elif tool_name == "app_launch":
+                app_id = arguments.get("app_id", "")
+                state["is_running"] = self.app_manager.get_running_pid(app_id) is not None
+            elif tool_name == "process_close":
+                pid = arguments.get("pid")
+                if pid:
+                    state["process_exists"] = psutil.pid_exists(pid)
+                elif arguments.get("app_name"):
+                    state["matching_pids"] = self.process_manager.find_pids_by_name(arguments["app_name"])
+            elif tool_name in [
+                "window_find",
+                "window_focus",
+                "window_type_text",
+                "window_send_keys",
+                "window_click_control",
+                "window_invoke_control",
+                "window_select_menu",
+                "window_wait_for_control",
+            ]:
+                target = arguments.get("window_title", "")
+                win = self.uia_service.find_window(target, timeout_seconds=0.5)
+                state["window_exists"] = win is not None
+                if win:
+                    state["window_title"] = win.Name
+                    state["window_handle"] = win.NativeWindowHandle
+                    if tool_name == "window_type_text":
+                        state["text_value"] = self.uia_service.read_text_value(
+                            target,
+                            automation_id=arguments.get("automation_id"),
+                            name=arguments.get("name"),
+                            control_type=arguments.get("control_type"),
+                        )
+        except Exception:
+            pass
         return state
 
     def _verify_state_transition(
@@ -223,12 +413,28 @@ class WindowsExecutionEngine:
         if error:
             return False
         if tool_name == "fs_write_file":
-            # File must exist and modification time must be >= pre mtime
             return post.get("file_exists", False) and post.get("mtime", 0) >= pre.get("mtime", 0)
         if tool_name == "fs_read_file":
             return pre.get("file_exists", False)
         if tool_name == "app_launch":
             return post.get("is_running", False)
+        if tool_name == "window_find":
+            return post.get("window_exists", False)
+        if tool_name == "window_focus":
+            return post.get("window_exists", False)
+        if tool_name in ["window_type_text", "window_send_keys"]:
+            return post.get("window_exists", False) and error is None
+        if tool_name in ["window_click_control", "window_invoke_control", "window_select_menu", "window_wait_for_control"]:
+            return error is None
+        if tool_name == "process_close":
+            return error is None
+        if (
+            tool_name.startswith("system_")
+            or tool_name.startswith("process_")
+            or tool_name == "window_list"
+            or tool_name == "window_get_foreground"
+        ):
+            return error is None
         return True
 
     def _log_audit(self, tool_name: str, status: str, details: str, session_id: str, agent_id: str) -> Optional[str]:

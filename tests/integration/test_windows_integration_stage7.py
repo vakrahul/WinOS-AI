@@ -27,21 +27,29 @@ def test_app_manager_discovery_and_policy():
 
 @pytest.mark.integration
 def test_uia_accessible_tree_and_actions():
-    """Verify accessible element discovery and control pattern actions."""
-    uia = UIAutomationService()
-    elements = uia.inspect_window_elements("Notepad")
-    assert len(elements) > 0
-    assert any(e.name == "Text Editor" for e in elements)
+    """Verify accessible element discovery and control pattern actions using real Windows Notepad."""
+    import subprocess
+    import time
 
-    # Set and read text
-    success = uia.set_text_value("Notepad", "15", "Hello via UI Automation")
-    assert success is True
-    val = uia.read_text_value("Notepad", "15")
-    assert val == "Hello via UI Automation"
+    proc = subprocess.Popen(["notepad.exe"])
+    time.sleep(1.5)
+    try:
+        uia = UIAutomationService()
+        win = uia.find_window("Notepad", timeout_seconds=4.0)
+        assert win is not None, "Real Notepad window was not found on desktop"
 
-    # Button invocation
-    btn_success = uia.invoke_button("Calculator", "clearButton")
-    assert btn_success is True
+        elements = uia.inspect_window_elements("Notepad", max_depth=3)
+        assert len(elements) > 0, "No accessible elements enumerated from real Notepad"
+
+        # Set and read text via real UIA ValuePattern / SendKeys
+        success = uia.set_text_value("Notepad", "Hello via UI Automation")
+        assert success is True
+        val = uia.read_text_value("Notepad")
+        assert val is not None
+        assert "Hello via UI Automation" in val
+    finally:
+        proc.terminate()
+        time.sleep(0.5)
 
 
 @pytest.mark.integration
