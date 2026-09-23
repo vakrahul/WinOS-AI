@@ -130,6 +130,46 @@ def test_human_approval_lifecycle(client_app):
 
 
 @pytest.mark.integration
+def test_approval_pending_endpoint_end_to_end(client_app):
+    """Verify the on-screen button's API loop: proposal -> pending -> approve -> cleared."""
+    client, _ = client_app
+
+    assert client.get("/api/v1/approval/pending").json() == {"pending": []}
+
+    with client.websocket_connect("/ws/v1/stream") as websocket:
+        websocket.send_json({
+            "action": "chat",
+            "messages": [{"role": "user", "content": "Please run a command"}]
+        })
+        nonce = None
+        while True:
+            msg = websocket.receive_json()
+            if msg.get("event") == "tool_proposal":
+                assert msg["tool_call"]["tool_name"] == "terminal_run"
+                assert msg["policy_decision"]["decision"] == "REQUIRE_APPROVAL"
+                nonce = msg["policy_decision"]["approval_nonce"]
+            elif msg.get("event") == "done":
+                break
+        assert nonce, "strict policy must issue a nonce for terminal_run"
+
+    pending = client.get("/api/v1/approval/pending").json()["pending"]
+    assert len(pending) == 1
+    assert pending[0]["approval_nonce"] == nonce
+    assert pending[0]["tool_name"] == "terminal_run"
+
+    resp = client.post("/api/v1/approval/respond", json={
+        "approval_nonce": nonce, "user_decision": "APPROVED",
+    })
+    assert resp.status_code == 200
+    assert client.get("/api/v1/approval/pending").json() == {"pending": []}
+
+    replay = client.post("/api/v1/approval/respond", json={
+        "approval_nonce": nonce, "user_decision": "APPROVED",
+    })
+    assert replay.status_code == 404
+
+
+@pytest.mark.integration
 def test_websocket_streaming_and_tool_proposal(client_app):
     """Verify WebSocket real-time token streaming and tool proposal event dispatch."""
     client, _ = client_app

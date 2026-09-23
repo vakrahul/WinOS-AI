@@ -351,6 +351,15 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
         )
         return response
 
+    @app.get("/api/v1/approval/pending")
+    async def list_pending_approvals():
+        """List awaiting approval requests for the on-screen approval button.
+
+        Loopback-only like every other route (see host binding). The overlay
+        polls this to render its badge.
+        """
+        return {"pending": policy_engine.pending_approvals_summary()}
+
     @app.post("/api/v1/approval/respond")
     async def respond_to_approval(payload: ApprovalResponsePayload):
         pending = policy_engine.consume_approval(payload.approval_nonce)

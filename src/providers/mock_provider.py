@@ -53,6 +53,21 @@ class MockProvider(BaseModelProvider):
                 ],
             )
 
+        # Approval-button demo trigger: proposes a harmless sandboxed command
+        # so the strict policy engine issues a real approval nonce.
+        if "run a command" in last_msg.lower():
+            return ProviderResponse(
+                content="I will run a harmless sandboxed echo command.",
+                model_name=self.model_name,
+                tool_calls=[
+                    ToolCallProposal(
+                        id="call_mock_2",
+                        tool_name="terminal_run",
+                        arguments={"command": ["echo", "approval-button-probe"]},
+                    )
+                ],
+            )
+
         return ProviderResponse(
             content=f"Mock response to: '{last_msg}'",
             model_name=self.model_name,

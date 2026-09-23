@@ -333,3 +333,20 @@ class SecurityPolicyEngine:
     def consume_approval(self, nonce: str) -> Optional[Dict[str, Any]]:
         """Validate and immediately consume an approval nonce (single use)."""
         return self._pending_approvals.pop(nonce, None)
+
+    def pending_approvals_summary(self) -> List[Dict[str, Any]]:
+        """Display-safe snapshot of awaiting approvals for the local overlay UI.
+
+        Nonces are included because the overlay (same user, loopback only) must
+        present them back to /api/v1/approval/respond. Never expose this
+        endpoint beyond 127.0.0.1.
+        """
+        summary = []
+        for nonce, info in self._pending_approvals.items():
+            summary.append({
+                "approval_nonce": nonce,
+                "tool_name": info.get("tool_name", ""),
+                "target": str(info.get("target", info.get("command", ""))),
+                "session_id": info.get("session_id", ""),
+            })
+        return summary
