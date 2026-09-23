@@ -135,6 +135,10 @@ class AuditLogger:
         operation_id: Optional[str] = None,
     ) -> AuditEvent:
         """Emit an audit event and append to the hash-chained audit log."""
+        # Re-read the chain tip on every write so multiple logger instances
+        # in one process (dispatcher engine + per-request harnesses) extend a
+        # single linear chain instead of forking from a stale cached tip.
+        self.last_hash = self._read_last_hash()
         event = AuditEvent(
             event_type=event_type,
             message=message,

@@ -24,6 +24,8 @@ from src.storage.credential_vault import CredentialVault
 from src.windows_integration.system_app_scanner import SystemAppScanner
 from src.windows_integration.app_manager import AppManager
 from src.orchestrator.task_dispatcher import AutonomousTaskDispatcher
+from src.security.audit_logger import AuditLogger
+from src.windows_integration.execution_engine import ActionExecutionOutcome, WindowsExecutionEngine
 
 import time as _time
 
@@ -221,6 +223,121 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     async def dispatch_task(payload: TaskDispatchPayload):
         result = await dispatcher.execute_task(payload.task)
         return result.model_dump()
+
+    @app.post("/api/v1/security/approval-selftest")
+    async def approval_selftest():
+        """Exercise the real approval lifecycle against a harmless probe file.
+
+        Uses a STRICT policy engine (approvals required) and the real execution
+        engine + audit log. Transcript proves: pre-approval non-execution,
+        invalid-nonce rejection, single-use valid approval, reuse rejection.
+        """
+        import time as _t
+
+        t0 = _t.perf_counter()
+        probe_rel = ".winai/approval_probe.txt"
+        probe_abs = (app_config.workspace_root / probe_rel).resolve()
+        if probe_abs.exists():
+            probe_abs.unlink()
+
+        strict_policy = SecurityPolicyEngine(
+            workspace_root=app_config.workspace_root, require_approvals=True
+        )
+        strict_audit = AuditLogger(log_file=app_config.workspace_root / ".winai" / "audit.log")
+        strict_engine = WindowsExecutionEngine(
+            workspace_root=app_config.workspace_root,
+            policy_engine=strict_policy,
+            audit_logger=strict_audit,
+        )
+        transcript = []
+        sid, agent = "approval_selftest", "security_harness"
+
+        # 1. Request approval for a harmless write.
+        r1 = await strict_engine.execute_action(
+            tool_name="fs_write_file",
+            arguments={"path": probe_rel, "content": "approvallifecycle-probe"},
+            session_id=sid,
+            agent_id=agent,
+        )
+        nonce = (r1.post_state or {}).get("approval_nonce")
+        transcript.append({
+            "stage": "request_approval",
+            "outcome": r1.outcome.value,
+            "nonce_issued": bool(nonce),
+            "file_exists_after_request": probe_abs.exists(),
+        })
+
+        # 2. Invalid nonce must be rejected with nothing executed.
+        r2 = await strict_engine.execute_action(
+            tool_name="fs_write_file",
+            arguments={"path": probe_rel, "content": "approvallifecycle-probe"},
+            session_id=sid,
+            agent_id=agent,
+            approval_nonce="deadbeef" * 8,
+        )
+        transcript.append({
+            "stage": "invalid_nonce",
+            "outcome": r2.outcome.value,
+            "rejected": r2.outcome == ActionExecutionOutcome.BLOCKED_POLICY,
+            "file_exists_after_invalid": probe_abs.exists(),
+        })
+
+        # 3. Valid nonce executes exactly the approved action.
+        r3 = await strict_engine.execute_action(
+            tool_name="fs_write_file",
+            arguments={"path": probe_rel, "content": "approvallifecycle-probe"},
+            session_id=sid,
+            agent_id=agent,
+            approval_nonce=nonce,
+        )
+        try:
+            content_ok = probe_abs.read_text(encoding="utf-8") == "approvallifecycle-probe"
+        except Exception:
+            content_ok = False
+        transcript.append({
+            "stage": "valid_nonce_single_use",
+            "outcome": r3.outcome.value,
+            "file_exists": probe_abs.exists(),
+            "content_verified": content_ok,
+        })
+        mtime_after_valid = probe_abs.stat().st_mtime if probe_abs.exists() else 0.0
+
+        # 4. Reused nonce must be rejected; file must be untouched.
+        r4 = await strict_engine.execute_action(
+            tool_name="fs_write_file",
+            arguments={"path": probe_rel, "content": "tampered-content"},
+            session_id=sid,
+            agent_id=agent,
+            approval_nonce=nonce,
+        )
+        try:
+            content_still_ok = probe_abs.read_text(encoding="utf-8") == "approvallifecycle-probe"
+        except Exception:
+            content_still_ok = False
+        transcript.append({
+            "stage": "reused_nonce",
+            "outcome": r4.outcome.value,
+            "rejected": r4.outcome == ActionExecutionOutcome.BLOCKED_POLICY,
+            "file_untouched": content_still_ok,
+            "mtime_unchanged": (probe_abs.stat().st_mtime == mtime_after_valid) if probe_abs.exists() else False,
+        })
+
+        passed = (
+            r1.outcome == ActionExecutionOutcome.BLOCKED_APPROVAL
+            and not transcript[0]["file_exists_after_request"]
+            and transcript[1]["rejected"]
+            and not transcript[1]["file_exists_after_invalid"]
+            and r3.outcome == ActionExecutionOutcome.VERIFIED_SUCCESS
+            and transcript[2]["content_verified"]
+            and transcript[3]["rejected"]
+            and transcript[3]["file_untouched"]
+        )
+        return {
+            "status": "PASSED" if passed else "FAILED",
+            "probe_file": str(probe_abs),
+            "transcript": transcript,
+            "duration_ms": round((_t.perf_counter() - t0) * 1000, 1),
+        }
 
     @app.post("/api/v1/chat", response_model=ProviderResponse)
     async def complete_chat(request: ChatRequest):

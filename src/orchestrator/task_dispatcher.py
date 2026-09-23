@@ -337,6 +337,39 @@ class AutonomousTaskDispatcher:
         """Parse natural language task and execute genuine operating system / browser operations."""
         prompt_lower = task_prompt.lower()
 
+        # 0. Ambiguous destructive/process request: never guess; ask for clarification.
+        if re.search(r"\b(close|terminate|kill|quit|exit)\b", prompt_lower):
+            known_targets = ["notepad", "calc", "calculator", "chrome", "edge", "vscode", "brave"]
+            has_pid = re.search(r"\bpid\b\s*\d+", prompt_lower)
+            named = [t for t in known_targets if t in prompt_lower]
+            if not named and not has_pid:
+                running: List[str] = []
+                try:
+                    procs = self.execution_engine.intelligence.list_processes(sort_by="memory", limit=30)
+                    seen = set()
+                    for p in procs:
+                        n = (p.name or "").lower()
+                        if n.endswith(".exe") and n not in seen and n not in (
+                            "system", "registry", "memcompression",
+                        ):
+                            seen.add(n)
+                            running.append(f"{p.name} (PID {p.pid})")
+                            if len(running) >= 10:
+                                break
+                except Exception:
+                    pass
+                return TaskDispatchResult(
+                    action_type="clarification_required",
+                    summary=(
+                        "Your request does not identify which application to close, "
+                        "so no application was closed. Please specify the application "
+                        "name or PID (for example: 'Close Notepad')."
+                    ),
+                    status="NEEDS_CLARIFICATION",
+                    details={"candidate_processes": running},
+                    observable_evidence=["Ambiguity detected: close intent with no identifiable target; zero OS operations performed"],
+                )
+
         # 1. n8n Automation Task
         if any(k in prompt_lower for k in ["n8n", "workflow", "automate n8n", "sample automation"]):
             exec_data = self.execute_n8n_in_browser()
@@ -450,6 +483,81 @@ class AutonomousTaskDispatcher:
         desktop_res = await self.execute_desktop_workflow(task_prompt)
         if desktop_res:
             return desktop_res
+
+        # 7. Explicit application launch request: resolve against the approved
+        # whitelist through the real AppManager, then execute (or honestly fail)
+        # through the real policy-gated execution engine. Never substitute.
+        if re.search(r"\b(open|launch|start)\b", prompt_lower) and re.search(
+            r"\b(app|application|program|software)\b", prompt_lower
+        ):
+            requested: Optional[str] = None
+            m = re.search(
+                r"(?:named|called)\s+([A-Za-z0-9_.\- ]+?)(?:\.|$)", task_prompt, re.IGNORECASE
+            )
+            if m:
+                requested = m.group(1).strip()
+            approved = self.app_manager.list_approved_apps()
+            match = None
+            if requested:
+                rl = requested.lower()
+                for app in approved:
+                    if app.app_id.lower() in rl or app.display_name.lower() in rl:
+                        match = app
+                        break
+            if match is None:
+                # Attempt the exact requested id through the engine so the real
+                # policy engine denies it and the denial is audited. No substitution.
+                raw_id = (requested or "unknown").strip().lower().replace(" ", "_")[:64]
+                denied = await self.execution_engine.execute_action(
+                    tool_name="app_launch",
+                    arguments={"app_id": raw_id},
+                    session_id="dispatcher_session",
+                    agent_id="app_launcher",
+                )
+                return TaskDispatchResult(
+                    action_type="app_launch",
+                    summary=(
+                        f"Application '{requested or 'unknown'}' is not available: "
+                        f"no approved application matches, and the policy engine "
+                        f"denied the launch ({denied.error_message}). "
+                        f"No application was launched and nothing was substituted."
+                    ),
+                    status="FAILED",
+                    details={
+                        "requested": requested,
+                        "approved_apps": [a.app_id for a in approved],
+                        "policy_outcome": denied.outcome.value,
+                        "policy_error": denied.error_message,
+                    },
+                    observable_evidence=[
+                        "Whitelist lookup: 0 matches",
+                        f"Policy decision: {denied.outcome.value}",
+                        "OS operation performed: none",
+                    ],
+                )
+            if match.app_id in ("notepad", "calc"):
+                return None  # handled by richer desktop workflows on retry paths
+            launched = await self.execution_engine.execute_action(
+                tool_name="app_launch",
+                arguments={"app_id": match.app_id},
+                session_id="dispatcher_session",
+                agent_id="app_launcher",
+            )
+            if launched.outcome == ActionExecutionOutcome.FAILED_EXECUTION:
+                return TaskDispatchResult(
+                    action_type="app_launch",
+                    summary=f"Failed to launch {match.display_name}: {launched.error_message}",
+                    status="FAILED",
+                    details={"steps": [launched.model_dump()]},
+                    observable_evidence=["Launch attempted through policy-gated engine"],
+                )
+            return TaskDispatchResult(
+                action_type="app_launch",
+                summary=f"Launched {match.display_name} (PID {launched.output_data.get('launched_pid')}).",
+                status="COMPLETED",
+                details={"steps": [launched.model_dump()]},
+                observable_evidence=[f"Process started: PID {launched.output_data.get('launched_pid')}"],
+            )
 
         # 6. Default Fallback: Fail if unexecutable (never claim COMPLETED without execution)
         key = self.vault.get_credential("gemini")

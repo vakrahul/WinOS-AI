@@ -107,6 +107,7 @@ class WindowsExecutionEngine:
         if policy_eval.decision == PolicyDecision.REQUIRE_APPROVAL:
             if not approval_nonce:
                 duration = (time.perf_counter() - start_time) * 1000
+                self._log_audit(tool_name, "PENDING_APPROVAL", policy_eval.reason, session_id, agent_id)
                 return ObservableExecutionResult(
                     action_id=action_id,
                     tool_name=tool_name,
@@ -120,6 +121,7 @@ class WindowsExecutionEngine:
             consumed = self.policy_engine.consume_approval(approval_nonce)
             if not consumed:
                 duration = (time.perf_counter() - start_time) * 1000
+                self._log_audit(tool_name, "APPROVAL_REJECTED", "Invalid, expired, or already-consumed approval nonce.", session_id, agent_id)
                 return ObservableExecutionResult(
                     action_id=action_id,
                     tool_name=tool_name,
@@ -129,6 +131,7 @@ class WindowsExecutionEngine:
                     error_message="Invalid or expired approval nonce.",
                     duration_ms=duration,
                 )
+            self._log_audit(tool_name, "APPROVAL_ACCEPTED", "Valid approval nonce consumed for this action only.", session_id, agent_id)
 
         # Step 2: Validate Action Schema
         is_valid, validated_schema, val_msg = ActionValidator.validate_action(tool_name, arguments)
