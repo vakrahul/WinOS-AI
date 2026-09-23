@@ -780,6 +780,8 @@ class AutonomousTaskDispatcher:
                 return u.rstrip("/")
 
             exp, obs = norm(expected), norm(observed)
+            if not exp and not obs:
+                return True  # blank New Tab page matches a blank observation
             return bool(exp) and (exp in obs or obs in exp)
         session = "acceptance_session"
         agent = "browser_tab_controller"
@@ -861,7 +863,13 @@ class AutonomousTaskDispatcher:
             return fail("original-tab recording", "could not read the active tab URL via UI Automation")
         original_url = r.output_data.get("url")
         original_title = chrome_window
-        evidence.append(f"Original tab recorded: URL={original_url} | Title={original_title}")
+        original_tabs = self.uia_service.list_browser_tabs(chrome_hwnd)
+        original_tab = next((t["name"] for t in original_tabs if t.get("selected")), None)
+        evidence.append(
+            f"Original tab recorded: URL={original_url or '(blank New Tab page)'} | "
+            f"Title={original_title} | ActiveTab={original_tab or 'unknown'} | "
+            f"AllTabs={[t['name'][:30] for t in original_tabs]}"
+        )
 
         # 3. Open a new tab with Ctrl+T.
         r = await run_step("window_send_keys", {"window_title": chrome_window, "keys": "{Ctrl}t", **hwnd_args})
@@ -920,8 +928,8 @@ class AutonomousTaskDispatcher:
         if not navigated_url:
             return fail("navigation verification", f"address bar never reported {target_url}")
         evidence.append(f"Navigation verified: address bar reports {navigated_url}")
-        chrome_window = refresh_window_title()
-        evidence.append(f"Page title after navigation: {chrome_window}")
+        nav_title = refresh_window_title()
+        evidence.append(f"Page title after navigation: {nav_title}")
 
         # 6. Read the page heading through the accessibility tree.
         heading: Optional[str] = None
@@ -932,27 +940,50 @@ class AutonomousTaskDispatcher:
             heading = r.output_data.get("heading")
             evidence.append(f"Page heading read via accessibility tree: {heading}")
 
-        # 7. Return to the original tab (Ctrl+Shift+Tab) without closing anything.
+        # 7. Return to the original tab without closing anything, by activating
+        # its recorded TabItem control directly (deterministic; no MRU guessing).
         if wants_return:
+            if not original_tab:
+                return fail("tab return", "original active tab name was not recorded")
             r = await run_step(
-                "window_send_keys",
-                {"window_title": chrome_window, "keys": "{Ctrl}{Shift}{Tab}", **hwnd_args},
+                "browser_select_tab",
+                {"window_title": chrome_window, "tab_name": original_tab, **hwnd_args},
             )
             if r.outcome == ActionExecutionOutcome.FAILED_EXECUTION:
-                return fail("tab return (Ctrl+Shift+Tab)", r.error_message or "unknown error")
+                return fail("tab return (TabItem invoke)", r.error_message or "unknown error")
             time.sleep(1.5)
             chrome_window = refresh_window_title()
             restored_url: Optional[str] = None
-            deadline = time.time() + 10.0
+            tab_selected = False
+            deadline = time.time() + 20.0
             while time.time() < deadline:
                 time.sleep(1.0)
                 probe = self.uia_service.get_browser_url_by_hwnd(chrome_hwnd)
                 if urls_match(original_url, probe):
                     restored_url = probe
                     break
-            if not restored_url:
-                return fail("return verification", "active tab URL did not match the original tab")
-            evidence.append(f"Returned to original tab verified: {restored_url}")
+                # Independent confirmation: the recorded tab reports selected.
+                # (The address bar can lag behind an already-completed switch.)
+                try:
+                    for t in self.uia_service.list_browser_tabs(chrome_hwnd):
+                        if original_tab.lower() in (t.get("name") or "").lower() and t.get("selected"):
+                            tab_selected = True
+                            restored_url = probe
+                            break
+                    if tab_selected:
+                        break
+                except Exception:
+                    pass
+            if restored_url is None and not tab_selected:
+                return fail(
+                    "return verification",
+                    f"active tab URL did not match the original tab '{original_tab}'",
+                )
+            evidence.append(
+                f"Returned to original tab '{original_tab}' verified: "
+                f"{restored_url or '(blank New Tab page)'}"
+                f"{' (via tab selection state)' if tab_selected and not urls_match(original_url, restored_url) else ''}"
+            )
 
         return TaskDispatchResult(
             action_type="browser_tab_control",
@@ -962,7 +993,7 @@ class AutonomousTaskDispatcher:
                 "original_url": original_url,
                 "original_title": original_title,
                 "navigated_url": navigated_url,
-                "page_title": chrome_window,
+                "page_title": nav_title,
                 "heading": heading,
                 "steps": step_details,
             },

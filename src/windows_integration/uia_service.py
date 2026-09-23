@@ -553,7 +553,11 @@ class UIAutomationService:
             return False
 
     def get_browser_url_by_hwnd(self, hwnd: int) -> Optional[str]:
-        """Read a Chromium address bar by window handle (deterministic, no title matching)."""
+        """Read a Chromium address bar by window handle (deterministic, no title matching).
+
+        Returns None only when the address bar cannot be found. A blank New Tab
+        page legitimately reports an empty string, which is a valid observation.
+        """
         try:
             win = self._window_from_hwnd(hwnd)
             if not win:
@@ -564,14 +568,76 @@ class UIAutomationService:
                         continue
                     cname = child.Name or ""
                     if "address and search bar" in cname.lower():
-                        vp = child.GetValuePattern()
-                        if vp:
-                            return vp.Value
+                        try:
+                            vp = child.GetValuePattern()
+                        except Exception:
+                            return None
+                        if vp is None:
+                            return None
+                        return vp.Value or ""
                 except Exception:
                     continue
         except Exception:
             pass
         return None
+
+    def list_browser_tabs(self, hwnd: int) -> List[Dict[str, Any]]:
+        """List browser tabs (TabItem controls) with selection state. No screenshots."""
+        tabs: List[Dict[str, Any]] = []
+        try:
+            win = self._window_from_hwnd(hwnd)
+            if not win:
+                return tabs
+            for child, _ in auto.WalkControl(win, maxDepth=14):
+                try:
+                    if (child.ControlTypeName or "") != "TabItemControl":
+                        continue
+                    name = child.Name or ""
+                    selected = False
+                    try:
+                        sip = child.GetSelectionItemPattern()
+                        if sip:
+                            selected = bool(sip.IsSelected)
+                    except Exception:
+                        pass
+                    tabs.append({"name": name, "selected": selected})
+                except Exception:
+                    continue
+        except Exception:
+            pass
+        return tabs
+
+    def select_browser_tab(self, hwnd: int, tab_name: str) -> bool:
+        """Activate a browser tab by (sub)string of its accessible name via InvokePattern."""
+        try:
+            win = self._window_from_hwnd(hwnd)
+            if not win:
+                return False
+            self.focus_window_by_hwnd(hwnd)
+            needle = (tab_name or "").lower()
+            for child, _ in auto.WalkControl(win, maxDepth=14):
+                try:
+                    if (child.ControlTypeName or "") != "TabItemControl":
+                        continue
+                    if needle and needle not in (child.Name or "").lower():
+                        continue
+                    try:
+                        ip = child.GetInvokePattern()
+                        if ip:
+                            ip.Invoke()
+                            return True
+                    except Exception:
+                        pass
+                    try:
+                        child.Click()
+                        return True
+                    except Exception:
+                        continue
+                except Exception:
+                    continue
+        except Exception:
+            pass
+        return False
 
     def read_page_heading_by_hwnd(self, hwnd: int, timeout_seconds: float = 15.0) -> Optional[str]:
         """Read a page heading by window handle through the accessibility tree.
@@ -672,9 +738,13 @@ class UIAutomationService:
                         continue
                     cname = child.Name or ""
                     if "address and search bar" in cname.lower():
-                        vp = child.GetValuePattern()
-                        if vp:
-                            return vp.Value
+                        try:
+                            vp = child.GetValuePattern()
+                        except Exception:
+                            return None
+                        if vp is None:
+                            return None
+                        return vp.Value or ""
                 except Exception:
                     continue
         except Exception:

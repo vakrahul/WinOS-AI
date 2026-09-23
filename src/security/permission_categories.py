@@ -167,6 +167,14 @@ class CategorizedPermissionManager:
             risk_tier=RiskTier.LOW,
             description="Read text from an accessible UI control",
         ),
+        CategorizedPermissionRule(
+            category=OperationCategory.WRITE,
+            tool_name="browser_select_tab",
+            target_pattern="*",
+            requires_human_approval=False,
+            risk_tier=RiskTier.MEDIUM,
+            description="Activate a browser tab via accessible TabItem control",
+        ),
         # WRITE
         CategorizedPermissionRule(
             category=OperationCategory.WRITE,

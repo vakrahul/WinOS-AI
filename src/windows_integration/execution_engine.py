@@ -328,6 +328,23 @@ class WindowsExecutionEngine:
                 w = self.intelligence.get_foreground_window()
                 output_data = w.model_dump() if w else None
 
+            elif tool_name == "browser_select_tab":
+                # Tab activation requires an HWND pin (tab names repeat across windows).
+                if not arguments.get("hwnd"):
+                    error_msg = "browser_select_tab requires an hwnd argument"
+                else:
+                    tabs = self.uia_service.list_browser_tabs(arguments["hwnd"])
+                    ok = self.uia_service.select_browser_tab(
+                        arguments["hwnd"], arguments["tab_name"]
+                    )
+                    if ok:
+                        output_data = {"selected_tab": arguments["tab_name"]}
+                    else:
+                        error_msg = (
+                            f"Could not activate tab '{arguments['tab_name']}' "
+                            f"(visible tabs: {[t.get('name') for t in tabs][:8]})"
+                        )
+
             elif tool_name == "browser_get_url":
                 if arguments.get("hwnd"):
                     url = self.uia_service.get_browser_url_by_hwnd(arguments["hwnd"])
@@ -336,7 +353,7 @@ class WindowsExecutionEngine:
                         arguments["window_title"],
                         timeout_seconds=arguments.get("timeout_seconds", 3.0),
                     )
-                if url:
+                if url is not None:
                     output_data = {"url": url}
                 else:
                     error_msg = f"Could not read address-bar URL from window '{arguments['window_title']}'"
@@ -435,6 +452,7 @@ class WindowsExecutionEngine:
                 "browser_get_url",
                 "browser_get_heading",
                 "window_get_text",
+                "browser_select_tab",
             ]:
                 target = arguments.get("window_title", "")
                 win = self.uia_service.find_window(target, timeout_seconds=0.5)

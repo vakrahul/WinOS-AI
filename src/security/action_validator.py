@@ -134,6 +134,13 @@ class WindowListSchema(BaseModel):
     visible_only: Optional[bool] = True
 
 
+class BrowserSelectTabSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    window_title: str = Field(min_length=1)
+    tab_name: str = Field(min_length=1)
+    hwnd: Optional[int] = Field(default=None, ge=1)
+
+
 class WindowGetForegroundSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -167,6 +174,7 @@ class ActionValidator:
         "browser_get_url": WindowFocusSchema,
         "browser_get_heading": WindowFocusSchema,
         "window_get_text": WindowClickControlSchema,
+        "browser_select_tab": BrowserSelectTabSchema,
     }
 
     @classmethod
@@ -193,3 +201,4 @@ class ActionValidator:
                     return False, None, "Null byte in command argument"
 
         return True, validated, "Validation successful"
+

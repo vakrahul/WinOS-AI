@@ -237,6 +237,7 @@ class SecurityPolicyEngine:
             "window_click_control",
             "window_invoke_control",
             "window_select_menu",
+            "browser_select_tab",
         ]:
             target_win = arguments.get("window_title", "")
             if self.require_approvals:
