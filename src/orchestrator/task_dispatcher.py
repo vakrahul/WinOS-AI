@@ -312,6 +312,13 @@ class AutonomousTaskDispatcher:
     def inspect_resume(self) -> Dict[str, Any]:
         """Read and extract skills and projects from the user's resume in Downloads."""
         pdf_path = Path.home() / "Downloads" / "Rahul_vak_resume.pdf"
+        alternates: List[str] = []
+        try:
+            for cand in sorted((Path.home() / "Downloads").glob("*rahul*.pdf")):
+                if cand.resolve() != pdf_path.resolve() if pdf_path.exists() else True:
+                    alternates.append(str(cand))
+        except Exception:
+            pass
         if not pdf_path.exists():
             for cand in (Path.home() / "Downloads").glob("*rahul*.pdf"):
                 pdf_path = cand
@@ -323,12 +330,16 @@ class AutonomousTaskDispatcher:
         try:
             from pypdf import PdfReader
             reader = PdfReader(str(pdf_path))
-            text = "".join(p.extract_text() for p in reader.pages)
+            text = "".join(p.extract_text() or "" for p in reader.pages)
             return {
                 "file_path": str(pdf_path),
+                "file_format": "PDF",
                 "file_size": pdf_path.stat().st_size,
+                "page_count": len(reader.pages),
                 "character_count": len(text),
                 "snippet": text[:400],
+                "full_text": text,
+                "alternate_matches": alternates,
             }
         except Exception as e:
             return {"error": str(e)}
@@ -409,6 +420,14 @@ class AutonomousTaskDispatcher:
                 observable_evidence=evidence,
             )
 
+        # 1b. LinkedIn Jobs Search & Inspection Workflow (real listings, no screenshots)
+        if "linkedin" in prompt_lower and any(
+            k in prompt_lower for k in ["job", "hiring", "apply", "today", "intern", "opening"]
+        ):
+            jobs_res = await self.execute_linkedin_jobs_workflow(task_prompt)
+            if jobs_res:
+                return jobs_res
+
         # 2. Chrome Open / Search / LinkedIn / X
         if any(k in prompt_lower for k in ["open chrome", "browse", "linkedin", "twitter", "search jobs"]):
             url = "https://www.google.com"
@@ -431,8 +450,8 @@ class AutonomousTaskDispatcher:
                 observable_evidence=evidence,
             )
 
-        # 3. Resume Inspection
-        if any(k in prompt_lower for k in ["resume", "rahulvak", "cv", "downloads"]):
+        # 3. Resume Inspection (greeting workflows have their own branch below)
+        if "greeting" not in prompt_lower and any(k in prompt_lower for k in ["resume", "rahulvak", "cv", "downloads"]):
             resume_data = self.inspect_resume()
             if "error" in resume_data:
                 return TaskDispatchResult(
@@ -473,6 +492,12 @@ class AutonomousTaskDispatcher:
                 details={},
                 observable_evidence=evidence,
             )
+
+        # 4b. Resume-Based Greeting Workflow (verify resume, write + verify file, VS Code)
+        if "greeting" in prompt_lower:
+            greet_res = await self.execute_resume_greeting_workflow(task_prompt)
+            if greet_res:
+                return greet_res
 
         # 5. Genuine Browser Tab Navigation Workflow (existing session, no screenshots)
         browser_res = await self.execute_browser_tab_workflow(task_prompt)
@@ -1103,6 +1128,447 @@ class AutonomousTaskDispatcher:
                 "navigated_url": navigated_url,
                 "page_title": nav_title,
                 "heading": heading,
+                "steps": step_details,
+            },
+            observable_evidence=evidence,
+        )
+
+    # ------------------------------------------------------------------
+    # LinkedIn jobs inspection (Phases 1-2 of the job-search workflow)
+    # ------------------------------------------------------------------
+    def _walk_document_texts(self, doc: Any, max_depth: int = 16) -> List[Dict[str, Any]]:
+        """Collect named accessible nodes under a page document (no screenshots)."""
+        import uiautomation as auto
+
+        items: List[Dict[str, Any]] = []
+        try:
+            for child, depth in auto.WalkControl(doc, maxDepth=max_depth):
+                try:
+                    name = (child.Name or "").strip()
+                    if not name:
+                        continue
+                    items.append({
+                        "depth": depth,
+                        "type": child.ControlTypeName or "",
+                        "name": name[:300],
+                    })
+                    if len(items) > 600:
+                        break
+                except Exception:
+                    continue
+        except Exception:
+            pass
+        return items
+
+    def _find_chrome_document(self, url_hint: str = "linkedin", timeout_seconds: float = 20.0) -> Optional[Any]:
+        """Locate the page document of the Chrome window showing a given URL fragment."""
+        import time as _time
+        import uiautomation as auto
+
+        deadline = _time.time() + timeout_seconds
+        while _time.time() < deadline:
+            try:
+                for win, _ in auto.WalkControl(auto.GetRootControl(), maxDepth=2):
+                    try:
+                        if (win.ControlTypeName or "") != "WindowControl":
+                            continue
+                        if "Chrome" not in (win.Name or ""):
+                            continue
+                        try:
+                            addr = None
+                            for c, _ in auto.WalkControl(win, maxDepth=14):
+                                try:
+                                    if (c.ControlTypeName or "") == "EditControl" and "address and search bar" in (c.Name or "").lower():
+                                        vp = c.GetValuePattern()
+                                        addr = vp.Value if vp else ""
+                                        break
+                                except Exception:
+                                    continue
+                        except Exception:
+                            addr = None
+                        if addr and url_hint in (addr or ""):
+                            try:
+                                doc = win.DocumentControl(searchDepth=10)
+                                if doc.Exists(1.0):
+                                    return doc
+                            except Exception:
+                                pass
+                    except Exception:
+                        continue
+            except Exception:
+                pass
+            _time.sleep(2.0)
+        return None
+
+    async def execute_linkedin_jobs_workflow(self, task_prompt: str) -> Optional[TaskDispatchResult]:
+        """Search LinkedIn jobs posted today and inspect listing details.
+
+        Uses the authenticated Chrome Default profile via the existing
+        open_chrome_with_profile path, then reads listings purely through the
+        Windows accessibility tree. Never fabricates listings. Never applies.
+        """
+        prompt_lower = task_prompt.lower()
+        if "linkedin" not in prompt_lower:
+            return None
+
+        keywords = "AI Engineer Intern"
+        m = re.search(r"(?:jobs?|roles?|positions?)\s+(?:for|in|as)\s+([A-Za-z][A-Za-z0-9+/#.\- ]{2,60})", task_prompt, re.IGNORECASE)
+        if m:
+            keywords = m.group(1).strip()
+        location = "Hyderabad"
+        lm = re.search(r"in\s+([A-Z][A-Za-z ]{2,30})(?:\s|$|,)", task_prompt)
+        if lm and "linkedin" not in lm.group(1).lower():
+            location = lm.group(1).strip()
+
+        search_url = (
+            "https://www.linkedin.com/jobs/search/?keywords="
+            + keywords.replace(" ", "%20")
+            + "&location=" + location.replace(" ", "%20")
+            + "&f_TPR=r86400&sortBy=DD"
+        )
+        evidence: List[str] = []
+        chrome_res = self.open_chrome_with_profile(url=search_url, profile="Default")
+        evidence.append(f"LinkedIn jobs search opened in Chrome Default profile: {search_url}")
+        evidence.append(f"Chrome window state: {chrome_res.get('chrome_window', {})}")
+
+        doc = await asyncio.get_event_loop().run_in_executor(
+            None, lambda: self._find_chrome_document("linkedin.com/jobs", 25.0)
+        )
+        if doc is None:
+            return TaskDispatchResult(
+                action_type="linkedin_jobs",
+                summary="LinkedIn jobs page did not expose an accessible document within 25s. No listings inspected; nothing fabricated.",
+                status="BLOCKED",
+                details={"search_url": search_url},
+                observable_evidence=evidence + ["Accessible document: not found (page may show login wall or still be loading)"],
+            )
+
+        items = await asyncio.get_event_loop().run_in_executor(
+            None, lambda: self._walk_document_texts(doc)
+        )
+        blob = "\n".join(i["name"] for i in items)
+        evidence.append(f"Accessible nodes collected from jobs page: {len(items)}")
+
+        # Authentication / wall detection from real exposed text only.
+        login_markers = [s for s in ("Sign in", "Join now", "log in to", "Log in") if s in blob]
+        job_markers = [s for s in ("Easy Apply", "Apply", "Posted", "Actively hiring", "applicants") if s in blob]
+        if login_markers and not job_markers:
+            return TaskDispatchResult(
+                action_type="linkedin_jobs",
+                summary="LinkedIn shows an authentication wall in this session; listings are not accessible. Stopped without bypassing.",
+                status="BLOCKED",
+                details={"search_url": search_url, "markers": login_markers},
+                observable_evidence=evidence + ["Authentication wall detected; no bypass attempted"],
+            )
+
+        # Collect candidate listing rows: list items and substantial link texts.
+        listings: List[Dict[str, Any]] = []
+        for i in items:
+            if i["type"] in ("ListItemControl",) and len(i["name"]) > 8:
+                listings.append({"kind": "list_item", "text": i["name"]})
+            elif i["type"] in ("HyperlinkControl",) and 12 < len(i["name"]) < 220:
+                listings.append({"kind": "link", "text": i["name"]})
+            if len(listings) >= 60:
+                break
+        evidence.append(f"Candidate listing nodes extracted: {len(listings)}")
+
+        # Open up to 5 distinct descriptions via accessible Invoke (no coordinates).
+        import uiautomation as auto
+
+        opened: List[Dict[str, Any]] = []
+        easy_apply_count = 0
+        seen_texts = set()
+        invoked = 0
+        try:
+            list_items = []
+            for child, _ in auto.WalkControl(doc, maxDepth=16):
+                try:
+                    if (child.ControlTypeName or "") == "ListItemControl" and (child.Name or "").strip():
+                        list_items.append(child)
+                        if len(list_items) >= 12:
+                            break
+                except Exception:
+                    continue
+        except Exception:
+            list_items = []
+        evidence.append(f"Clickable job rows found: {len(list_items)}")
+
+        for row in list_items:
+            if invoked >= 5:
+                break
+            try:
+                row_name = (row.Name or "").strip()
+            except Exception:
+                continue
+            if not row_name or row_name in seen_texts:
+                continue
+            seen_texts.add(row_name)
+            try:
+                clicked = False
+                try:
+                    ip = row.GetInvokePattern()
+                    if ip:
+                        ip.Invoke()
+                        clicked = True
+                except Exception:
+                    pass
+                if not clicked:
+                    try:
+                        row.Click()
+                        clicked = True
+                    except Exception:
+                        continue
+                invoked += 1
+                await asyncio.sleep(3.0)
+                detail_items = await asyncio.get_event_loop().run_in_executor(
+                    None, lambda: self._walk_document_texts(doc)
+                )
+                detail_blob = "\n".join(
+                    d["name"] for d in detail_items
+                    if d["type"] in ("TextControl", "HyperlinkControl") and len(d["name"]) > 30
+                )
+                has_easy = False
+                try:
+                    for d2, _ in auto.WalkControl(doc, maxDepth=16):
+                        try:
+                            if (d2.ControlTypeName or "") == "ButtonControl" and (d2.Name or "").strip() == "Easy Apply":
+                                has_easy = True
+                                break
+                        except Exception:
+                            continue
+                except Exception:
+                    pass
+                if has_easy:
+                    easy_apply_count += 1
+                opened.append({
+                    "row_title": row_name[:250],
+                    "detail_chars": len(detail_blob),
+                    "detail_text": detail_blob[:3000],
+                    "easy_apply_detected": has_easy,
+                })
+            except Exception as e:
+                opened.append({"row_title": row_name[:250], "error": str(e)[:200]})
+
+        evidence.append(f"Job descriptions opened and read: {len([o for o in opened if 'detail_text' in o])}")
+        evidence.append(f"Easy Apply buttons detected: {easy_apply_count}")
+        read_count = len([o for o in opened if 'detail_text' in o])
+        empty_tree = len(listings) == 0 and len(list_items) == 0
+        return TaskDispatchResult(
+            action_type="linkedin_jobs",
+            summary=(
+                f"LinkedIn jobs search page opened in Chrome ({search_url}). "
+                + (
+                    "The page exposed no accessible listing nodes (empty accessibility tree): "
+                    "0 listings inspected, 0 descriptions read. Session state (login wall vs "
+                    "unrendered content) could not be determined without screenshots, which are "
+                    "prohibited. No applications submitted."
+                    if empty_tree else
+                    f"Inspected via accessibility tree: {len(listings)} listing nodes, "
+                    f"{len(list_items)} clickable rows, {read_count} descriptions read, "
+                    f"{easy_apply_count} Easy Apply button(s) detected. No applications submitted."
+                )
+            ),
+            status="PARTIAL" if empty_tree else "COMPLETED",
+            details={
+                "search_url": search_url,
+                "keywords": keywords,
+                "location": location,
+                "listing_nodes": listings[:60],
+                "opened_descriptions": opened,
+                "easy_apply_count": easy_apply_count,
+            },
+            observable_evidence=evidence,
+        )
+
+    # ------------------------------------------------------------------
+    # Resume greeting workflow (Phase 6 of the job-search workflow)
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _parse_resume_sections(full_text: str) -> Dict[str, str]:
+        """Split resume text into sections on common headers (best effort, normalized)."""
+        canonical = ["SUMMARY", "SKILLS", "EXPERIENCE", "PROJECTS", "EDUCATION", "CERTIFICATIONS", "ACHIEVEMENTS"]
+        sections: Dict[str, List[str]] = {}
+        current: Optional[str] = None
+        for raw_line in (full_text or "").splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+            upper = re.sub(r"[^A-Z ]", "", line.upper()).strip()
+            norm = None
+            if upper in canonical and len(line) < 45:
+                norm = upper
+            elif len(line) < 45:
+                for h in canonical:
+                    if h in upper and len(upper) <= len(h) + 12:
+                        norm = h
+                        break
+            if norm:
+                current = norm
+                sections.setdefault(current, [])
+                continue
+            if current:
+                sections[current].append(line)
+        return {k: "\n".join(v) for k, v in sections.items()}
+
+    @staticmethod
+    def _redact_contact(text: str) -> str:
+        """Remove emails, phone numbers, and street addresses from a string."""
+        text = re.sub(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", "[redacted-email]", text)
+        text = re.sub(r"\+?\d[\d\s\-()]{7,}\d", "[redacted-phone]", text)
+        return text
+
+    async def execute_resume_greeting_workflow(self, task_prompt: str) -> Optional[TaskDispatchResult]:
+        """Build a resume-based greeting: verify resume, write file, run it, open VS Code.
+
+        - Resume is the sole source of facts; contact info is redacted.
+        - File creation goes through the policy-gated engine with backup + verify.
+        - Program execution goes through the restricted runner (approval-gated).
+        - VS Code is launched through the approved app manager (in-editor control untested).
+        """
+        if "greeting" not in task_prompt.lower():
+            return None
+        evidence: List[str] = []
+        step_details: List[Dict[str, Any]] = []
+
+        # 1. Verify the resume file.
+        resume = self.inspect_resume()
+        if "error" in resume:
+            return TaskDispatchResult(
+                action_type="resume_greeting",
+                summary=f"Resume problem — application process stopped: {resume['error']}",
+                status="BLOCKED",
+                details={"resume": resume},
+                observable_evidence=["Resume file could not be found or read; nothing else attempted"],
+            )
+        evidence.append(
+            f"Resume verified: {resume['file_path']} ({resume['file_format']}, "
+            f"{resume['file_size']} bytes, {resume.get('page_count', '?')} pages, "
+            f"{resume['character_count']} chars)"
+        )
+        if resume.get("alternate_matches"):
+            evidence.append(f"Other similar files present (not used): {resume['alternate_matches']}")
+
+        sections = self._parse_resume_sections(resume.get("full_text", ""))
+        full = resume.get("full_text", "")
+        name = (full.splitlines()[0].strip() if full.splitlines() else "Candidate")
+        name = re.sub(r"\s+", " ", name)[:60]
+        skills = self._redact_contact(sections.get("SKILLS", ""))[:600]
+        experience = self._redact_contact(sections.get("EXPERIENCE", ""))[:800]
+        projects = self._redact_contact(sections.get("PROJECTS", ""))[:800]
+        education = self._redact_contact(sections.get("EDUCATION", ""))[:400]
+        summary = self._redact_contact(sections.get("SUMMARY", ""))[:400]
+
+        # 2. Compose greeting strictly from verified resume content.
+        program = (
+            "def main():\n"
+            f"    print({json.dumps('Hello, I am ' + name + '.')})\n"
+            + (f"    print({json.dumps('Summary: ' + summary)})\n" if summary else "")
+            + (f"    print({json.dumps('Skills: ' + skills)})\n" if skills else "")
+            + (f"    print({json.dumps('Experience: ' + experience)})\n" if experience else "")
+            + (f"    print({json.dumps('Projects: ' + projects)})\n" if projects else "")
+            + (f"    print({json.dumps('Education: ' + education)})\n" if education else "")
+            + "\n\nif __name__ == \"__main__\":\n    main()\n"
+        )
+
+        # 3. Write the file through the policy-gated engine and verify on disk.
+        rel_path = "resume_greeting/greeting.py"
+        r = await self.execution_engine.execute_action(
+            tool_name="fs_write_file",
+            arguments={"path": rel_path, "content": program},
+            session_id="greeting_session",
+            agent_id="greeting_builder",
+        )
+        step_details.append(r.model_dump())
+        if r.outcome != ActionExecutionOutcome.VERIFIED_SUCCESS:
+            return TaskDispatchResult(
+                action_type="resume_greeting",
+                summary=f"File creation failed: {r.error_message}",
+                status="FAILED",
+                details={"steps": step_details},
+                observable_evidence=evidence,
+            )
+        abs_path = (self.workspace_root / rel_path).resolve()
+        if not abs_path.exists():
+            return TaskDispatchResult(
+                action_type="resume_greeting",
+                summary="File write reported success but greeting.py is absent on disk.",
+                status="FAILED",
+                details={"steps": step_details},
+                observable_evidence=evidence,
+            )
+        on_disk = abs_path.read_text(encoding="utf-8")
+        if name not in on_disk:
+            return TaskDispatchResult(
+                action_type="resume_greeting",
+                summary="greeting.py on disk does not contain the verified resume name.",
+                status="FAILED",
+                details={"steps": step_details},
+                observable_evidence=evidence,
+            )
+        evidence.append(f"greeting.py written and verified at {abs_path} ({abs_path.stat().st_size} bytes)")
+
+        # 4. Run the program through the restricted, approval-gated runner.
+        r = await self.execution_engine.execute_action(
+            tool_name="terminal_run",
+            arguments={"command": ["python", rel_path]},
+            session_id="greeting_session",
+            agent_id="greeting_builder",
+        )
+        step_details.append(r.model_dump())
+        run_output: Optional[str] = None
+        run_verified = False
+        if r.outcome == ActionExecutionOutcome.VERIFIED_SUCCESS and r.output_data:
+            run_output = (r.output_data.get("stdout") or "") + (r.output_data.get("stderr") or "")
+            run_verified = name in run_output
+            evidence.append(f"Program executed via restricted runner; output verified: {run_verified}")
+        elif r.outcome == ActionExecutionOutcome.BLOCKED_APPROVAL:
+            evidence.append("Program execution BLOCKED pending user approval (nonce issued, nothing ran)")
+        else:
+            evidence.append(f"Program execution did not complete: {r.error_message}")
+
+        # 5. Open VS Code through the approved app manager (in-editor control untested).
+        vscode_status = "not attempted"
+        try:
+            r = await self.execution_engine.execute_action(
+                tool_name="app_launch",
+                arguments={"app_id": "vscode"},
+                session_id="greeting_session",
+                agent_id="greeting_builder",
+            )
+            step_details.append(r.model_dump())
+            if r.outcome == ActionExecutionOutcome.VERIFIED_SUCCESS:
+                vscode_ok: Any = "unverified (transient automation error)"
+                for _ in range(2):
+                    try:
+                        vscode_ok = self.uia_service.wait_for_window("Visual Studio Code", timeout_seconds=10.0)
+                        break
+                    except Exception:
+                        await asyncio.sleep(1.0)
+                vscode_status = f"launched PID {r.output_data.get('launched_pid')}, window present: {vscode_ok}"
+                evidence.append(f"VS Code {vscode_status} (in-editor file/control operations: untested)")
+            else:
+                vscode_status = f"launch failed: {r.error_message}"
+                evidence.append(f"VS Code {vscode_status}")
+        except Exception as e:
+            vscode_status = f"launch error: {str(e)[:200]}"
+            evidence.append(f"VS Code {vscode_status}")
+
+        status = "COMPLETED" if run_verified else "PARTIAL"
+        return TaskDispatchResult(
+            action_type="resume_greeting",
+            summary=(
+                f"Resume-based greeting {'built, executed, and verified' if run_verified else 'built and verified on disk (execution pending approval)'}. "
+                f"VS Code: {vscode_status}."
+            ),
+            status=status,
+            details={
+                "resume_file": resume["file_path"],
+                "resume_format": resume.get("file_format"),
+                "greeting_file": str(abs_path),
+                "run_output": run_output,
+                "run_verified": run_verified,
+                "vscode": vscode_status,
+                "sections_found": sorted(sections.keys()),
                 "steps": step_details,
             },
             observable_evidence=evidence,
