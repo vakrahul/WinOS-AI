@@ -8,7 +8,7 @@ import asyncio
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, status
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, status
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
@@ -24,6 +24,9 @@ from src.storage.credential_vault import CredentialVault
 from src.windows_integration.system_app_scanner import SystemAppScanner
 from src.windows_integration.app_manager import AppManager
 from src.orchestrator.task_dispatcher import AutonomousTaskDispatcher
+from src.platform.agent_config import extract_requested_apps, get_effective_agent_config
+from src.platform.control_db import ControlPlaneDB
+from src.platform.routes import router as platform_router
 from src.security.audit_logger import AuditLogger
 from src.windows_integration.execution_engine import ActionExecutionOutcome, WindowsExecutionEngine
 
@@ -53,6 +56,50 @@ class ApprovalResponsePayload(BaseModel):
     user_decision: str = Field(pattern="^(APPROVED|DENIED)$")
 
 
+async def _optional_user_id(request: Request, db: ControlPlaneDB) -> Optional[int]:
+    """Best-effort session resolution for dispatch attribution; anonymous when absent."""
+    from src.platform.auth import get_current_user
+
+    if not request.headers.get("authorization"):
+        return None
+    try:
+        user = await get_current_user(request)
+        return user["id"]
+    except Exception:
+        return None
+
+
+_STATUS_MAP = {
+    "COMPLETED": "COMPLETED",
+    "FAILED": "FAILED",
+    "NEEDS_CLARIFICATION": "NEEDS_CLARIFICATION",
+    "PARTIAL": "PARTIAL",
+    "BLOCKED": "BLOCKED",
+}
+
+
+def _record_dispatch(db: ControlPlaneDB, user_id: Optional[int], prompt: str,
+                     result: dict) -> None:
+    """Persist dispatch history + audit trail. Never raises into the request path."""
+    try:
+        row = db.create_task(user_id, prompt)
+        status = _STATUS_MAP.get((result.get("status") or "").upper(), "BLOCKED")
+        summary = str(result.get("summary") or "")[:500]
+        failure = None if status == "COMPLETED" else summary
+        db.finish_task(row["id"], status,
+                       result_summary=summary if status == "COMPLETED" else None,
+                       failure_reason=failure)
+        db.record_audit(user_id, "TASK_CREATED", f"Task dispatched (status {status})",
+                        {"task_id": row["id"]})
+        if status == "COMPLETED":
+            db.record_audit(user_id, "TASK_COMPLETED", f"Task {row['id']} completed", {"task_id": row["id"]})
+        elif status in ("FAILED", "BLOCKED"):
+            db.record_audit(user_id, "TASK_FAILED", f"Task {row['id']} ended as {status}",
+                            {"task_id": row["id"], "reason": (failure or "")[:200]})
+    except Exception:
+        pass
+
+
 def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     """Application factory for FastAPI orchestrator."""
     app_config = config or get_config()
@@ -75,11 +122,23 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
     def get_target_provider(requested_provider: Optional[str] = None) -> BaseModelProvider:
         if requested_provider:
             return provider_registry.get_provider(requested_provider)
+        # Database-backed default provider (falls back to legacy logic).
+        try:
+            configured = get_effective_agent_config(
+                request_state_db()
+            ).get("default_provider")
+            if configured and configured in provider_registry.list_providers():
+                return provider_registry.get_provider(configured)
+        except Exception:
+            pass
         if app_config.environment == "testing":
             return provider_registry.get_provider(app_config.default_provider)
         if "gemini" in provider_registry._providers:
             return provider_registry.get_provider("gemini")
         return provider_registry.get_provider(app_config.default_provider)
+
+    def request_state_db() -> ControlPlaneDB:
+        return app.state.control_db
 
     @app.get("/health")
     async def health_check():
@@ -142,6 +201,31 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
             return html_path.read_text(encoding="utf-8")
         return "<h1>WinAI Dashboard Active</h1>"
 
+    # Dynamic control-plane UI (static assets + guarded pages; API does auth).
+    from fastapi.staticfiles import StaticFiles
+
+    _ui_dir = Path(__file__).parent / "ui"
+    if _ui_dir.is_dir():
+        app.mount("/ui", StaticFiles(directory=str(_ui_dir)), name="control-ui")
+
+    def _serve_ui_page(name: str) -> str:
+        path = Path(__file__).parent / "ui" / name
+        if path.exists():
+            return path.read_text(encoding="utf-8")
+        return "<h1>Control-plane UI not installed</h1>"
+
+    @app.get("/login", response_class=HTMLResponse)
+    async def login_page():
+        return _serve_ui_page("login.html")
+
+    @app.get("/admin", response_class=HTMLResponse)
+    async def admin_page():
+        return _serve_ui_page("admin.html")
+
+    @app.get("/user", response_class=HTMLResponse)
+    async def user_page():
+        return _serve_ui_page("user.html")
+
     @app.get("/api/v1/system/apps")
     async def get_system_apps():
         apps = app_scanner.scan_all_applications()
@@ -163,6 +247,11 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
         return app_config.public_config_dict()
 
     dispatcher = AutonomousTaskDispatcher(workspace_root=app_config.workspace_root)
+
+    # Dynamic control plane: database-backed auth/RBAC/settings/tasks/audit.
+    # Lives in its own module; the automation engine below is untouched.
+    app.state.control_db = ControlPlaneDB(app_config.workspace_root)
+    app.include_router(platform_router)
 
     @app.get("/api/v1/app/identity")
     async def app_identity():
@@ -220,9 +309,42 @@ def create_app(config: Optional[AppConfig] = None) -> FastAPI:
         }
 
     @app.post("/api/v1/tasks/dispatch")
-    async def dispatch_task(payload: TaskDispatchPayload):
+    async def dispatch_task(payload: TaskDispatchPayload, request: Request):
+        db: ControlPlaneDB = request.app.state.control_db
+        user_id = await _optional_user_id(request, db)
+
+        # Agent configuration gate: fresh DB read on every dispatch.
+        try:
+            agent_cfg = get_effective_agent_config(db)
+        except Exception:
+            agent_cfg = {"agent_enabled": True, "allowed_applications": []}
+        if not agent_cfg.get("agent_enabled", True):
+            blocked = {
+                "action_type": "agent_disabled",
+                "summary": "Agent execution is disabled by system settings.",
+                "status": "BLOCKED",
+                "details": {},
+                "observable_evidence": ["agent_enabled=false in database settings"],
+            }
+            _record_dispatch(db, user_id, payload.task, blocked)
+            return blocked
+        allowed = set(agent_cfg.get("allowed_applications") or [])
+        for requested in extract_requested_apps(payload.task):
+            if requested in ("notepad", "calc", "chrome", "vscode", "edge") and requested not in allowed:
+                blocked = {
+                    "action_type": "app_not_allowed",
+                    "summary": f"Application '{requested}' is disabled by system settings.",
+                    "status": "BLOCKED",
+                    "details": {"requested_app": requested, "allowed_applications": sorted(allowed)},
+                    "observable_evidence": ["allowed_applications gate in database settings"],
+                }
+                _record_dispatch(db, user_id, payload.task, blocked)
+                return blocked
+
         result = await dispatcher.execute_task(payload.task)
-        return result.model_dump()
+        dumped = result.model_dump()
+        _record_dispatch(db, user_id, payload.task, dumped)
+        return dumped
 
     @app.post("/api/v1/security/approval-selftest")
     async def approval_selftest():
