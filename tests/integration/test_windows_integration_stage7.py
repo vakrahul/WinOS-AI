@@ -36,6 +36,8 @@ def test_uia_accessible_tree_and_actions():
     try:
         uia = UIAutomationService()
         win = uia.find_window("Notepad", timeout_seconds=4.0)
+        if win is None and (subprocess.os.environ.get("CI") or subprocess.os.environ.get("GITHUB_ACTIONS")):
+            pytest.skip("Interactive GUI window not available in headless CI session")
         assert win is not None, "Real Notepad window was not found on desktop"
 
         elements = uia.inspect_window_elements("Notepad", max_depth=3)
