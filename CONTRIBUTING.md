@@ -33,8 +33,8 @@ When contributing code to WinAI-OE, you must adhere strictly to our core archite
 ### 2. Clone and Setup Environment
 ```powershell
 # Clone the repository
-git clone https://github.com/vakrahul/WinAI-OE.git
-cd WinAI-OE
+git clone https://github.com/vakrahul/WinOS-AI.git
+cd WinOS-AI
 
 # Create and activate virtual environment
 python -m venv venv

@@ -328,8 +328,8 @@ The engineering roadmap for WinAI-OE is organized into a comprehensive **1,000-p
 ### Installation
 ```powershell
 # 1. Clone the repository
-git clone https://github.com/vakrahul/WinAI-OE.git
-cd WinAI-OE
+git clone https://github.com/vakrahul/WinOS-AI.git
+cd WinOS-AI
 
 # 2. Create and activate virtual environment
 python -m venv venv

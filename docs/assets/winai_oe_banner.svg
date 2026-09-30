@@ -148,7 +148,7 @@
 
   <!-- Bottom Terminal Accent Line -->
   <g transform="translate(60, 452)">
-    <text x="0" y="10" fill="#475569" font-family="Consolas, monospace" font-size="10.5">github.com/vakrahul/WinAI-OE • MIT License • 412+ Automated Tests Passing (100%)</text>
+    <text x="0" y="10" fill="#475569" font-family="Consolas, monospace" font-size="10.5">github.com/vakrahul/WinOS-AI • MIT License • 412+ Automated Tests Passing (100%)</text>
     <circle cx="1060" cy="7" r="4" fill="#10b981"/>
     <text x="1072" y="10" fill="#10b981" font-family="Consolas, monospace" font-size="10.5" font-weight="bold">SYSTEM ACTIVE</text>
   </g>
