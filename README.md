@@ -1,14 +1,21 @@
+<p align="center">
+  <img src="docs/assets/winai_oe_banner.svg" alt="WinAI-OE Banner" width="100%">
+</p>
+
 # Windows AI Operating Environment (WinAI-OE)
 
-> **An enterprise-grade, zero-implicit-trust autonomous desktop operating environment for Microsoft Windows.**  
-> *Engineered for high-assurance local execution, authenticated browser automation, hardware-backed credential protection, and continuous self-healing software development.*
+> **An open-source, enterprise-grade, zero-implicit-trust autonomous desktop operating environment for Microsoft Windows.**  
+> *Engineered for high-assurance local execution, direct UI Automation (UIAutomationCore), hardware-backed credential protection (Windows DPAPI), and dynamic multi-tenant control.*
 
-[![Automated Tests](https://img.shields.io/badge/tests-407%20passed%20%7C%20100%25-brightgreen.svg)]()
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011%20x64-blue.svg)]()
-[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)]()
-[![Frontend](https://img.shields.io/badge/client-WinUI%203%20(.NET%208)%20%2B%20FastAPI%20Web-purple.svg)]()
-[![Security](https://img.shields.io/badge/security-Windows%20DPAPI%20%2B%20Zero--Trust%20Host%20Policy-red.svg)]()
-[![Decision Layer](https://img.shields.io/badge/fast--path-TypeSafe%20AI%20JEV%20(System%20One)-orange.svg)]()
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-412%20passed%20%7C%20100%25-brightgreen.svg" alt="Tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/platform-Windows%2010%20%2F%2011%20x64-blue.svg" alt="Platform"></a>
+  <a href="#"><img src="https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg" alt="Python"></a>
+  <a href="#"><img src="https://img.shields.io/badge/security-Windows%20DPAPI%20%2B%20Zero--Trust-red.svg" alt="Security"></a>
+  <a href="#"><img src="https://img.shields.io/badge/control--plane-Dynamic%20RBAC-purple.svg" alt="RBAC"></a>
+</p>
 
 ---
 
@@ -25,15 +32,18 @@
    - [E. Token & Cost Optimization Subsystem](#e-token--cost-optimization-subsystem)
    - [F. 12 Specialized Autonomous Agent Roles & Dynamic Factory](#f-12-specialized-autonomous-agent-roles--dynamic-factory)
    - [G. Autonomous Project Builder & Self-Healing Coding Loop](#g-autonomous-project-builder--self-healing-coding-loop)
-   - [H. Windows OS Integration & OpenCV Computer Vision](#h-windows-os-integration--opencv-computer-vision)
-   - [I. Authenticated Chrome & Live Web Automation](#i-authenticated-chrome--live-web-automation)
+   - [H. Windows OS Integration & Native UI Automation](#h-windows-os-integration--native-ui-automation)
+   - [I. Authenticated Browser Automation (Chrome & Edge)](#i-authenticated-browser-automation-chrome--edge)
    - [J. TypeSafe AI JEV Decision Layer (Stages 1–12)](#j-typesafe-ai-jev-decision-layer-stages-112)
    - [K. Dual Control Centers: Native WinUI 3 & Live Web Dashboard](#k-dual-control-centers-native-winui-3--live-web-dashboard)
+   - [L. Dynamic Multi-Tenant Control Plane & RBAC](#l-dynamic-multi-tenant-control-plane--rbac)
+   - [M. Always-On-Top On-Screen Approval Overlay & Standalone .EXE](#m-always-on-top-on-screen-approval-overlay--standalone-exe)
 5. [What You Can Achieve (Real-World Capabilities)](#5-what-you-can-achieve-real-world-capabilities)
-6. [Automated Verification Net (407 Tests)](#6-automated-verification-net-407-tests)
+6. [Automated Verification Net (412 Tests)](#6-automated-verification-net-412-tests)
 7. [Master 1,000-Phase Roadmap Governance](#7-master-1000-phase-roadmap-governance)
 8. [Quick-Start & Operational Guide](#8-quick-start--operational-guide)
 9. [Repository Structure](#9-repository-structure)
+10. [Open Source Community & Contributing](#10-open-source-community--contributing)
 
 ---
 
@@ -237,6 +247,17 @@ Located in `src/orchestrator/jev/` and `docs/jev/`:
   * High-performance native desktop application written in **C# / .NET 8** utilizing the **Windows App SDK (WinUI 3)** and Fluent Design.
   * Connects over local loopback IPC to orchestrate tasks with zero web overhead.
 
+### L. Dynamic Multi-Tenant Control Plane & RBAC
+Located in `src/platform/`:
+* **Zero Hardcoded Credentials:** 12 relational database tables (`control_plane.db` with SQLite WAL) managing `users`, `roles`, `permissions`, `admins`, `settings`, `feature_flags`, `tasks`, `sessions`, and `audit_logs`.
+* **Centralized Authorization Layer (RBAC):** Strict role hierarchy (`SUPER_ADMIN` ➔ `ADMIN` ➔ `USER`) with per-request server-side permission validation.
+* **Dynamic Configuration & Feature Flags:** Live database settings for `agent_enabled`, `allowed_applications`, and `default_provider` that re-evaluate on every dispatch without requiring code changes or application restarts.
+* **Modern Web Console:** Built-in UI served at `/login`, `/admin` (8 live-data management tabs), and `/user` (private task history & custom JSON configuration).
+
+### M. Always-On-Top On-Screen Approval Overlay & Standalone .EXE
+* **On-Screen Approval Overlay (`approval_button.py`):** A small, floating, always-on-top draggable desktop widget that monitors pending authorization nonces in real-time. Turns red with a visual badge counter when human approval is required, allowing one-click `Approve` or `Deny` decisions on any screen.
+* **Standalone Windows Executable (`dist/WinAI-OE/WinAI-OE.exe`):** Fully packaged native 64-bit Windows binary containing the entire orchestration engine, UI Automation bindings, security shield, and control plane. Operates independently with zero Python runtime installation prerequisites.
+
 ---
 
 ## 5. What You Can Achieve (Real-World Capabilities)
@@ -244,7 +265,8 @@ Located in `src/orchestrator/jev/` and `docs/jev/`:
 | Domain | What You Can Do | How WinAI-OE Executes It |
 |---|---|---|
 | **Autonomous Coding** | Scaffold complete Python/FastAPI/React projects from a single prompt | Generates directory structure, initializes Git, creates a feature branch, writes code, executes `pytest`, analyzes failures, fixes errors, and merges cleanly on 100% pass. |
-| **Authenticated Web Operations** | Read your live personal X/Twitter or LinkedIn feed | Connects to your existing authenticated Chrome session via remote debugging; uses OpenCV + Gemini vision to extract text and images without session hijacking. |
+| **Direct OS Control** | Control Notepad, Calculator, Edge, and Chrome via accessibility | Discovers real windows, inspects control trees, types text via ValuePattern, dispatches keystrokes, and verifies disk outputs with 0 screenshots. |
+| **Authenticated Web Operations** | Read live feeds and automate multi-tab browser journeys | Reuses authenticated browser sessions via UI Automation; opens tabs, navigates, extracts headings, and restores original tab states deterministically. |
 | **SaaS Workflow Automation** | Build and test multi-node workflows on cloud n8n | Automates the Chrome browser to log into n8n, drag/wire nodes (`Manual Trigger` ➔ `Code` ➔ `IF`), run executions, and verify output payloads. |
 | **Recruiter Intelligence** | Find fresh AI/ML engineering jobs and recruiter emails | Scrapes and filters hiring posts from the past 24 hours, extracts verified emails, and formats custom cover letters matching your resume. |
 | **Desktop Creative Automation** | Draw complex illustrations in Microsoft Paint | Discovers `mspaint.exe`, launches it, detects the canvas using OpenCV contour thresholding, and uses a cubic-eased virtual cursor to draw multi-layered vector artwork. |
@@ -254,19 +276,19 @@ Located in `src/orchestrator/jev/` and `docs/jev/`:
 
 ---
 
-## 6. Automated Verification Net (407 Tests)
+## 6. Automated Verification Net (412 Tests)
 
-WinAI-OE maintains a strict, hermetic test suite with **407 automated tests passing at 100%**:
+WinAI-OE maintains a strict, hermetic test suite with **412 automated tests passing at 100%**:
 
 ```powershell
 python -m pytest tests -q
 ........................................................................ [ 17%]
-........................................................................ [ 35%]
-........................................................................ [ 53%]
-........................................................................ [ 70%]
-........................................................................ [ 88%]
-...............................................                          [100%]
-============================= 407 passed in 38.45s =============================
+........................................................................ [ 34%]
+........................................................................ [ 52%]
+........................................................................ [ 69%]
+........................................................................ [ 87%]
+....................................................                     [100%]
+============================= 412 passed in 39.12s =============================
 ```
 
 ### Breakdown of Test Suites
@@ -306,7 +328,7 @@ The engineering roadmap for WinAI-OE is organized into a comprehensive **1,000-p
 ### Installation
 ```powershell
 # 1. Clone the repository
-git clone https://github.com/your-username/WinAI-OE.git
+git clone https://github.com/vakrahul/WinAI-OE.git
 cd WinAI-OE
 
 # 2. Create and activate virtual environment
@@ -442,8 +464,22 @@ D:\Interveiewsass\
 
 ---
 
-## 10. License & Security Advisory
+## 10. Open Source Community & Contributing
 
-This software executes actions natively on Microsoft Windows. Always configure appropriate tool permissions and review high-impact actions through the approval broker. Windows DPAPI security ensures that secrets are encrypted under the active user account context.
+WinAI-OE is an open-source project welcoming contributions from developers, researchers, and systems engineers worldwide.
 
-*Engineered with zero-implicit-trust security for reliable, high-assurance autonomous computing.*
+* **Contributing Guidelines:** Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for architectural principles, local development setup, and PR conventions.
+* **Code of Conduct:** We adhere to the [Contributor Covenant](CODE_OF_CONDUCT.md).
+* **License:** Licensed under the [MIT License](LICENSE) © 2026 Rahul Vakiti (`vakrahul`) and WinAI-OE contributors.
+* **Security Reporting:** Review [THREAT_MODEL.md](docs/THREAT_MODEL.md) and report security concerns directly to `vakitirahul@gmail.com`.
+
+---
+
+## 11. Security Advisory & Hardware Anchoring
+
+This software executes native actions on Microsoft Windows. It strictly enforces a zero-implicit-trust architecture:
+* Zero plaintext secrets on disk: API keys are encrypted via Windows DPAPI (`CryptProtectData`) tied to the local user account and TPM.
+* Zero unconstrained administrative execution: all high-impact actions require cryptographic approval nonces.
+* All actions are hash-chained in SHA-256 tamper-evident JSONL audit logs.
+
+*Engineered with zero-implicit-trust security for reliable, high-assurance autonomous desktop computing.*
