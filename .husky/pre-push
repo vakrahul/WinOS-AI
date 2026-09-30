@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "[Husky] Running pre-push fast test validation..."
+
+python -m pytest tests/unit/test_config.py tests/unit/test_audit_logger.py tests/unit/test_token_optimizer.py -q
+if [ $? -ne 0 ]; then
+    echo "❌ [TEST FAILURE] Pre-push automated tests failed. Push aborted."
+    exit 1
+fi
+
+echo "✅ [Husky] Pre-push verification passed."

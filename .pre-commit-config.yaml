@@ -1,0 +1,22 @@
+# Pre-commit configuration for WinAI-OE
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: detect-private-key
+
+  - repo: local
+    hooks:
+      - id: block-dotenv
+        name: Block .env files
+        entry: bash -c '! git diff --cached --name-only | grep -E "(\.env.*|.*\.env)$"'
+        language: system
+        files: '.*'

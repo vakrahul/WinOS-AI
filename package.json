@@ -1,0 +1,18 @@
+{
+  "name": "winai-oe",
+  "version": "0.1.0",
+  "description": "Autonomous Windows AI Operating Environment with Zero-Implicit-Trust Security",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vakrahul/WinOS-AI.git"
+  },
+  "author": "Rahul Vakiti <vakitirahul@gmail.com> (https://github.com/vakrahul)",
+  "license": "MIT",
+  "scripts": {
+    "prepare": "husky install",
+    "test": "python -m pytest tests -q"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3"
+  }
+}

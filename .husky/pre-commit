@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "[Husky] Running pre-commit security and syntax checks..."
+
+# 1. Block any .env or secret files from being staged/committed
+STAGED_SECRETS=$(git diff --cached --name-only | grep -E '(\.env|\.pem|\.key|\.pfx|\.p12|id_rsa)$')
+if [ -n "$STAGED_SECRETS" ]; then
+    echo "❌ [SECURITY ERROR] Attempting to commit sensitive/secret files:"
+    echo "$STAGED_SECRETS"
+    echo "Aborting commit. Please remove secrets from staging."
+    exit 1
+fi
+
+# 2. Python syntax compilation check
+python -m compileall src tests -q
+if [ $? -ne 0 ]; then
+    echo "❌ [SYNTAX ERROR] Python syntax validation failed. Aborting commit."
+    exit 1
+fi
+
+echo "✅ [Husky] Pre-commit checks passed."
