@@ -1,0 +1,47 @@
+Rahul Vakiti
+vakitirahul@gmail.com|+91-7416754611|linkedin.com/in/vakiti-rahul|github.com/vakrahul
+Career Objective
+Driven engineer and open-source contributor with expertise in building scalable agentic frameworks, LLM
+orchestration, and autonomous workflows. Passionate about shipping high-impact, outcome-driven
+solutions in fast-paced startup environments.
+Education
+CMR Institute of Technology, Hyderabad, India2023 – 2027
+• B.Tech in Computer Science|SGPA: 8.45
+Experience
+xstratum.ai, San Francisco, California (Remote)May 2026 – aug 2026
+SDE Intern
+• Engineered Model Context Protocol (MCP) agents to drive autonomous, agentic data analytics and
+complex insight generation.
+• Designed scalable semantic layers and data pipelines utilizing Neo4j graph databases, Cube, and
+advanced SQL.
+• Bridged LLMs with highly interconnected structured and graph datasets, enabling dynamic, real-time
+data exploration workflows.
+Aden (YC-backed Startup), San Francisco, California (Remote)Jan 2026 – April 2026
+Core Product Team Member
+• Contributed to building a scalable AI agent framework focused on outcome-driven automation.
+• Recognized as a Top 4 Core Contributor globally for driving high-impact architectural enhancements.
+• Engineered Model Context Protocol (MCP) workflows to improve modularity and system extensibility .
+Projects
+CyberGuardian Hybrid AI SOC SystemGitHub Repository
+• Designed a scalable, real-time threat detection system processing large-scale log data.
+• Implemented Vector RAG + rule-based pipeline for detecting zero-day attacks.
+• Created an advanced monitoring dashboard using React + Three Fiber.
+Tech:FastAPI, Vector DB, BERT, React, Docker
+Intelligent Invoice Extraction SystemGitHub Repository
+• Built a multi-stage document processing pipeline handling diverse invoice formats.
+• Designed a cost-optimized routing system, reducing LLM API usage by ˜40%.
+• Combined RegEx + OCR + LLMs to improve accuracy across structured/unstructured data.
+Tech:Python, Tesseract OCR, LLMs, Docker
+Technical Skills
+Languages:Python, Java, JavaScript, SQL
+AI & Agentic Systems:LLMs, RAG, MCP, AI Agents, LLM Orchestration, Vector Databases, LangChain,
+PyTorch
+Backend & Frameworks:FastAPI, Node.js, Next.js, React, REST APIs
+Databases:PostgreSQL, MongoDB, Neo4j, Supabase, Qdrant
+Tools & Infrastructure:Docker, Git, GitHub, Linux, AWS, Cloudflare
+Relevant Coursework:Database Management Systems (DBMS), Operating Systems (OS), Computer
+Networks, Cloud Computing
+Publications & Achievements
+• Publication:“Investigating Data Leakage–Induced Over-Confidence and Explanation Faithfulness in
+Transformer-Based Text and Audio Models” –Iconic Research and Engineering Journals (IRE Journals).
+• Secured a rank among thetop 2 out of 1000+participants in the cos-data India hackathon.
