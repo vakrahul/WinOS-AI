@@ -900,7 +900,21 @@
       input.value = '';
 
       appendChatMsg(text, true);
-      const thinking = appendChatMsg("<em>Thinking and operating...</em>", false);
+      const thinking = appendChatMsg("<em>⏳ Connecting to authenticated Chrome profile (Vakiti)...</em>", false);
+
+      const progressSteps = [
+        "⏳ Connecting to authenticated Chrome profile (Vakiti)...",
+        "🔎 Browsing LinkedIn hiring posts & identifying recruiter contact...",
+        "✍️ Generating tailored cold email & populating Gmail Compose...",
+        "📎 Attaching local resume PDF & verifying delivery proof..."
+      ];
+      let stepIdx = 1;
+      const progressTimer = setInterval(() => {
+        if (stepIdx < progressSteps.length) {
+          thinking.innerHTML = `<em>${progressSteps[stepIdx]}</em>`;
+          stepIdx++;
+        }
+      }, 1800);
 
       try {
         const res = await fetch('/api/v1/tasks/dispatch', {
@@ -908,6 +922,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ task: text })
         });
+        clearInterval(progressTimer);
         const data = await res.json();
         let reply = (data.summary || "Task executed.")
           .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -919,6 +934,7 @@
         }
         thinking.innerHTML = reply;
       } catch (e) {
+        clearInterval(progressTimer);
         thinking.innerHTML = `<span style="color: var(--red);">Error: ${e.message}</span>`;
       }
     }

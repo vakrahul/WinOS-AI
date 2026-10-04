@@ -102,7 +102,7 @@ def launch_chrome_with_profile(url: str = "https://www.linkedin.com"):
         f'Start-Process "{CHROME_EXE}" -ArgumentList \'--profile-directory="Default"\', "{url}"',
     ]
     subprocess.run(cmd, capture_output=True)
-    time.sleep(3.0)
+    time.sleep(1.2)
     force_foreground_by_keyword("chrome")
 
 
@@ -110,56 +110,21 @@ def main():
     cursor = HumanCursorController()
 
     print("=" * 75)
-    print("PHASE 1: Launching Google Chrome under 'Default' (Person 1 / Vakiti Rahul)...")
+    print("PHASE 1: Launching Google Chrome & Navigating to LinkedIn AI Hiring Search...")
     print("=" * 75)
-    launch_chrome_with_profile("https://www.linkedin.com")
+    linkedin_url = "https://www.linkedin.com/search/results/content/?keywords=%22AI%20intern%22%20email&sortBy=%22date_posted%22"
+    launch_chrome_with_profile(linkedin_url)
 
     print("\n" + "=" * 75)
-    print("PHASE 2: Navigating to base LinkedIn homepage...")
+    print("PHASE 2: Browsing hiring posts feed with smooth visible cursor...")
     print("=" * 75)
     force_foreground_by_keyword("chrome")
-    print("Gliding cursor slowly to Address Bar (500, 65) over 2.5s...")
-    cursor.move_smooth(500, 65, duration=2.5)
-    cursor.click_smooth(500, 65, duration=0.2)
+    cursor.move_smooth(960, 480, duration=0.8)
     time.sleep(0.3)
-    pyautogui.write("https://www.linkedin.com", interval=0.012)
-    pyautogui.press("enter")
-    print("Waiting 4.0s for LinkedIn home feed to render...")
-    time.sleep(4.0)
-
-    print("\n" + "=" * 75)
-    print("PHASE 3: In-app LinkedIn Deep Search (clicking search bar & typing)...")
-    print("=" * 75)
-    print("Gliding cursor slowly to LinkedIn search bar (240, 135) over 2.5s...")
-    cursor.move_smooth(240, 135, duration=2.5)
-    time.sleep(0.4)
-    print("Clicking LinkedIn search input field...")
-    cursor.click_smooth(240, 135, duration=0.2)
-    time.sleep(0.5)
-
-    search_query = "AI intern hiring email"
-    print(f"Typing in LinkedIn search box: '{search_query}'...")
-    pyautogui.write(search_query, interval=0.03)
-    time.sleep(0.4)
-    print("Submitting search query...")
-    pyautogui.press("enter")
-    time.sleep(4.0)
-
-    # Click 'Posts' filter if visible (around x=235, y=190)
-    print("Gliding cursor slowly to 'Posts' filter tab (235, 190) over 2.0s...")
-    cursor.move_smooth(235, 190, duration=2.0)
-    cursor.click_smooth(235, 190, duration=0.2)
-    time.sleep(3.5)
-
-    # Scroll down slowly through the feed
-    print("Scrolling down through LinkedIn posts feed...")
-    cursor.move_smooth(960, 500, duration=1.5)
     pyautogui.scroll(-350)
-    time.sleep(1.5)
-    cursor.move_smooth(960, 650, duration=1.5)
-    time.sleep(1.0)
+    time.sleep(0.6)
+    cursor.move_smooth(960, 620, duration=0.8)
 
-    # Capture snapshot of the hiring post
     feed_shot = "linkedin_deep_search_feed.png"
     try:
         ImageGrab.grab().save(feed_shot)
@@ -174,7 +139,7 @@ def main():
     trigger_event = "recent hiring expansion in edge computer vision and real-time model inference"
 
     print("\n" + "=" * 75)
-    print("PHASE 4: Generating high-converting NO AI SLOP cold email...")
+    print("PHASE 3: Generating high-converting NO AI SLOP cold email...")
     print("=" * 75)
     agent = JobColdEmailAgent()
     spec = OutreachSpec(
@@ -201,24 +166,22 @@ def main():
     print("-" * 75)
 
     print("\n" + "=" * 75)
-    print("PHASE 5: Navigating to Gmail Compose in Chrome...")
+    print("PHASE 4: Navigating to Gmail Compose in Chrome...")
     print("=" * 75)
     encoded_to = urllib.parse.quote(recruiter_email)
     encoded_su = urllib.parse.quote(email_draft["subject"])
     encoded_body = urllib.parse.quote(email_draft["body"])
     compose_url = f"https://mail.google.com/mail/?view=cm&fs=1&to={encoded_to}&su={encoded_su}&body={encoded_body}"
     launch_chrome_with_profile(compose_url)
-    print("Waiting 4.0s for Gmail Compose window to load...")
-    time.sleep(4.0)
+    time.sleep(1.5)
 
-    # Gliding cursor smoothly across compose window
     print("Gliding cursor smoothly over Gmail Compose canvas...")
-    cursor.move_smooth(1000, 600, duration=2.0)
+    cursor.move_smooth(1000, 600, duration=0.8)
     cursor.click_smooth(1000, 600, duration=0.2)
-    time.sleep(0.5)
+    time.sleep(0.4)
 
     print("\n" + "=" * 75)
-    print(f"PHASE 6: Attaching Resume PDF ({RESUME_PATH})...")
+    print(f"PHASE 5: Attaching Resume PDF ({RESUME_PATH})...")
     print("=" * 75)
     if Path(RESUME_PATH).exists():
         subprocess.run([
@@ -227,15 +190,13 @@ def main():
             "-Command",
             f"Set-Clipboard -Path '{RESUME_PATH}'"
         ])
-        time.sleep(0.5)
+        time.sleep(0.3)
         print("Pasting file into Gmail to trigger automatic attachment upload...")
         pyautogui.hotkey("ctrl", "v")
-        print("Waiting 3.5s for PDF attachment upload...")
-        time.sleep(3.5)
+        time.sleep(1.2)
     else:
         print(f"Notice: Resume path {RESUME_PATH} not found.")
 
-    # Verification snapshot before send
     before_send = "gmail_pre_send_verification.png"
     try:
         ImageGrab.grab().save(before_send)
@@ -244,12 +205,11 @@ def main():
         print(f"Pre-send snapshot notice: {e}")
 
     print("\n" + "=" * 75)
-    print("PHASE 7: Gliding cursor smoothly to 'Send' / Verification...")
+    print("PHASE 6: Gliding cursor smoothly to 'Send' / Verification...")
     print("=" * 75)
-    cursor.move_smooth(145, 920, duration=2.5)
-    time.sleep(0.5)
+    cursor.move_smooth(145, 920, duration=0.8)
+    time.sleep(0.3)
 
-    # Save draft / Send confirmation
     print("Verified draft ready in Gmail. Dispatching confirmation snapshot...")
     after_send = "gmail_final_sent_confirmation.png"
     try:
@@ -259,7 +219,7 @@ def main():
         print(f"After-send snapshot notice: {e}")
 
     print("\n" + "=" * 75)
-    print("PHASE 8: Recording token usage & cost telemetry in Control Center...")
+    print("PHASE 7: Recording token usage & cost telemetry in Control Center...")
     print("=" * 75)
     optimizer = TokenOptimizer()
     optimizer.tracker.record_usage(
