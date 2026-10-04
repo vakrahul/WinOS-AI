@@ -34,7 +34,10 @@ class HumanCursorController:
     def __init__(self):
         # Determine Windows display scaling factor
         self.logical_w = user32.GetSystemMetrics(0)
-        self.physical_w = ImageGrab.grab().width
+        try:
+            self.physical_w = ImageGrab.grab().width
+        except Exception:
+            self.physical_w = self.logical_w
         self.scale_factor = self.physical_w / self.logical_w if self.logical_w > 0 else 1.0
 
     def physical_to_logical(self, px: int, py: int) -> Tuple[int, int]:

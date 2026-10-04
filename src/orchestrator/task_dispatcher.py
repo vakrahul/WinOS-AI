@@ -434,7 +434,17 @@ class AutonomousTaskDispatcher:
             if not script_path.exists():
                 script_path = self.workspace_root / "autonomous_linkedin_gmail_end_to_end.py"
 
-            proc = subprocess.run([sys.executable, str(script_path)], cwd=str(self.workspace_root), capture_output=True, text=True)
+            proc = subprocess.run([sys.executable, "-u", str(script_path)], cwd=str(self.workspace_root), capture_output=True, text=True)
+
+            if proc.returncode != 0:
+                err_text = proc.stderr[-400:] if proc.stderr else proc.stdout[-400:]
+                return TaskDispatchResult(
+                    action_type="autonomous_recruiter_outreach",
+                    summary=f"⚠️ Outreach automation encountered an obstacle:\n```\n{err_text}\n```",
+                    status="FAILED",
+                    details={"returncode": proc.returncode, "stderr": err_text},
+                    observable_evidence=["Execution error intercepted; process aborted safely"],
+                )
 
             evidence = [
                 "Connected to authenticated Chrome profile 'Default' (Vakiti)",
