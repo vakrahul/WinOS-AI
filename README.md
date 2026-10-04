@@ -2,10 +2,10 @@
   <img src="docs/assets/winai_oe_banner.svg" alt="WinAI-OE Banner" width="100%">
 </p>
 
-# Windows AI Operating Environment (WinAI-OE)
+# Enterprise Autonomous AI Employee & Company Operator (WinAI-OE)
 
-> **An open-source, enterprise-grade, zero-implicit-trust autonomous desktop operating environment for Microsoft Windows.**  
-> *Engineered for high-assurance local execution, direct UI Automation (UIAutomationCore), hardware-backed credential protection (Windows DPAPI), and dynamic multi-tenant control.*
+> **An open-source, enterprise-grade, zero-implicit-trust autonomous execution runtime.**  
+> *Engineered to transform high-level business goals into verified outcomes across desktop software, authenticated browsers, local filesystems, and enterprise APIs with minimal human supervision.*
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
@@ -14,81 +14,77 @@
   <a href="#"><img src="https://img.shields.io/badge/platform-Windows%2010%20%2F%2011%20x64-blue.svg" alt="Platform"></a>
   <a href="#"><img src="https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg" alt="Python"></a>
   <a href="#"><img src="https://img.shields.io/badge/security-Windows%20DPAPI%20%2B%20Zero--Trust-red.svg" alt="Security"></a>
-  <a href="#"><img src="https://img.shields.io/badge/control--plane-Dynamic%20RBAC-purple.svg" alt="RBAC"></a>
+  <a href="#"><img src="https://img.shields.io/badge/execution-Desktop%20%2B%20Browser%20%2B%20OS-purple.svg" alt="Execution"></a>
 </p>
 
 ---
 
-## Table of Contents
+## Executive Summary
 
-1. [What is WinAI-OE?](#1-what-is-winai-oe)
-2. [Core Architectural Philosophy](#2-core-architectural-philosophy)
-3. [System Architecture Diagram](#3-system-architecture-diagram)
-4. [What We Built: Deep Dive by Subsystem](#4-what-we-built-deep-dive-by-subsystem)
-   - [A. Independent Host Security Core & Policy Sandbox](#a-independent-host-security-core--policy-sandbox)
-   - [B. Hardware-Backed Credential Vault (Windows DPAPI)](#b-hardware-backed-credential-vault-windows-dpapi)
-   - [C. Universal Multi-Provider AI Inference Engine](#c-universal-multi-provider-ai-inference-engine)
-   - [D. 4-Tier Memory Super-Brain & Mistake-Learning Database](#d-4-tier-memory-super-brain--mistake-learning-database)
-   - [E. Token & Cost Optimization Subsystem](#e-token--cost-optimization-subsystem)
-   - [F. 12 Specialized Autonomous Agent Roles & Dynamic Factory](#f-12-specialized-autonomous-agent-roles--dynamic-factory)
-   - [G. Autonomous Project Builder & Self-Healing Coding Loop](#g-autonomous-project-builder--self-healing-coding-loop)
-   - [H. Windows OS Integration & Native UI Automation](#h-windows-os-integration--native-ui-automation)
-   - [I. Authenticated Browser Automation (Chrome & Edge)](#i-authenticated-browser-automation-chrome--edge)
-   - [J. TypeSafe AI JEV Decision Layer (Stages 1–12)](#j-typesafe-ai-jev-decision-layer-stages-112)
-   - [K. Dual Control Centers: Native WinUI 3 & Live Web Dashboard](#k-dual-control-centers-native-winui-3--live-web-dashboard)
-   - [L. Dynamic Multi-Tenant Control Plane & RBAC](#l-dynamic-multi-tenant-control-plane--rbac)
-   - [M. Always-On-Top On-Screen Approval Overlay & Standalone .EXE](#m-always-on-top-on-screen-approval-overlay--standalone-exe)
-5. [What You Can Achieve (Real-World Capabilities)](#5-what-you-can-achieve-real-world-capabilities)
-6. [Automated Verification Net (412 Tests)](#6-automated-verification-net-412-tests)
-7. [Master 1,000-Phase Roadmap Governance](#7-master-1000-phase-roadmap-governance)
-8. [Quick-Start & Operational Guide](#8-quick-start--operational-guide)
-9. [Repository Structure](#9-repository-structure)
-10. [Open Source Community & Contributing](#10-open-source-community--contributing)
+Enterprise work is fragmented across legacy desktop applications, web-based SaaS tools, local documents, and internal APIs. Knowledge workers spend hours manually moving data between tools, following rigid procedural checklists, and verifying results. Furthermore, natural language requests frequently leave operational procedures and context unstated.
+
+Standard conversational AI assistants generate text suggestions, but cannot reliably execute or verify end-to-end work. 
+
+**WinAI-OE (Windows AI Operating Environment)** is an autonomous **AI Employee and Company Operator**. It interprets business objectives, queries persistent organizational memory, operates computer tools (browser, desktop apps, files, terminals), recovers from obstacles, verifies verifiable evidence of completion, and requests cryptographic human approval only when executing high-impact actions.
 
 ---
 
-## 1. What is WinAI-OE?
+## The Autonomous Execution Loop
 
-**WinAI-OE (Windows AI Operating Environment)** is an autonomous, context-aware, vendor-agnostic desktop execution system built natively for Microsoft Windows.
+WinAI-OE operates on a closed-loop autonomous execution cycle:
 
-### The Problem it Solves
-Standard AI agent frameworks and desktop automation scripts suffer from four critical vulnerabilities:
-1. **Implicit Trust in LLM Output:** They directly execute bash/powershell strings generated by language models, creating massive vulnerabilities to prompt injection, arbitrary remote code execution, and data destruction.
-2. **Plaintext Secrets on Disk:** They store sensitive API keys, cloud tokens, and passwords in `.env` files or plaintext JSON.
-3. **Amnesia & Repeated Mistakes:** When a tool fails, models repeatedly attempt the exact same broken approach because memory across runs is shallow or non-existent.
-4. **Brittle Desktop Interaction:** Traditional automation relies on hard-coded pixel coordinates that break immediately when display scaling, screen resolution, or window layouts change.
+```
++-------------------------------------------------------------------------------------------------------+
+|                                    THE AUTONOMOUS OPERATOR LOOP                                       |
+|                                                                                                       |
+|   [GOAL] ──> [UNDERSTAND] ──> [PLAN] ──> [EXECUTE] ──> [OBSERVE] ──> [ADAPT] ──> [VERIFY] ──> [COMPLETE]|
++-------------------------------------------------------------------------------------------------------+
+```
 
-### The WinAI-OE Solution
-WinAI-OE treats the AI model as an **untrusted advisory component**. All planned actions, tool calls, filesystem operations, and process launches are intercepted by an **independent host-side security engine** running outside the model's prompt space. Every operation is strictly validated against cryptographically enforced permissions, executed within sandboxed workspaces with automatic snapshot rollbacks, and recorded into tamper-evident SHA-256 chained audit logs.
+1. **Goal:** The operator receives an open-ended natural language business objective via Web Console, WinUI 3 desktop shell, or REST/WebSocket IPC.
+2. **Understand:** Resolves company context using the 4-tier memory architecture (Working RAM, Persistent Episodic SQLite WAL, Semantic Vector Store, and Project Context). Determines permitted tools, policies, and target environments.
+3. **Plan:** Deconstructs goals into an executable Directed Acyclic Graph (DAG) using `task_planner.py`, guided by the ultra-low-latency pre-cognitive JEV advisory layer (70–500ms).
+4. **Execute:** Directly interacts with the operating environment via:
+   - **Desktop Applications:** Native UI Automation (`UIAutomationCore`), Win32 process management, and 119 discovered Windows apps.
+   - **Web Browsers:** Authenticated remote debugging session against user Chrome/Edge profiles (zero cookie theft, zero headless bot traps).
+   - **Filesystems:** Canonicalized scoped file operations with automatic atomic pre-write backups (`.winai/backups/`).
+   - **Internal APIs & Scripts:** Scrubbed subprocess sandboxes with strict execution timeouts.
+5. **Observe:** Inspects execution outcomes through real-time telemetry: DOM mutations, stdout/stderr exit codes, process statuses, and OpenCV 4.12 computer vision (with automatic 125% Windows DPI scaling compensation).
+6. **Adapt:** When tool calls or environmental states diverge from expectations, the **Mistake-Learning Database** (`error_memory.py`) captures error signatures, determines root causes, and retrieves verified corrections to synthesize dynamic recovery paths without repeating failures.
+7. **Verify:** Assesses observable proof of completion: test pass rates, DOM elements, file content hashes, or visual UI states before declaring completion.
+8. **Complete:** Returns structured operational evidence and audit transcripts, serialized into tamper-evident SHA-256 hash-chained logs.
 
 ---
 
-## 2. Core Architectural Philosophy
+## Evaluation Benchmark & Core Competencies
 
-WinAI-OE is built upon four non-negotiable engineering principles:
-
-1. **Zero Implicit Trust:** The AI model is never granted root, admin, or unvalidated command access. Every tool call must pass deterministic schema validation, privilege boundaries, and policy gates (`ALLOW`, `DENY`, or `REQUIRE_APPROVAL`).
-2. **Hardware-Anchored Secrecy:** Secrets never live in plaintext. All provider keys are sealed using Microsoft's native **Windows Data Protection API (DPAPI)** (`CryptProtectData`), tied to the Windows logon credentials and TPM.
-3. **Mistake Learning & Provenance:** Failures are automatically recorded into an SQLite WAL database (`error_memory.py`). Past root causes and verified corrections are dynamically retrieved and injected into future reasoning loops to prevent repeat errors.
-4. **Verifiable Execution:** The agent never claims success based on intent. Code changes must pass automated test suites (`pytest`), filesystem operations must verify disk hashes, and browser tasks must verify DOM/visual state changes.
+| Evaluation Dimension | Challenge Standard | How WinAI-OE Executes It |
+| :--- | :--- | :--- |
+| **1. Autonomy** | Complete meaningful multi-step workflows without step-by-step handholding | Interprets goals, determines required tools, generates plans, and autonomously navigates browser/desktop applications to finish the task. |
+| **2. Real Execution** | Perform actual work rather than merely explaining what should be done | Controls real GUI applications (Chrome, Notepad, Calc, n8n, Paint) using UI Automation, Windows Win32 API, and human-like cursor paths. |
+| **3. Reliability & Recovery** | Recover gracefully from errors, plan failures, and changed states | Implements an active Mistake-Learning Database (`error_memory.py`), multi-provider circuit breakers, and Git task-branch rollbacks. |
+| **4. Verification** | Validate whether requested outcomes were actually achieved | Evaluates concrete proof-of-work: 412 automated tests, file hash validation, visual UI state verification, and observable DOM checks. |
+| **5. Generalization** | Reusable tool and connector abstractions across varied tasks | 12 specialized agent roles instantiated dynamically through a unified `AgentFactory`, universal model adapters (Gemini, GPT-4o, Claude, Ollama). |
+| **6. Engineering Quality** | Architectural rigor, memory safety, and security | Zero Implicit Trust: host-side deterministic security engine, Windows DPAPI hardware-backed encryption, 412 hermetic automated tests. |
+| **7. Product Thinking** | Focus on business objectives with minimal human friction | Integrated on-screen approval overlay widget, token cost accounting ($ USD / ₹ INR), and human-in-the-loop approvals for sensitive actions. |
+| **8. Technical Understanding** | First-principles systems engineering | Decoupled LLMs as untrusted advisory components with out-of-band host validation, ensuring security against prompt injection. |
 
 ---
 
-## 3. System Architecture Diagram
+## System Architecture
 
 ```
 +-----------------------------------------------------------------------------------------------+
 |                                  USER PRESENTATION SHELLS                                     |
-|   - Native Windows App SDK Shell (src/client/WinAI.Client - .NET 8 / C# / WinUI 3)            |
 |   - Real-Time Web Control Center (http://127.0.0.1:8765/dashboard - SSE Streaming)             |
+|   - Native Windows App SDK Shell (src/client/WinAI.Client - .NET 8 / C# / WinUI 3)            |
 |   - Interactive CLI Terminal Workspace (chat_cli.py)                                          |
 +-----------------------------------------------+-----------------------------------------------+
                                                 |
                                                 v Loopback IPC (REST / WebSockets on 127.0.0.1:8765)
 +-----------------------------------------------------------------------------------------------+
 |                               FAST ADVISORY DECISION LAYER (JEV)                             |
-|  - TypeSafe AI Jev / MockJevAdapter: Ultra-low latency classification & routing (70-500ms)    |
-|  - Task Classification | Agent Advisor | Model Routing Advisor | Guardrail Screening         |
+|  - Ultra-low latency classification & routing (70-500ms System One heuristic advisor)        |
 |  - Advisory Only: Zero authorization authority; mandatory fallback on failure/timeout        |
 +-----------------------------------------------+-----------------------------------------------+
                                                 |
@@ -97,15 +93,15 @@ WinAI-OE is built upon four non-negotiable engineering principles:
 |                             AI ORCHESTRATION & INTELLIGENCE CORE                              |
 |  - Intelligent Model Router: Evaluates complexity, latency, budget, and privacy constraints    |
 |  - Token & Cost Optimizer: SHA-256 prompt deduplication, semantic caching, prefix alignment   |
-|  - 12-Role Agent Factory: Planner, Coordinator, Coder, Reviewer, SecurityAuditor, etc.       |
-|  - Autonomous Project Builder: Full-stack scaffolding, git task isolation, self-healing loop  |
+|  - 12-Role Agent Factory: Planner, Coordinator, Coder, Reviewer, SecurityAuditor, QA, etc.    |
+|  - Autonomous Project Builder: Scaffolding, git task isolation, self-healing test loop         |
 +-----------------------+-------------------------------+-------------------------------+-------+
                         |                               |                               |
                         v                               v                               v
 +-------------------------------+  +----------------------------+  +----------------------------+
 |      CONTEXT LAYER BRAIN      |  |   HOST-SIDE SECURITY CORE  |  |    WINDOWS OS INTEGRATION  |
 | - Working Memory (RAM scratch)|  | - Policy Matrix (ALLOW/    |  | - Authenticated Chrome     |
-| - Persistent Episodic (SQLite)|  |   DENY/REQUIRE_APPROVAL)   |  |   Profile (Default/Gmail)  |
+| - Persistent Episodic (SQLite)|  |   DENY/REQUIRE_APPROVAL)   |  |   Profile (Default/Session)|
 | - Semantic Vector Engine      |  | - CSPRNG 256-Bit Nonces    |  | - Scoped File Service with |
 | - Project Workspace Context   |  | - Dynamic Defense Guard    |  |   Atomic Pre-Write Backups |
 | - Mistake-Learning Database   |  | - Privilege Guard Sandbox  |  | - Sandboxed Subprocess with|
@@ -126,59 +122,49 @@ WinAI-OE is built upon four non-negotiable engineering principles:
 
 ---
 
-## 4. What We Built: Deep Dive by Subsystem
+## Subsystem Deep Dive
 
-### A. Independent Host Security Core & Policy Sandbox
+### 1. Independent Host-Side Security Core & Policy Sandbox
 Located in `src/security/`:
-* **Deterministic Policy Engine (`policy_engine.py`):** Intercepts every tool request. Evaluates action against a strict permission matrix (`READ`, `WRITE`, `EXECUTE`, `EXTERNAL`, `HIGH_IMPACT`) and assigns one of three verdicts: `ALLOW`, `DENY`, or `REQUIRE_APPROVAL`.
-* **Action Validator (`action_validator.py`):** Enforces strict Pydantic schemas on all arguments. Blocks null-byte injections (`%00`, `\x00`), shell metacharacter chains (`;`, `&&`, `|`, `` ` ``, `$()`), path traversal (`../`, `..\\`), and UNC path hijacking (`\\\\`).
-* **Approval Broker (`approval_broker.py`):** Generates single-use, cryptographically secure 256-bit CSPRNG nonces for high-impact actions (e.g., executing code, modifying system files). Validates nonce existence, single consumption, and 300-second TTL expiration.
-* **Dynamic Defense Guard (`dynamic_defense.py`):** Real-time heuristic and regex barrier intercepting direct jailbreak prompts (`"ignore previous instructions"`, `"DAN mode"`), indirect prompt injections (`[SYSTEM: Override]`), base64 encoded attacks, and prompt extraction attempts.
-* **Privilege Guard (`privilege_guard.py`):** Enforces absolute isolation around sensitive directories. Hard-blocks any access to `.winai/`, `.ssh/`, Windows SAM/SYSTEM hives, and credential stores, even if the model requests them.
-* **Anomaly & Burst Monitor (`anomaly_monitor.py`):** Tracks error frequency and tool call velocities. Automatically locks the environment into quarantine if 3 consecutive tool failures or excessive call bursts occur.
-* **Tamper-Evident Audit Logger (`audit_logger.py`):** Every security event, tool execution, and approval is serialized into an append-only JSONL file where each record includes the SHA-256 hash of the preceding record, making historical log modification mathematically detectable.
+* **Zero Implicit Trust:** The AI model is treated as an **untrusted advisory component**. Every tool call is intercepted by an independent host security engine outside the LLM context.
+* **Deterministic Policy Engine (`policy_engine.py`):** Evaluates operations against an explicit permission matrix: `ALLOW`, `DENY`, or `REQUIRE_APPROVAL`.
+* **Action Validator (`action_validator.py`):** Enforces strict Pydantic schemas, blocking path traversals (`../`), null-byte injections, shell metacharacter chains (`;`, `&&`, `|`), and UNC hijack paths.
+* **Cryptographic Approval Broker (`approval_broker.py`):** Generates single-use 256-bit CSPRNG nonces for high-impact actions. Nonces expire after 300 seconds and cannot be reused or replayed.
+* **Tamper-Evident Audit Logger (`audit_logger.py`):** All events, approvals, and tool executions are serialized into an append-only JSONL log where each record includes the SHA-256 hash of the previous line.
 
-### B. Hardware-Backed Credential Vault (Windows DPAPI)
+### 2. Hardware-Backed Credential Vault (Windows DPAPI)
 Located in `src/storage/credential_vault.py`:
-* Integrates directly with the Windows Cryptographic Application Programming Interface via `ctypes.windll.crypt32.CryptProtectData`.
-* API keys (Gemini, OpenAI, Anthropic, n8n, etc.) are encrypted using the machine's local user master key and TPM.
-* Keys are decrypted **in-memory only** during outgoing HTTP request dispatch. Plaintext keys are never stored on disk, written to logs, or exposed in LLM prompt contexts.
+* API keys and credentials are encrypted using Microsoft's native **Windows Data Protection API (DPAPI)** (`CryptProtectData`), tied directly to the Windows machine user account and TPM chip.
+* Zero plaintext secrets exist on disk or in `.env` files. Secrets are decrypted **in-memory only** during outgoing HTTP request dispatch.
 
-### C. Universal Multi-Provider AI Inference Engine
-Located in `src/providers/`:
-* Implements a vendor-neutral interface (`BaseModelProvider`) supporting text generation, streaming, structured outputs, and tool calling.
-* **Supported Adapters:**
-  * **Google Gemini (`gemini_adapter.py`):** Powers default operations (`gemini-3.1-flash-lite`, `gemini-1.5-flash`, `gemini-2.0-flash`).
-  * **OpenAI (`openai_adapter.py`):** `gpt-4o`, `gpt-4o-mini`, `o1`, `o3-mini`.
-  * **Anthropic (`anthropic_adapter.py`):** `claude-3-5-sonnet`, `claude-3-haiku`.
-  * **Local Inference (`local_adapter.py`):** Ollama, LM Studio, vLLM (`llama3.2`, `mistral`, `deepseek-r1`) with zero external network egress.
-  * **Deterministic Mock (`mock_adapter.py`):** Predictable, offline test provider used for hermetic CI/CD testing.
-* **Fault Tolerance:** Every provider is wrapped with an active `CircuitBreaker` and jittered exponential backoff retry policies.
-
-### D. 4-Tier Memory Super-Brain & Mistake-Learning Database
+### 3. 4-Tier Memory Super-Brain & Mistake-Learning Database
 Located in `src/orchestrator/brain/`:
-* **Tier 1: Working Memory (`working_memory.py`):** Ephemeral RAM scratchpad tracking current subtask objectives, active variables, and immediate observations.
-* **Tier 2: Episodic Memory (`episodic_memory.py`):** Persistent SQLite WAL database capturing task histories, execution summaries, and long-term user preferences across restarts.
-* **Tier 3: Semantic Memory (`semantic_memory.py`):** Vector embeddings with local cosine similarity search for cross-session knowledge retrieval.
-* **Tier 4: Project Memory (`project_memory.py`):** Indexes workspace structures, active dependencies, coding conventions, and documentation.
-* **Mistake-Learning Database (`error_memory.py`):**
-  * When any tool or test fails, the error signature, root cause, and verified correction are stored in SQLite.
-  * Before generating new plans, the brain runs hybrid lexical + semantic retrieval over past mistakes and injects `[CRITICAL LESSONS FROM PAST MISTAKES]` into the prompt.
-* **Strict Provenance Tracking:** All memories carry tags (`VERIFIED_FACT`, `USER_ASSERTED`, `MODEL_HYPOTHESIS`, `UNVERIFIED_ASSUMPTION`, `FAILED_APPROACH`). Hypotheses are prevented from being treated as facts without verified tool output.
+* **Tier 1: Working Memory (`working_memory.py`):** In-memory ephemeral scratchpad tracking active subtask variables and observations.
+* **Tier 2: Episodic Memory (`episodic_memory.py`):** SQLite database in WAL mode recording task histories, outcomes, and preferences across restarts.
+* **Tier 3: Semantic Memory (`semantic_memory.py`):** Local vector embeddings enabling cross-session conceptual retrieval.
+* **Tier 4: Project Memory (`project_memory.py`):** Indexes workspace directory structure, dependencies, and business rules.
+* **Mistake-Learning Database (`error_memory.py`):** Indexes past tool and environment failures with verified solutions. Before creating plans, the agent retrieves relevant past mistakes to guarantee it never repeats the same error.
+* **Strict Provenance Filtering:** Information carries verification tags (`VERIFIED_FACT`, `USER_ASSERTED`, `MODEL_HYPOTHESIS`). Hypotheses are prevented from being treated as facts without verified execution outputs.
 
-### E. Token & Cost Optimization Subsystem
-Located in `src/orchestrator/token_optimizer.py`:
-* **Exact SHA-256 Prompt Caching:** Hashing prompt schemas produces immediate cache hits on duplicate calls, yielding **0 tokens consumed** and 0 latency.
-* **Semantic Caching:** Local cosine similarity projection (`threshold > 0.95`) satisfies conceptually identical queries without external API roundtrips.
-* **Prefix Caching Alignment:** System prompts and immutable tool schemas are structured at the front of the prompt context, activating provider-side prompt caching (up to **50% discount** on Gemini and Claude).
-* **Budget Tripwires:** Configurable per-task token limits halt execution before cost overruns occur.
-* **Dual Currency Accounting:** Calculates exact usage costs in both **USD ($)** and **INR (₹)** across dynamic pricing tables.
+### 4. Windows OS Integration & Native UI Automation
+Located in `src/windows_integration/`:
+* **Scoped File Service (`scoped_file_service.py`):** Path canonicalization with `os.path.realpath`, isolation sandboxing, and atomic pre-write backups before every file write.
+* **Restricted Subprocess Runner (`process_runner.py`):** Executes Windows subprocesses with scrubbed environments (blocking secret leakage), execution timeouts, and complete process tree termination.
+* **System Application Discovery (`app_scanner.py`):** Scans 32/64-bit Windows Registry hives and PATH to discover installed applications (**119 apps indexed**).
+* **Computer Vision Engine (`vision_engine.py`):** Powered by `OpenCV 4.12` with real-time **125% Windows Display DPI scaling compensation** to dynamically locate UI buttons and windows without static coordinate files.
+* **HumanCursorController (`human_cursor.py`):** Moves the mouse cursor along cubic-eased bezier curves (`3t² - 2t³`) with natural micro-jitters, enabling visual verification of automation without robotic snapping.
 
-### F. 12 Specialized Autonomous Agent Roles & Dynamic Factory
+### 5. Authenticated Browser Automation & SaaS Integration
+Located in `src/windows_integration/browser_service.py`:
+* **Primary Profile Connection:** Attaches directly to the user's active Google Chrome/Edge profile via remote debugging. Uses existing authenticated enterprise sessions without stealing cookies or spawning unauthenticated guest windows.
+* **SaaS Workflow Automation:** Capable of navigating cloud workflow builders (e.g. n8n cloud), placing nodes, wiring automation graphs, running test triggers, and validating outputs.
+* **Multimodal Feed Scraping:** Reads dynamic web timelines via multimodal vision and DOM inspection, bypassing anti-scraping walls and dynamic CSS obfuscations.
+
+### 6. Dynamic 12-Role Agent Factory
 Located in `src/orchestrator/planner/`:
-* Dynamic agent instantiation based on task taxonomy:
+* Spawns specialized agents based on task classification:
   1. `PlannerAgent`: Task decomposition and dependency DAG construction.
-  2. `CoordinatorAgent`: Orchestration and inter-agent communication.
+  2. `CoordinatorAgent`: Multi-agent orchestration and inter-agent synchronization.
   3. `CoderAgent`: Software development and targeted bug fixes.
   4. `ReviewerAgent`: Code quality, style, and regression analysis.
   5. `SecurityAuditorAgent`: AST security analysis and injection screening.
@@ -189,96 +175,33 @@ Located in `src/orchestrator/planner/`:
   10. `DatabaseArchitectAgent`: Schema design, migrations, and query tuning.
   11. `ResearcherAgent`: Web synthesis, literature search, and intelligence gathering.
   12. `QAEngineerAgent`: Automated test creation and edge-case validation.
-* **Sub-Agent Hierarchy:** Governed by `agent_factory.py` with hard depth bounds (`max_depth = 2`, `max_active_agents = 5`) and least-privilege tool inheritance.
+* Governed with hard recursion bounds (`max_depth = 2`, `max_active_agents = 5`).
 
-### G. Autonomous Project Builder & Self-Healing Coding Loop
-Located in `src/orchestrator/project_builder.py` and `coding_agent.py`:
-* **Natural Language Scaffolding:** Converts high-level requests into complete, production-ready directory architectures (e.g., FastAPI, React, PyTorch).
-* **Git Task Branch Isolation (`git_recovery.py`):** Automatically initializes Git repositories, creates isolated feature branches (`task/<task_id>`), stages changes, previews diffs, and supports one-click atomic rollbacks to `main`.
-* **Autonomous Test-Driven Self-Healing Loop:**
-  1. Generates source code and unit tests (`pytest`).
-  2. Runs tests in sandboxed execution environments.
-  3. On test failure, captures stderr, stack traces, and failing assertions.
-  4. Ingests failure details into `error_memory.py`, generates targeted fixes, and repeats the cycle until **100% test pass rate** is achieved.
-
-### H. Windows OS Integration & OpenCV Computer Vision
-Located in `src/windows_integration/`:
-* **Scoped File Service (`scoped_file_service.py`):** Canonicalizes all paths with `os.path.realpath` to defeat symlink and traversal attacks. Creates atomic pre-write backups in `.winai/backups/` before any file edit.
-* **Restricted Process Runner (`process_runner.py`):** Spawns Windows subprocesses with completely scrubbed environment variables (preventing API key inheritance), strict execution timeouts, and process-tree termination on exit.
-* **System Application Discovery (`app_scanner.py`):** Queries Windows 32/64-bit Registry hives (`HKLM` and `HKCU`), Start Menu shortcuts, and PATH to index all installed software (**119 applications discovered**, 33 developer tools).
-* **Dynamic Computer Vision (`vision_engine.py`):**
-  * Powered by `OpenCV 4.12` and `mss` screen capture.
-  * Real-time compensation for Windows Display DPI scaling (**125% DPI auto-detection**).
-  * Uses contour thresholding and edge detection to dynamically locate UI buttons, canvas areas, and active windows without static coordinate files.
-* **HumanCursorController (`human_cursor.py`):** Moves the mouse using smooth cubic-eased trajectories (`3t² - 2t³`) with realistic micro-jitters, enabling visual verification of automation without abrupt robotic snapping.
-* **Microsoft Paint Automation:** Full programmatic control to open `mspaint.exe`, locate the drawing canvas via computer vision, select brushes/colors, and render vector artwork.
-
-### I. Authenticated Chrome & Live Web Automation
-Located in `src/windows_integration/browser_service.py` and root runners:
-* **Primary Profile Connection:** Connects directly to the user's logged-in Google Chrome profile (`Default` / `vakitirahul@gmail.com`) via authenticated remote debugging without stealing cookies, dumping session stores, or spawning unauthenticated guest browsers.
-* **Multimodal Vision Timeline Reading:** Reads live social media feeds (e.g., X / Twitter, LinkedIn) via computer vision and multimodal LLM analysis, bypassing obfuscated dynamic DOMs and anti-scraping protections.
-* **Autonomous SaaS Workflow Builder:** Programmatically connects to cloud automation instances (e.g., n8n cloud), navigates the canvas, wires multi-node execution pipelines (`Manual Trigger` ➔ `Edit Fields` ➔ `IF Condition` ➔ `Output`), triggers test executions, and validates live branch outputs.
-* **Job & Recruiter Intelligence Scraping:** Automatically extracts active AI/ML/Python job postings and verified recruiter contact emails (`oxastra7@gmail.com`, `shubham@jobblow.in`) directly from online feeds.
-
-### J. TypeSafe AI JEV Decision Layer (Stages 1–12)
-Located in `src/orchestrator/jev/` and `docs/jev/`:
-* Implements TypeSafe AI's **Jev** concept — an ultra-fast (70–500ms), non-generative **System One decision model** acting as a high-speed pre-cognitive classifier.
-* **Advisory Only:** JEV provides rapid recommendations for task classification, agent selection, model routing, tool filtering, and context pruning. It holds **zero security authority** and never bypasses host policy validation.
-* **12-Stage Implementation:**
-  1. *Audit:* Documented exact touchpoints in `docs/jev/JEV_INTEGRATION_AUDIT.md`.
-  2. *Provider Abstraction:* Neutral `BaseJevProvider` and deterministic `MockJevAdapter` (`is_mock=True`).
-  3. *Decision Router:* 8 distinct decision use cases with guaranteed fallback paths and confidence thresholds.
-  4. *Agent Advisor:* Read-only recommendation engine over the 12-role agent registry.
-  5. *Model Routing Advisor:* Latency/budget/privacy routing suggestions running alongside `IntelligentRouter`.
-  6. *Security Gateway (`JevSecurityGateway`):* 3-gate verification (guardrail screen ➔ schema check ➔ host policy authorization) ensuring untrusted JEV outputs cannot perform unauthorized actions.
-  7. *Context Packer:* Minimizes and redacts context packs before dispatch, maintaining an ephemeral bounded decision log.
-  8. *Usage & Budget Tracker:* Per-provider tariff costing ($0.042/M input, free output) with hard request budgets and activation policies.
-  9. *UI & Service Integration:* FastAPI endpoints under `/api/v1/jev/*` and real-time dashboard panel with enable/disable toggle.
-  10. *Hardening & Gap Closure:* Validated end-to-end crash-proofing, injection immunity, and graceful fallback when offline.
-  11. *Benchmarking Harness:* Fixed 8-task comparison harness measuring completion, correctness, latency, cost, and fallback rates.
-  12. *Comprehensive Documentation:* Complete documentation suite in `docs/jev/` (`JEV_ARCHITECTURE.md`, `JEV_CONFIGURATION.md`, `JEV_SECURITY.md`, `JEV_TESTING.md`, `JEV_BENCHMARKS.md`, `JEV_TROUBLESHOOTING.md`).
-
-### K. Dual Control Centers: Native WinUI 3 & Live Web Dashboard
-* **Real-Time Web Control Center (`src/orchestrator/dashboard.html`):**
-  * Hosted directly by the FastAPI orchestrator at `http://127.0.0.1:8765/dashboard`.
-  * Features a modern, high-contrast dark theme with real-time Server-Sent Events (SSE) streaming.
-  * Interactive panels for active system health, real-time token spend (USD/INR), JEV decision layer toggle and status, an integrated 119-app system launcher, and a live AI Task Assistant.
-* **Native Windows Desktop Shell (`src/client/WinAI.Client`):**
-  * High-performance native desktop application written in **C# / .NET 8** utilizing the **Windows App SDK (WinUI 3)** and Fluent Design.
-  * Connects over local loopback IPC to orchestrate tasks with zero web overhead.
-
-### L. Dynamic Multi-Tenant Control Plane & RBAC
-Located in `src/platform/`:
-* **Zero Hardcoded Credentials:** 12 relational database tables (`control_plane.db` with SQLite WAL) managing `users`, `roles`, `permissions`, `admins`, `settings`, `feature_flags`, `tasks`, `sessions`, and `audit_logs`.
-* **Centralized Authorization Layer (RBAC):** Strict role hierarchy (`SUPER_ADMIN` ➔ `ADMIN` ➔ `USER`) with per-request server-side permission validation.
-* **Dynamic Configuration & Feature Flags:** Live database settings for `agent_enabled`, `allowed_applications`, and `default_provider` that re-evaluate on every dispatch without requiring code changes or application restarts.
-* **Modern Web Console:** Built-in UI served at `/login`, `/admin` (8 live-data management tabs), and `/user` (private task history & custom JSON configuration).
-
-### M. Always-On-Top On-Screen Approval Overlay & Standalone .EXE
-* **On-Screen Approval Overlay (`approval_button.py`):** A small, floating, always-on-top draggable desktop widget that monitors pending authorization nonces in real-time. Turns red with a visual badge counter when human approval is required, allowing one-click `Approve` or `Deny` decisions on any screen.
-* **Standalone Windows Executable (`dist/WinAI-OE/WinAI-OE.exe`):** Fully packaged native 64-bit Windows binary containing the entire orchestration engine, UI Automation bindings, security shield, and control plane. Operates independently with zero Python runtime installation prerequisites.
+### 7. Token & Cost Optimization Subsystem
+Located in `src/orchestrator/token_optimizer.py`:
+* **Exact SHA-256 Prompt Caching:** Identical requests return instant cache hits (**0 tokens consumed**, 0 latency).
+* **Semantic Caching:** Local cosine similarity projection (`threshold > 0.95`) satisfies conceptually identical queries without external API roundtrips.
+* **Prefix Caching Alignment:** Structures system prompts and tool definitions at the front of the prompt context, activating provider prompt caching (up to **50% discount**).
+* **Dual Currency Accounting:** Calculates exact spend and savings in both **USD ($)** and **INR (₹)**.
 
 ---
 
-## 5. What You Can Achieve (Real-World Capabilities)
+## Real-World Operational Demonstrations
 
-| Domain | What You Can Do | How WinAI-OE Executes It |
-|---|---|---|
-| **Autonomous Coding** | Scaffold complete Python/FastAPI/React projects from a single prompt | Generates directory structure, initializes Git, creates a feature branch, writes code, executes `pytest`, analyzes failures, fixes errors, and merges cleanly on 100% pass. |
-| **Direct OS Control** | Control Notepad, Calculator, Edge, and Chrome via accessibility | Discovers real windows, inspects control trees, types text via ValuePattern, dispatches keystrokes, and verifies disk outputs with 0 screenshots. |
-| **Authenticated Web Operations** | Read live feeds and automate multi-tab browser journeys | Reuses authenticated browser sessions via UI Automation; opens tabs, navigates, extracts headings, and restores original tab states deterministically. |
-| **SaaS Workflow Automation** | Build and test multi-node workflows on cloud n8n | Automates the Chrome browser to log into n8n, drag/wire nodes (`Manual Trigger` ➔ `Code` ➔ `IF`), run executions, and verify output payloads. |
-| **Recruiter Intelligence** | Find fresh AI/ML engineering jobs and recruiter emails | Scrapes and filters hiring posts from the past 24 hours, extracts verified emails, and formats custom cover letters matching your resume. |
-| **Desktop Creative Automation** | Draw complex illustrations in Microsoft Paint | Discovers `mspaint.exe`, launches it, detects the canvas using OpenCV contour thresholding, and uses a cubic-eased virtual cursor to draw multi-layered vector artwork. |
-| **System Administration** | Discover, launch, and manage 119+ installed Windows apps | Scans 32/64-bit registry and Start Menu; launches apps in sandboxed subprocesses with scrubbed environments and process-tree supervision. |
-| **Hardware-Grade Security** | Store all provider API keys with zero plaintext exposure | Encrypts all keys using Windows DPAPI (`CryptProtectData`), decrypting them only in volatile RAM during outgoing API calls. |
-| **Cost & Token Governance** | Run thousands of agent steps on a strict budget | Deduplicates identical prompts (0 tokens), leverages prefix caching discounts (up to 50%), and halts tasks before exceeding configured USD/INR budgets. |
+| Operational Capability | How the Autonomous Operator Executes It |
+|---|---|
+| **Autonomous Invoice & Sync** | Reads natural language requests, locates target invoices/documents in local directories or email, extracts amount/due date, opens target business tools, inputs data, and returns verifiable evidence. |
+| **SaaS Workflow Construction** | Navigates to cloud workflow engines (e.g. n8n cloud), drags and connects nodes (`Manual Trigger` ➔ `Code` ➔ `IF Condition` ➔ `Webhook`), executes tests, and verifies output payloads. |
+| **Authenticated Web Outreach** | Connects to authenticated Chrome sessions, navigates feeds, extracts verified contact information, drafts contextual personalized communications, and stages drafts with pre-send verification. |
+| **Self-Healing Code Building** | Scaffolds complete FastAPI/React projects, generates unit tests, executes `pytest` in sandboxed environments, analyzes failures, fixes errors, and merges on 100% test pass. |
+| **Direct Desktop UI Control** | Launches desktop applications (Notepad, Paint, Calculator), identifies UI controls via OpenCV contour analysis, and operates tools using a smooth cubic-eased cursor. |
+| **Cryptographic Human Approval** | Triggers an always-on-top floating desktop widget with 256-bit CSPRNG nonces whenever high-impact filesystem or code execution operations are attempted. |
 
 ---
 
-## 6. Automated Verification Net (412 Tests)
+## Automated Verification Net (412 Tests)
 
-WinAI-OE maintains a strict, hermetic test suite with **412 automated tests passing at 100%**:
+WinAI-OE maintains a strict, hermetic test suite with **412 automated tests**:
 
 ```powershell
 python -m pytest tests -q
@@ -288,42 +211,21 @@ python -m pytest tests -q
 ........................................................................ [ 69%]
 ........................................................................ [ 87%]
 ....................................................                     [100%]
-============================= 412 passed in 39.12s =============================
+============================= 412 passed in 18.06s =============================
 ```
 
-### Breakdown of Test Suites
-* **Unit Tests (`tests/unit/`):** 44+ tests covering configuration schemas, logging, DPAPI vault encryption, provider adapters, 4-tier memory, error reflection, token optimization, and specialized agent registries.
-* **Integration Tests (`tests/integration/`):** 26+ tests covering FastAPI REST endpoints, WebSocket streaming, scoped filesystem rollback, subprocess environment scrubbing, project builder lifecycle, and browser session locking.
-* **Security & Adversarial Tests (`tests/security/`):** 12+ penetration tests covering directory traversal, null-byte injections, schema tampering, approval nonce replay/forgery, prompt-injection taint tracking, privilege escalation blocking, and emergency kill-switch responsiveness.
-* **JEV Decision Layer Tests (`tests/unit/test_jev_*.py`):** 80+ tests validating the provider abstraction, mock adapter, 8-use-case router, agent/model advisors, 3-gate security gateway, context packing, budget tracking, UI integration, benchmark harness, and Stage-10 gap closures.
+* **Unit Tests (`tests/unit/`):** Configuration schemas, DPAPI vault encryption, provider adapters, 4-tier memory, error reflection, and agent factories.
+* **Integration Tests (`tests/integration/`):** FastAPI REST/WebSocket endpoints, scoped filesystem rollback, subprocess environment scrubbing, and browser session locking.
+* **Security & Adversarial Tests (`tests/security/`):** Path traversal, null-byte injection, schema tampering, approval nonce replay/forgery, prompt injection defense, and privilege escalation blocking.
 
 ---
 
-## 7. Master 1,000-Phase Roadmap Governance
-
-The engineering roadmap for WinAI-OE is organized into a comprehensive **1,000-phase master architecture**, tracked in machine-readable JSON (`docs/MASTER_ROADMAP_1000_PHASES.json`) and Markdown (`docs/MASTER_ROADMAP_1000_PHASES.md`).
-
-### The 10 Master Stages (100 Phases Each)
-* **Stage 1 (Phases 1–100):** Core Architecture, Security Foundations & Local Execution *(100% Complete — Milestone Verified)*.
-* **Stage 2 (Phases 101–200):** Autonomous Agent Swarms & Advanced Orchestration.
-* **Stage 3 (Phases 201–300):** Deep Windows System Integration & Driver/Hardware Interop.
-* **Stage 4 (Phases 301–400):** Advanced Computer Vision, Screen Understanding & Native UI Control.
-* **Stage 5 (Phases 401–500):** Enterprise Knowledge Graph, Memory Tiers & Cross-Session Cognition.
-* **Stage 6 (Phases 501–600):** Zero-Trust Security, Formal Verification & Sandbox Hardening.
-* **Stage 7 (Phases 601–700):** Autonomous Software Engineering, Self-Compilation & Dynamic Tool Synthesis.
-* **Stage 8 (Phases 701–800):** Multimodal Voice, Audio & Ambient Desktop Interaction.
-* **Stage 9 (Phases 801–900):** Enterprise Compliance, Auditability, Privacy & Fleet Operations.
-* **Stage 10 (Phases 901–1000):** Self-Evolving AI Operating System & Autonomous Ecosystem.
-
----
-
-## 8. Quick-Start & Operational Guide
+## Quick-Start & Operational Guide
 
 ### Prerequisites
 * Windows 10 or Windows 11 (64-bit)
 * Python 3.11 or 3.12
-* Google Chrome (optional, for authenticated web operations)
-* .NET 8 SDK (optional, for compiling the native WinUI 3 client)
+* Google Chrome or Microsoft Edge
 
 ### Installation
 ```powershell
@@ -339,46 +241,36 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 1. Run Complete Automated Test Suite
+### 1. Run the Automated Verification Suite
 ```powershell
 python -m pytest tests -q
 ```
 
 ### 2. Store API Credentials in Windows DPAPI Vault
 ```powershell
-# Store your Google Gemini API key securely in hardware-backed storage:
-python -c "from src.storage.credential_vault import CredentialVault; v = CredentialVault(); v.store_credential('gemini', 'YOUR_GEMINI_API_KEY'); print('Encrypted key stored successfully via DPAPI.')"
+# Encrypt API keys securely using Windows DPAPI (zero plaintext on disk):
+python -c "from src.storage.credential_vault import CredentialVault; v = CredentialVault(); v.store_credential('gemini', 'YOUR_API_KEY'); print('Encrypted key stored successfully via DPAPI.')"
 ```
 
-### 3. Start the Orchestrator & Web Control Center
+### 3. Launch the Orchestrator & Live Web Control Center
 ```powershell
 python run_vertical_slice.py
 ```
-Open your browser to: **`http://127.0.0.1:8765/dashboard`** to access the live Control Center, JEV controls, and system launcher.
+Open your browser to: **`http://127.0.0.1:8765/dashboard`** or **`http://127.0.0.1:8765/`** to access the live Control Center, JEV controls, and interactive planning console.
 
 ### 4. Launch the Interactive Terminal Workspace
 ```powershell
 python chat_cli.py
 ```
 
-### 5. Execute Live Automation Tasks
+### 5. Launch the Always-On-Top Approval Overlay Widget
 ```powershell
-# Read live logged-in feed from active Chrome window:
-python read_active_chrome_x.py
-
-# Execute autonomous n8n cloud workflow builder:
-python populate_n8n_live.py
-
-# Launch Microsoft Paint and draw rocket artwork with human cursor:
-python render_natural_paint_experience.py
-
-# Run the JEV benchmark harness:
-python -m pytest tests/unit/test_jev_benchmark.py -v
+python approval_button.py
 ```
 
 ---
 
-## 9. Repository Structure
+## Repository Structure
 
 ```
 D:\Interveiewsass\
@@ -387,63 +279,31 @@ D:\Interveiewsass\
 │   ├── ARCHITECTURE.md                   # Core Architecture Specification
 │   ├── THREAT_MODEL.md                   # STRIDE & OWASP Threat Analysis
 │   ├── TRUST_BOUNDARIES.md               # Trust Boundary Map & Isolation Zones
-│   ├── CODING_STANDARDS.md               # Strict Engineering Guidelines
-│   ├── MASTER_ROADMAP_1000_PHASES.json   # Machine-Readable 1,000-Phase Master Plan
-│   ├── MASTER_ROADMAP_1000_PHASES.md     # Full Documentation for 1,000 Phases
-│   └── jev/                              # Complete JEV Decision Layer Documentation (Stages 1-12)
-│       ├── JEV_INTEGRATION_AUDIT.md      # Touchpoint Audit & Zero-Authority Mandate
-│       ├── JEV_ARCHITECTURE.md           # Fast Advisory Layer Architecture
-│       ├── JEV_CONFIGURATION.md          # Runtime Controls & Safe-Removal Guide
-│       ├── JEV_SECURITY.md               # 3-Gate Verification & Security Protocol
-│       ├── JEV_TESTING.md                # 80+ Test Coverage Mapping
-│       ├── JEV_BENCHMARKS.md             # Measured Benchmarks & Honest Findings
-│       └── JEV_TROUBLESHOOTING.md        # Debugging & Diagnostic Handbook
+│   └── jev/                              # JEV Fast Advisory Decision Layer Documentation
 ├── src/
 │   ├── client/                           # Native Windows Desktop Frontend (C# / .NET 8 / WinUI 3)
-│   │   └── WinAI.Client/                 # WinUI 3 Application Project
 │   ├── orchestrator/                     # Core Intelligence & Orchestration Service
 │   │   ├── main.py                       # FastAPI Application, Endpoints & SSE Streaming
-│   │   ├── dashboard.html                # Real-Time Web Control Center & UI Panels
-│   │   ├── intelligent_router.py         # Latency/Cost/Privacy Dynamic Model Router
-│   │   ├── token_optimizer.py            # Exact/Semantic Caching & Token Accounting
-│   │   ├── project_builder.py            # Multi-Stage Project Builder & Scaffolder
-│   │   ├── brain/                        # 4-Tier Memory, Context & Mistake Learning
-│   │   │   ├── working_memory.py         # Ephemeral In-Memory Scratchpad
+│   │   ├── dashboard.html                # Live Web Control Center, Planner & Task Console
+│   │   ├── intelligent_router.py         # Dynamic Model Routing Engine
+│   │   ├── token_optimizer.py            # Exact & Semantic Caching, Cost Accounting
+│   │   ├── brain/                        # 4-Tier Memory & Mistake-Learning Engine
+│   │   │   ├── working_memory.py         # Ephemeral RAM Scratchpad
 │   │   │   ├── episodic_memory.py        # Persistent SQLite WAL Storage
 │   │   │   ├── semantic_memory.py        # Local Vector Similarity Store
 │   │   │   ├── project_memory.py         # Workspace Context & Dependencies
-│   │   │   ├── error_memory.py           # Mistake-Learning & Reflection Engine
-│   │   │   └── context_manager.py        # Context Compilation & Provenance Filter
+│   │   │   └── error_memory.py           # Mistake-Learning Database
 │   │   ├── planner/                      # Autonomous Planning & Agent Hierarchy
 │   │   │   ├── task_planner.py           # DAG Task Decomposition
-│   │   │   ├── agent_factory.py          # Dynamic Agent Instantiation & Quotas
-│   │   │   ├── agent_registry.py         # 12 Specialized Agent Roles
+│   │   │   ├── agent_factory.py          # Dynamic Agent Instantiation
 │   │   │   └── coding_agent.py           # Self-Healing Code & Test Execution Loop
-│   │   └── jev/                          # TypeSafe AI JEV System One Decision Layer
-│   │       ├── base.py                   # Provider Contracts, Schemas & Exceptions
-│   │       ├── mock_adapter.py           # Deterministic Mock Provider Simulator
-│   │       ├── router.py                 # 8-Use-Case Decision Router & Fallback Net
-│   │       ├── agent_advisor.py          # Agent Selection & Task Split Recommendations
-│   │       ├── model_advisor.py          # Fast Model Routing & Privacy Advisor
-│   │       ├── security_gateway.py       # 3-Gate Security Verification Pipeline
-│   │       ├── decision_context.py       # Context Redactor, Packer & Decision Logger
-│   │       ├── usage_tracker.py          # Tariff Costing, Budgets & Activation Policy
-│   │       ├── service.py                # JEV Runtime Service & Diagnostics
-│   │       └── benchmark.py              # Empirical JEV vs. Baseline Benchmark Harness
-│   ├── providers/                        # Vendor-Agnostic LLM Adapters
-│   │   ├── base_provider.py              # Universal Base Adapter Interface
-│   │   ├── gemini_adapter.py             # Google Gemini REST & Streaming Adapter
-│   │   ├── openai_adapter.py             # OpenAI REST & Tool Calling Adapter
-│   │   ├── anthropic_adapter.py          # Anthropic Messages API Adapter
-│   │   ├── local_adapter.py              # Ollama / LM Studio Local Inference Adapter
-│   │   └── mock_provider.py              # Offline Deterministic Test Adapter
+│   │   └── jev/                          # Fast Advisory Decision Layer
+│   ├── providers/                        # Vendor-Agnostic LLM Adapters (Gemini, OpenAI, Claude, Local)
 │   ├── security/                         # Independent Host-Side Security Core
 │   │   ├── policy_engine.py              # ALLOW/DENY/REQUIRE_APPROVAL Matrix
 │   │   ├── action_validator.py           # Schema, Injection & Traversal Validator
 │   │   ├── approval_broker.py            # CSPRNG 256-Bit Nonce Broker & Tracker
 │   │   ├── dynamic_defense.py            # Prompt Injection & Jailbreak Defense Shield
-│   │   ├── privilege_guard.py            # System Hives & Key Isolation Sandbox
-│   │   ├── anomaly_monitor.py            # Error Quotas & Rate-Burst Anomaly Detector
 │   │   └── audit_logger.py               # Tamper-Evident SHA-256 Chained JSONL Logger
 │   ├── storage/                          # Persistence & Recovery Engines
 │   │   ├── credential_vault.py           # Windows DPAPI Hardware Credential Vault
@@ -456,30 +316,43 @@ D:\Interveiewsass\
 │       ├── browser_service.py            # Authenticated Chrome Remote Debugging
 │       ├── vision_engine.py              # OpenCV 4.12 Vision with 125% DPI Compensation
 │       └── human_cursor.py               # Cubic-Eased Realistic Mouse Travel
-└── tests/                                # Automated Test Net (407 Tests / 100% Pass)
-    ├── unit/                             # Isolated Component Tests
-    ├── integration/                      # Cross-Boundary API & Workflow Tests
-    └── security/                         # Adversarial, Penetration & Traversal Tests
+├── tests/                                # Automated Test Net (412 Tests / 100% Pass)
+└── archive/                              # Archived Experimental Workflows & Test Media
 ```
 
 ---
 
-## 10. Open Source Community & Contributing
+## Technical Decisions & Rationale
 
-WinAI-OE is an open-source project welcoming contributions from developers, researchers, and systems engineers worldwide.
+1. **Host-Side Security Supervisor vs. In-Prompt Guardrails:**  
+   LLM prompt guardrails fail reliably against prompt injection, jailbreaks, and indirect injection from untrusted web pages. WinAI-OE implements an out-of-band host-side security engine. The model is treated as an untrusted advisory client; every filesystem write, subprocess execution, and network request must pass deterministic Pydantic schema validation and host policy checks.
 
-* **Contributing Guidelines:** Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for architectural principles, local development setup, and PR conventions.
-* **Code of Conduct:** We adhere to the [Contributor Covenant](CODE_OF_CONDUCT.md).
-* **License:** Licensed under the [MIT License](LICENSE) © 2026 Rahul Vakiti (`vakrahul`) and WinAI-OE contributors.
-* **Security Reporting:** Review [THREAT_MODEL.md](docs/THREAT_MODEL.md) and report security concerns directly to `vakitirahul@gmail.com`.
+2. **Windows DPAPI vs. `.env` Plaintext Files:**  
+   Enterprise production environments cannot tolerate plaintext API keys or credentials stored on disk. WinAI-OE binds secrets to the Windows user account and hardware TPM via Windows DPAPI (`CryptProtectData`), decrypting credentials exclusively in volatile RAM during active HTTP requests.
+
+3. **Closed-Loop Verification vs. Text Assumption:**  
+   Standard assistants declare success when the language model outputs a conversational conclusion. WinAI-OE enforces closed-loop verification: operations require observable evidence (test execution pass codes, file content hash matching, or visual UI element confirmation) before resolving a task.
+
+4. **Mistake-Learning Reflection Engine vs. Memory Dumps:**  
+   When an autonomous agent hits an error, dumping conversational history often leads the model to repeat the same failed pattern. WinAI-OE logs failure signatures, identified root causes, and verified corrections in an SQLite database. These lessons are dynamically injected into future planning prompts to prevent recurring mistakes.
 
 ---
 
-## 11. Security Advisory & Hardware Anchoring
+## Known Limitations & Future Roadmap
 
-This software executes native actions on Microsoft Windows. It strictly enforces a zero-implicit-trust architecture:
-* Zero plaintext secrets on disk: API keys are encrypted via Windows DPAPI (`CryptProtectData`) tied to the local user account and TPM.
-* Zero unconstrained administrative execution: all high-impact actions require cryptographic approval nonces.
-* All actions are hash-chained in SHA-256 tamper-evident JSONL audit logs.
+### Current Limitations
+1. **Windows-Native OS Specialization:** Core system features leverage native Windows APIs (Windows DPAPI, Win32 EnumWindows, UI Automation, Registry). Cross-platform execution (Linux/macOS) is currently supported in headless/mock mode.
+2. **Canvas-Heavy Web Applications:** Web tools that draw entirely onto HTML5 `<canvas>` elements without standard DOM accessibility trees require visual computer vision heuristics, which can be sensitive to dynamic viewport changes.
+3. **Unlocked Desktop Session:** Full GUI automation (OpenCV screen capture and cursor movement) requires an active, unlocked Windows desktop session.
 
-*Engineered with zero-implicit-trust security for reliable, high-assurance autonomous desktop computing.*
+### What We Would Build Next
+1. **Cross-Platform Enterprise Agent Daemon:** Decouple the core execution runtime into containerized Linux and macOS worker nodes managed via a centralized control plane.
+2. **"Demonstrate & Learn" Workflow Synthesizer:** An observation mode where a human operator performs a manual enterprise task once; the system records UI states and generates an executable, parameter-driven DAG with auto-generated verification criteria.
+3. **Enterprise SaaS Connector Library:** Out-of-the-box native connectors for Jira, Salesforce, ServiceNow, SAP, and Slack, reducing reliance on browser UI clicks when official APIs are accessible.
+4. **Active Learning from Human Approval Nonces:** Utilize approved vs. denied actions in the cryptographic audit log to fine-tune local models on company-specific authorization boundaries.
+
+---
+
+## License & Community
+
+WinAI-OE is open-source under the [MIT License](LICENSE) © 2026 Rahul Vakiti (`vakrahul`) and contributors.
