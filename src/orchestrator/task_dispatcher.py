@@ -643,8 +643,8 @@ class AutonomousTaskDispatcher:
                 action_type="llm_assistant",
                 summary=resp.content,
                 status="COMPLETED",
-                details={"model": "gemini-3.1-flash-lite"},
-                observable_evidence=["Gemini 3.1 Flash-Lite inference completed"],
+                details={"model": "Enterprise LLM"},
+                observable_evidence=["Enterprise LLM inference completed"],
             )
 
         return TaskDispatchResult(
